@@ -1,0 +1,1480 @@
+﻿<!DOCTYPE html>
+<html lang="ch"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:th="http://www.thymeleaf.org">
+
+<!--      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"-->
+<!--      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"-->
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="index, follow" name="robots">
+    <title>LOST & FOUND</title>
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:regular,700,600&amp;latin" rel="stylesheet"
+          type="text/css"/>
+    <!-- Essential styles -->
+    <link rel="stylesheet" th:href="@{/assets/bootstrap/css/bootstrap.min.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/assets/plugins/font-awesome/css/font-awesome.css}" type="text/css">
+
+    <!-- Dlapak styles -->
+    <link id="theme_style" media="screen" rel="stylesheet" th:href="@{/assets/css/style1.css}" type="text/css">
+
+    <!-- /Assets -->
+    <link rel="stylesheet" th:href="@{/assets/plugins/owl-carousel/owl.carousel.css}">
+    <link rel="stylesheet" th:href="@{/assets/plugins/owl-carousel/owl.theme.css}">
+    <link media="screen" rel="stylesheet" th:href="@{/assets/plugins/flexslider/flexslider.css}" type="text/css"/>
+
+    <!--    clock    -->
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}"/>
+    <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+
+    <!-- JS Library -->
+    <script th:src="@{/assets/js/jquery.js}"></script>
+    <script th:src="@{/assets/js/jquery.min.js}"></script>
+    <script th:src="@{/assets/js/moment.min.js}"></script>
+    <script th:src="@{/assets/js/script.js}"></script>
+    <script th:src="@{/assets/js/echarts.min.js}"></script>
+
+</head>
+<body>
+<div class="wrapper">
+    <!--    <div th:replace="menu/header::header"></div>-->
+    <div th:replace="menu/header::header(operation=${selectedOperation})"></div>
+    <!--    <header class="navbar navbar-default navbar-fixed-top navbar-top">-->
+    <!--        <div class="container">-->
+    <!--            <div class="navbar-header">-->
+    <!--                <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse" type="button">-->
+    <!--                    <span class="sr-only">Toggle navigation</span>-->
+    <!--                    <span class="icon-bar"></span>-->
+    <!--                    <span class="icon-bar"></span>-->
+    <!--                    <span class="icon-bar"></span>-->
+    <!--                </button>-->
+    <!--                <a class="navbar-brand" th:href="@{/user/index}"><span class="logo"><i class="fa fa-recycle"></i> Lost & Found</span></a>-->
+    <!--            </div>-->
+
+    <!--            <div class="navbar-collapse collapse">-->
+    <!--                <ul class="nav navbar-nav navbar-right">-->
+    <!--                    <li><a class="btn" style="font-size: medium" th:href="@{/user/category(operation=0)}">失物招领</a></li>-->
+    <!--                    <li><a class="btn" style="font-size: medium" th:href="@{/user/category(operation=1)}">寻物启事</a></li>-->
+    <!--                    <li><a class="btn" style="font-size: medium" th:href="@{#}">常见问题</a></li>-->
+    <!--                    <li><a class="btn" style="font-size: medium" th:href="@{#}">关于我们</a></li>-->
+    <!--                    <li><a class="btn" style="font-size: medium" th:href="@{#}">联系我们</a></li>-->
+
+    <!--                    &lt;!&ndash;                            <li class="dropdown" th:if="${not #strings.isEmpty(session.get('user'))}">&ndash;&gt;-->
+    <!--                    <li class="dropdown">-->
+    <!--                        &lt;!&ndash;                                <a class="dropdown-toggle" href="#" data-toggle="dropdown" style="font-size: medium"><strong class="caret"></strong>&nbsp;帮助</a>&ndash;&gt;-->
+    <!--                        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-user"></i> <strong-->
+    <!--                                class="caret"></strong>&nbsp;</a>-->
+    <!--                        <ul class="dropdown-menu">-->
+    <!--                            <li><a style="font-size: medium" th:href="@{/user/profile}">个人信息</a></li>-->
+    <!--                            <li><a style="font-size: medium" th:href="@{#}">发布信息</a></li>-->
+    <!--                            <li><a style="font-size: medium" th:href="@{/toLogout}">登出</a></li>-->
+    <!--                        </ul>-->
+    <!--                    </li>-->
+    <!--                </ul>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </header>-->
+    <section class="main" style="margin-left: 7%">
+        <div class="container" style="margin: 0;width: 100%">
+            <!--            <div class="row" >-->
+            <!--                <div class="col-md-12" style="margin-left: 90%">-->
+            <!--                    <ul class="breadcrumb pull-left">-->
+            <!--                        <li><a th:href="@{/user/index}">Home</a></li>-->
+            <!--                        <li><a th:href="@{/user/category}">Category</a></li>-->
+            <!--                        <li>Profile</li>-->
+            <!--                    </ul>-->
+            <!--                </div>-->
+            <!--            </div>-->
+
+            <div class="row">
+                <div class="col-md-3 col-sm-3" style="width: 15%">
+                    <div class="widget">
+                        <div align="center" class="widget-header">
+                            <!--                                    <input hidden="hidden" id="operationType" th:if="" th:value="${operationType.getType()}">-->
+                            <h3>操作</h3>
+                        </div>
+                        <div class="widget-body text-center">
+                            <!--                            <button type="button" class="btn btn-primary" data-toggle="collapse"-->
+                            <!--                                    data-target="#demo">-->
+                            <!--                                简单的可折叠组件-->
+                            <!--                            </button>-->
+
+                            <!--                            <div id="demo" class="collapse in">-->
+                            <!--                                Nihil anim keffiyeh helvetica, craft beer labore wes anderson-->
+                            <!--                                cred nesciunt sapiente ea proident. Ad vegan excepteur butcher-->
+                            <!--                                vice lomo.-->
+                            <!--                            </div>-->
+                            <ul class="trends">
+                                <div class="panel-group">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading" style="border-bottom: #e3e3e3 solid">
+                                            <h4 class="panel-title">
+                                                <a class="btn btn-sm" onclick="getGraph()">首页</a>
+                                            </h4>
+                                        </div>
+                                        <div class="panel-heading" style="border-bottom: #e3e3e3 solid">
+                                            <h4 class="panel-title">
+                                                <a class="btn btn-sm" data-toggle="collapse"
+                                                   href="#goodsOperation">物品信息</a>
+                                            </h4>
+                                        </div>
+                                        <div class="panel-collapse collapse" id="goodsOperation">
+                                            <!--                                            <ul class="list-group" >-->
+                                            <!--                                                <li class="list-group-item">已申请</li>-->
+                                            <!--                                                <li class="list-group-item">待审核</li>-->
+                                            <!--                                                <li class="list-group-item">已审核</li>-->
+                                            <!--                                                <li class="list-group-item">已审核</li>-->
+                                            <!--                                            </ul>-->
+                                            <ul>
+                                                <li th:each="goodsStatus:${T(com.suerte.lostandfound.eum.GoodsStatusEnum).values()}">
+                                                    <a class="btn"
+                                                       th:onclick="generateGoodsResult([[${goodsStatus.getType()}]],null)"
+                                                       th:text="${goodsStatus.getMsg()}">已申请</a>
+                                                </li>
+                                            </ul>
+                                            <!--                                            <button th:onclick="getResult()" class="btn-menu-custom">待审核</button><br>-->
+                                            <!--                                            <button th:onclick="getResult()" class="btn-menu-custom">已审核</button><br>-->
+                                            <!--                                            <button  href="#" class="btn-menu-custom">已审核</button><br>-->
+                                            <!--                                            <div class="panel-footer">Footer</div>-->
+                                        </div>
+
+                                        <div class="panel-heading" style="border-bottom: #e3e3e3 solid">
+                                            <h4 class="panel-title">
+                                                <a class="btn btn-sm" data-toggle="collapse"
+                                                   href="#formOperation">申请信息</a>
+                                            </h4>
+                                        </div>
+                                        <div class="panel-collapse collapse" id="formOperation">
+                                            <!--                                            <ul class="list-group" >-->
+                                            <!--                                                <li class="list-group-item">已申请</li>-->
+                                            <!--                                                <li class="list-group-item">待审核</li>-->
+                                            <!--                                                <li class="list-group-item">已审核</li>-->
+                                            <!--                                                <li class="list-group-item">已审核</li>-->
+                                            <!--                                            </ul>-->
+                                            <ul>
+                                                <li th:each="formStatus:${T(com.suerte.lostandfound.eum.FormStatusEnum).values()}">
+                                                    <a class="btn"
+                                                       th:onclick="generateFormResult([[${formStatus.getType()}]],null)"
+                                                       th:text="${formStatus.getMsg()}">已申请</a>
+                                                </li>
+                                            </ul>
+                                            <!--                                            <button th:onclick="getResult()" class="btn-menu-custom">待审核</button><br>-->
+                                            <!--                                            <button th:onclick="getResult()" class="btn-menu-custom">已审核</button><br>-->
+                                            <!--                                            <button  href="#" class="btn-menu-custom">已审核</button><br>-->
+                                            <!--                                            <div class="panel-footer">Footer</div>-->
+                                        </div>
+
+                                        <script>
+                                            function getGraph() {
+                                                $("#graph").show()
+                                                $("#emptyResult").hide()
+                                                $("#resultRow").hide()
+                                                $("#pageNum").hide()
+                                            }
+                                            function generateGoodsResult(type,currentPage) {
+                                                $("#graph").hide()
+
+                                                $.get(
+                                                    "/goods/getByStatus?status=" + type+(currentPage===null?'':"&currPage="+currentPage),
+                                                    function success(response, status) {
+                                                        // console.log(response)
+                                                        // console.log(status)
+
+                                                        if (response.code === 500) {
+                                                            alert(response.msg)
+                                                        } else {
+                                                            let result = response.data;
+                                                            console.log(result);
+
+                                                            $("#currPage").text(result.currPage);
+                                                            // $("#pageSize").text(result.pageSize);
+                                                            // $("#totalCount").text(result.totalCount);
+                                                            // $("#totalPage").text(result.totalPage);
+
+                                                            // alert(type)
+                                                            if (result.totalCount === 0) {
+                                                                $("#resultRow").hide();
+                                                                $("#emptyResult").show()
+                                                            } else {
+                                                                $("#resultRow").html('');
+                                                                $("#emptyResult").html('');
+                                                                let goodsList = result.list;
+                                                                let resultHtml = "";
+
+                                                                for (let goods of goodsList) {
+                                                                    console.log(goods);
+                                                                    let goodsImg = goods.imgSrc === '' ? '/icons/emptyImg.png' : goods.imgSrc;
+                                                                    let html = "\n<div class=\"row\">\n" +
+                                                                        "                            <div class=\"col-sm-12\">\n" +
+                                                                        "                                <div class=\"row\" >\n" +
+                                                                        "                                    <div class=\"col-sm-2 col-xs-3\">\n" +
+                                                                        "                                        <div class=\"item-badge featured-ads\">\n" +
+                                                                        "                                            <a href=\"#\">Featured Ads</a>\n" +
+                                                                        "                                        </div>\n" +
+                                                                        "                                        <div class=\"item-img\">\n" +
+                                                                        "                                            <img alt=\"\" src=\"" + goodsImg +
+                                                                        "\">\n" +
+                                                                        "                                        </div>\n" +
+                                                                        "                                    </div>\n" +
+                                                                        "                                    <div class=\"col-sm-8 col-xs-6\">\n" +
+                                                                        "                                        <div class=\"item-title\">\n" +
+                                                                        "                                            <!--                                                <a th:href=\"@{/user/detail(id=${goods.getId()})}\"><h4>Lenovo A326 Black 4GB RAM</h4></a>-->\n" +
+                                                                        "                                            <a><h4>Lenovo A326 Black 4GB RAM</h4></a>\n" +
+                                                                        "                                        </div>\n" +
+                                                                        "                                        <div class=\"item-meta\">\n" +
+                                                                        "                                            <ul>\n" +
+                                                                        "                                                <li class=\"item-date\"><i class=\"fa fa-clock-o\"></i> Today 10.35 am</li>\n" +
+                                                                        "                                                <li class=\"item-cat hidden-xs\"><i class=\"fa fa-bars\"></i> <a href=\"#\">Electronics</a> , <a href=\"category.html\">Smartphone</a></li>\n" +
+                                                                        "                                                <li class=\"item-location hidden-xs\"><a href=\"#\"><i class=\"fa fa-map-marker\"></i> Manchester</a></li>\n" +
+                                                                        "                                                <li class=\"item-type\"><i class=\"fa fa-bookmark\"></i> New</li>\n" +
+                                                                        "                                            </ul>\n" +
+                                                                        "                                        </div>\n" +
+                                                                        "                                    </div>\n" +
+                                                                        "                                    <div class=\"col-sm-2 col-xs-3\">\n" +
+                                                                        "                                        <div class=\"item-price\">\n" +
+                                                                        "                                            <h3>$ 100</h3>\n" +
+                                                                        "                                            <span>Negotiable</span>\n" +
+                                                                        "                                        </div>\n" +
+                                                                        "                                        <div class=\"item-action\">\n" +
+                                                                        "                                            <ul>\n" +
+                                                                        "                                                <li><a href=\"#\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Save Favorite\" class=\"btn btn-default btn-sm\"><i class=\"fa fa-heart\"></i></a></li>\n" +
+                                                                        "                                                <li><a href=\"detail.html\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Show Details\" class=\"btn btn-success btn-sm\"><i class=\"fa fa-eye\"></i></a></li>\n" +
+                                                                        "                                            </ul>\n" +
+                                                                        "                                        </div>\n" +
+                                                                        "                                    </div>\n" +
+                                                                        "                                </div>\n" +
+                                                                        "\n" +
+                                                                        "                            </div>\n" +
+                                                                        "                        </div>";
+
+                                                                    // console.log(html)
+                                                                    resultHtml += html;
+
+                                                                }
+                                                                $("#emptyResult").hide();
+                                                                $("#resultRow").html(resultHtml);
+                                                                $("#resultRow").show();
+
+                                                                $("#pagination").val('');
+                                                                let pageHtml = "";
+
+                                                                let pageNum=5.0;
+
+                                                                let middle = Math.round(pageNum / 2.0);
+                                                                let startPage = result.currPage - middle > 0 ? (result.totalPage - result.currPage + 1 > middle ? result.currPage - middle + 1 : result.totalPage - pageNum + 1) : 1
+                                                                let end = result.totalPage > startPage +pageNum - 1 ? startPage + pageNum- 1 : result.totalPage;
+                                                                for (let i = startPage; i <= end; i++) {
+                                                                    pageHtml += "\n<li><a onclick=\"generateGoodsResult("+type+","+i+")\">"+i+"</a></li>\n";
+                                                                }
+                                                                console.log(pageHtml);
+                                                                $("#pagination").html(pageHtml)
+                                                                $("#pageNum").show()
+                                                            }
+                                                        }
+                                                    }
+                                                )
+
+                                            }
+
+
+                                            function generateFormResult(type,currentPage) {
+                                                $("#graph").hide()
+
+                                                console.log(type)
+                                                $.get(
+                                                    "/goods/getByStatus?status=" + type+(currentPage===null?'':"&currPage="+currentPage),
+                                                    function success(response, status) {
+                                                        console.log(response)
+                                                        // if (response.code === 500) {
+                                                        //     alert(response.msg)
+                                                        // } else {
+                                                        //     let result = response.data;
+                                                        //     console.log(result);
+                                                        //
+                                                        //     $("#currPage").text(result.currPage);
+                                                        //     // $("#pageSize").text(result.pageSize);
+                                                        //     // $("#totalCount").text(result.totalCount);
+                                                        //     // $("#totalPage").text(result.totalPage);
+                                                        //
+                                                        //     // alert(type)
+                                                        //     if (result.totalCount === 0) {
+                                                        //         $("#resultRow").hide();
+                                                        //         $("#emptyResult").show()
+                                                        //     } else {
+                                                        //         $("#resultRow").html('');
+                                                        //         $("#emptyResult").html('');
+                                                        //         let goodsList = result.list;
+                                                        //         let resultHtml = "";
+                                                        //
+                                                        //         for (let goods of goodsList) {
+                                                        //             console.log(goods);
+                                                        //             let goodsImg = goods.imgSrc === '' ? '/icons/emptyImg.png' : goods.imgSrc;
+                                                        //             let html = "\n<div class=\"row\">\n" +
+                                                        //                 "                            <div class=\"col-sm-12\">\n" +
+                                                        //                 "                                <div class=\"row\" >\n" +
+                                                        //                 "                                    <div class=\"col-sm-2 col-xs-3\">\n" +
+                                                        //                 "                                        <div class=\"item-badge featured-ads\">\n" +
+                                                        //                 "                                            <a href=\"#\">Featured Ads</a>\n" +
+                                                        //                 "                                        </div>\n" +
+                                                        //                 "                                        <div class=\"item-img\">\n" +
+                                                        //                 "                                            <img alt=\"\" src=\"" + goodsImg +
+                                                        //                 "\">\n" +
+                                                        //                 "                                        </div>\n" +
+                                                        //                 "                                    </div>\n" +
+                                                        //                 "                                    <div class=\"col-sm-8 col-xs-6\">\n" +
+                                                        //                 "                                        <div class=\"item-title\">\n" +
+                                                        //                 "                                            <!--                                                <a th:href=\"@{/user/detail(id=${goods.getId()})}\"><h4>Lenovo A326 Black 4GB RAM</h4></a>-->\n" +
+                                                        //                 "                                            <a><h4>Lenovo A326 Black 4GB RAM</h4></a>\n" +
+                                                        //                 "                                        </div>\n" +
+                                                        //                 "                                        <div class=\"item-meta\">\n" +
+                                                        //                 "                                            <ul>\n" +
+                                                        //                 "                                                <li class=\"item-date\"><i class=\"fa fa-clock-o\"></i> Today 10.35 am</li>\n" +
+                                                        //                 "                                                <li class=\"item-cat hidden-xs\"><i class=\"fa fa-bars\"></i> <a href=\"#\">Electronics</a> , <a href=\"category.html\">Smartphone</a></li>\n" +
+                                                        //                 "                                                <li class=\"item-location hidden-xs\"><a href=\"#\"><i class=\"fa fa-map-marker\"></i> Manchester</a></li>\n" +
+                                                        //                 "                                                <li class=\"item-type\"><i class=\"fa fa-bookmark\"></i> New</li>\n" +
+                                                        //                 "                                            </ul>\n" +
+                                                        //                 "                                        </div>\n" +
+                                                        //                 "                                    </div>\n" +
+                                                        //                 "                                    <div class=\"col-sm-2 col-xs-3\">\n" +
+                                                        //                 "                                        <div class=\"item-price\">\n" +
+                                                        //                 "                                            <h3>$ 100</h3>\n" +
+                                                        //                 "                                            <span>Negotiable</span>\n" +
+                                                        //                 "                                        </div>\n" +
+                                                        //                 "                                        <div class=\"item-action\">\n" +
+                                                        //                 "                                            <ul>\n" +
+                                                        //                 "                                                <li><a href=\"#\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Save Favorite\" class=\"btn btn-default btn-sm\"><i class=\"fa fa-heart\"></i></a></li>\n" +
+                                                        //                 "                                                <li><a href=\"detail.html\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Show Details\" class=\"btn btn-success btn-sm\"><i class=\"fa fa-eye\"></i></a></li>\n" +
+                                                        //                 "                                            </ul>\n" +
+                                                        //                 "                                        </div>\n" +
+                                                        //                 "                                    </div>\n" +
+                                                        //                 "                                </div>\n" +
+                                                        //                 "\n" +
+                                                        //                 "                            </div>\n" +
+                                                        //                 "                        </div>";
+                                                        //
+                                                        //             // console.log(html)
+                                                        //             resultHtml += html;
+                                                        //
+                                                        //         }
+                                                        //         $("#emptyResult").hide();
+                                                        //         $("#resultRow").html(resultHtml);
+                                                        //         $("#resultRow").show();
+                                                        //
+                                                        //         $("#pagination").val('');
+                                                        //         let pageHtml = "";
+                                                        //
+                                                        //         let pageNum=5.0;
+                                                        //
+                                                        //         let middle = Math.round(pageNum / 2.0);
+                                                        //         let startPage = result.currPage - middle > 0 ? (result.totalPage - result.currPage + 1 > middle ? result.currPage - middle + 1 : result.totalPage - pageNum + 1) : 1
+                                                        //         let end = result.totalPage > startPage +pageNum - 1 ? startPage + pageNum- 1 : result.totalPage;
+                                                        //         for (let i = startPage; i <= end; i++) {
+                                                        //             pageHtml += "\n<li><a onclick=\"generateGoodsResult("+type+","+i+")\">"+i+"</a></li>\n";
+                                                        //         }
+                                                        //         console.log(pageHtml);
+                                                        //         $("#pagination").html(pageHtml)
+                                                        //         $("#pageNum").show()
+                                                        //     }
+                                                        // }
+                                                    }
+                                                )
+                                                console.log(currentPage)
+
+                                            }
+
+
+                                        </script>
+                                    </div>
+                                </div>
+                                <!--                                <li><a >Smartphone</a>&nbsp;<span class="item-numbers"></span></li>-->
+                                <!--                                <li>-->
+                                <!--                                    <button type="button" class="btn btn-primary" data-toggle="collapse"-->
+                                <!--                                              data-target="#goodsOperation">-->
+                                <!--                                    简单的可折叠组件-->
+                                <!--                                    </button>-->
+                                <!--                                    <div id="goodsOperation" class="collapse ">-->
+                                <!--                                        <button>已申请</button>-->
+                                <!--                                        <button>待审核</button>-->
+                                <!--                                        <button>已审核</button>-->
+                                <!--                                        <button>已审核</button>-->
+                                <!--                                    </div>-->
+
+                                <!--                                </li>-->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5 col-sm-5" style="margin-left: 5%;margin-right: 5%">
+                    <!--                    <div class="search-results-box">-->
+                    <!--                        <div class="row">-->
+                    <!--                            <div class="col-md-12 search-results">-->
+                    <!--&lt;!&ndash;                                Keyword : <span th:text="${searchKey}"></span>  Results : <span th:text="${resultPageList.getTotalCount()}"></span> items&ndash;&gt;-->
+                    <!--                                Keyword : <span></span>  Results : <span></span> items-->
+                    <!--                            </div>-->
+                    <!--                        </div>-->
+                    <!--                    </div>-->
+
+                    <div class="row" id="graph">
+                        <div class="col-md-6">
+                            <!-- 为 ECharts 准备一个定义了宽高的 DOM -->
+                            <div id="goodsHistogram" style="height: 300px;width: 100%;margin: 0"></div>
+                            <script type="text/javascript">
+                                var defaultOption = {
+                                    // 全局调色盘。
+                                    defaultColor: [
+                                        '#c23531',
+                                        '#2f4554',
+                                        '#61a0a8',
+                                        '#d48265',
+                                        '#91c7ae',
+                                        '#749f83',
+                                        '#ca8622',
+                                        '#bda29a',
+                                        '#6e7074',
+                                        '#546570',
+                                        '#c4ccd3'
+                                    ],
+
+                                    barColor: [
+
+                                                '#dd6b66',
+                                                '#759aa0',
+                                                '#e69d87',
+                                                '#8dc1a9',
+                                                '#ea7e53',
+                                                '#eedd78',
+                                                '#73a373',
+                                                '#73b9bc',
+                                                '#7289ab',
+                                                '#91ca8c',
+                                                '#f49f42'
+                                            ],
+                                    pieColor:[
+                                                '#37A2DA',
+                                                '#32C5E9',
+                                                '#67E0E3',
+                                                '#9FE6B8',
+                                                '#FFDB5C',
+                                                '#ff9f7f',
+                                                '#fb7293',
+                                                '#E062AE',
+                                                '#E690D1',
+                                                '#e7bcf3',
+                                                '#9d96f5',
+                                                '#8378EA',
+                                                '#96BFFF'
+                                            ]
+                                };
+                                // 基于准备好的dom，初始化echarts实例
+                                let myChart = echarts.init($("#goodsHistogram").get(0));
+
+                                // 指定图表的配置项和数据
+                                let option = {
+                                    title: {
+                                        text: '发布物品统计'
+                                    },
+                                    tooltip: {},
+                                    legend: {
+                                        data: ['销量'],
+                                        // orient: 'vertical',
+                                        // orient: 'horizontal',
+                                        right: 10,
+                                        // top: 'center'
+                                    },
+                                    // grid:{
+                                    //     containLabel: true
+                                    //     // show: true,
+                                    //     // backgroundColor:"#000",//设置图表背景色（注：如果使用背景色必须配合show:true）
+                                    //     top:10,
+                                    //     bottom:10,
+                                    //     left:10,
+                                    //     right:10
+                                    // },
+                                    xAxis: {
+                                        data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+                                    },
+                                    yAxis: {},
+                                    series: [
+                                        {
+                                            name: '销量',
+                                            type: 'bar',
+                                            data: [5, 20, 36, 10, 10, 20],
+                                            itemStyle:{
+                                                normal:{
+                                                    color: function (params) {
+                                                        // 柱状图颜色
+                                                        // return defaultOption.barColor[params.dataIndex];
+                                                        let randomIndex=Math.floor(Math.random()*defaultOption.barColor.length)
+                                                        return defaultOption.barColor[randomIndex];
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                };
+
+                                // 使用刚指定的配置项和数据显示图表。
+                                myChart.setOption(option);
+
+
+                                window.onresize=function () {
+                                    myChart.resize();
+                                }
+                            </script>
+
+                        </div>
+                        <div class="col-md-6" style="float: right">
+                            <div id="applyFormHistogram" style="height: 300px;width: 100%;margin: 0"></div>
+                            <script type="text/javascript">
+                                // 基于准备好的dom，初始化echarts实例
+                                let myApplyChart = echarts.init($("#applyFormHistogram").get(0));
+
+                                // 指定图表的配置项和数据
+                                option = {
+                                    title: {
+                                        text: "申请物品统计",
+                                        show: true
+                                    },
+                                    tooltip: {
+                                        trigger: 'item',
+                                        color:"red",
+                                        //formatter: "{a} <br/>{b} : {c}  ({d}%)"
+                                        formatter: function(data) {
+                                            // console.log(data)
+                                            return data.name +"("+data.percent+"%)"+ '<br/>'; //将小数转化为百分数显示
+                                        }
+                                    },
+                                    legend: {
+                                        orient: 'vertical',
+                                        x: 'left',
+                                        data: ['A', 'B', 'C', 'D', 'E']
+                                    },
+                                    series: [
+                                        {
+                                            type: 'pie',
+                                            // radius: ['50%', '70%'],
+                                            avoidLabelOverlap: false,
+                                            label: {
+                                                show: false,
+                                                // position: 'center',
+                                                emphasis: {
+                                                    show: false
+                                                }
+                                            },
+                                            labelLine: {
+                                                show: false
+                                            },
+                                            // emphasis: {
+                                            //     label: {
+                                            //         show: true,
+                                            //         fontSize: '30',
+                                            //         fontWeight: 'bold'
+                                            //     }
+                                            // },
+                                            itemStyle:{
+                                                normal:{
+                                                    color: function (params) {
+                                                        // 柱状图颜色
+                                                        // return defaultOption.barColor[params.dataIndex];
+                                                        let randomIndex=Math.floor(Math.random()*defaultOption.pieColor.length)
+                                                        return defaultOption.pieColor[randomIndex];
+                                                    }
+                                                }
+                                            },
+                                            // color: defaultOption.pieColor,
+                                            // stillShowZeroSum: false,
+                                            data: [
+                                                {
+                                                    value: 3,
+                                                    name: '直接访问'
+                                                },
+                                                {
+                                                    value: 2,
+                                                    name: '联盟广告'
+                                                },
+                                                {
+                                                    value: 1,
+                                                    name: '搜索引擎'
+                                                }
+                                            ],
+                                            radius: '70%'
+                                        }
+                                    ]
+                                };
+                                // 使用刚指定的配置项和数据显示图表。
+                                myApplyChart.setOption(option);
+
+                                window.onresize=function () {
+                                    myApplyChart.resize();
+                                }
+                            </script>
+                        </div>
+                    </div>
+
+
+                    <!--                    <div class="list-results" th:if="${resultPageList.getList().size()!=0}" style="background: floralwhite;" th:each="goods:${resultPageList.getList()}" th:object="${goods}">-->
+                    <div class="list-results" hidden="hidden" id="resultRow" style="background: floralwhite;">
+<!--                        <div class="row">-->
+<!--                            <div class="col-sm-12">-->
+<!--                                <div class="row">-->
+<!--                                    <div class="col-sm-2 col-xs-3">-->
+<!--                                        <div class="item-badge featured-ads">-->
+<!--                                            <a href="#">Featured Ads</a>-->
+<!--                                        </div>-->
+<!--                                        <div class="item-img">-->
+<!--                                            &lt;!&ndash;                                                <img alt="" th:if="*{not #strings.isEmpty(imgSrc)}" th:src="*{imgSrc}">&ndash;&gt;-->
+<!--                                            &lt;!&ndash;                                                <img alt="" th:if="*{#strings.isEmpty(imgSrc)}" th:src="@{/icons/emptyImg.png}">&ndash;&gt;-->
+<!--                                            <img alt="" src="">-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                    <div class="col-sm-8 col-xs-6">-->
+<!--                                        <div class="item-title">-->
+<!--                                            &lt;!&ndash;                                                <a th:href="@{/user/detail(id=${goods.getId()})}"><h4>Lenovo A326 Black 4GB RAM</h4></a>&ndash;&gt;-->
+<!--                                            <a><h4>Lenovo A326 Black 4GB RAM</h4></a>-->
+<!--                                        </div>-->
+<!--                                        <div class="item-meta">-->
+<!--                                            <ul>-->
+<!--                                                <li class="item-date"><i class="fa fa-clock-o"></i> Today 10.35 am</li>-->
+<!--                                                <li class="item-cat hidden-xs"><i class="fa fa-bars"></i> <a href="#">Electronics</a>-->
+<!--                                                    , <a href="category.html">Smartphone</a></li>-->
+<!--                                                <li class="item-location hidden-xs"><a href="#"><i-->
+<!--                                                        class="fa fa-map-marker"></i> Manchester</a></li>-->
+<!--                                                <li class="item-type"><i class="fa fa-bookmark"></i> New</li>-->
+<!--                                            </ul>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                    <div class="col-sm-2 col-xs-3">-->
+<!--                                        <div class="item-price">-->
+<!--                                            <h3>$ 100</h3>-->
+<!--                                            <span>Negotiable</span>-->
+<!--                                        </div>-->
+<!--                                        <div class="item-action">-->
+<!--                                            <ul>-->
+<!--                                                <li><a class="btn btn-default btn-sm" data-placement="top" data-toggle="tooltip"-->
+<!--                                                       href="#" title="Save Favorite"><i-->
+<!--                                                        class="fa fa-heart"></i></a></li>-->
+<!--                                                <li><a class="btn btn-success btn-sm" data-placement="top" data-toggle="tooltip"-->
+<!--                                                       href="detail.html" title="Show Details"><i-->
+<!--                                                        class="fa fa-eye"></i></a></li>-->
+<!--                                            </ul>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+
+<!--                            </div>-->
+<!--                        </div>-->
+                    </div>
+                    <!--                    <div class="list-results" th:if="${resultPageList.getList().size()==0}">-->
+                    <div class="list-results" hidden="hidden" id="emptyResult">
+                        <div class="row" style="margin: 0">
+                            <div class="col-md-12 text-center"
+                                 style="align-items: center;justify-content: center;display: flex;border-style: ridge; height: 500px;background: floralwhite">
+                                <div class="item-img">
+                                    <img alt="" th:src="@{/icons/emptyItem.png}">
+                                    <span class="page-404__text" style="color: black">未找到相关的物品 请换个关键字或类型试一试</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="pageNum">
+                        <div class="col-md-12 text-right">
+<!--                            <a class="btn" id="currPage"></a>-->
+                            <ul class="pagination" id="pagination">
+                                <!--                                <li><a class="btn" name="currPage" id="currPage"></a></li>-->
+                                <!--                                <li><a hidden name="pageSize" id="pageSize"></a></li>-->
+                                <!--                                <li><a hidden name="totalCount" id="totalCount"></a></li>-->
+                                <!--                                <li><a hidden name="totalPage" id="totalPage"></a></li>-->
+                            </ul>
+
+                            <!--                            <ul class="pagination" th:each="pageItem:${#numbers.sequence(start,resultPageList.getTotalPage()>start+7.0-1?start+7.0-1:resultPageList.getTotalPage())}">-->
+                            <!--                                <li><a href="#" onclick="searchGoods(this)" th:text="${pageItemStat.current}"></a></li>-->
+                            <!--                            </ul>-->
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="col-md-3 col-sm-3">
+                    <div class="widget">
+                        <div class="widget-header">
+                            <!--                                    <h3>Seller</h3>-->
+                            <h3>用户</h3>
+                        </div>
+                        <div class="widget-body text-center">
+                            <img alt="avatar" class="seller-avatar img-responsive" th:src="${loginUser.getAvatar()}">
+                            <strong class="seller-name" th:text="${loginUser.getAccount()}">John Doe</strong><br>
+                            <table class="table table-responsive table-condensed table-striped table-bordered table-hover">
+                                <!--                                <tr>-->
+                                <!--                                    <td>账号</td>-->
+                                <!--                                    <td sec:authentication="principal.account"></td>-->
+                                <!--                                </tr>-->
+                                <tr>
+                                    <td>姓名</td>
+                                    <!--                                    <td sec:authentication="principal.name"></td>-->
+                                    <td th:text="${loginUser.getName()}"></td>
+                                </tr>
+                                <tr>
+                                    <td>密码</td>
+                                    <!--                                    <td sec:authentication="principal.uncrypted" style="border: 0"  class="fa fa-eye" onclick="showPassword(this)"></td>-->
+                                    <!--                                    <td sec:authentication="principal.uncrypted" id="uncrypted" hidden="hidden"></td>-->
+                                    <td class="fa fa-eye" onclick="showPassword(this)" style="border: 0"
+                                        th:text="${loginUser.getUncrypted()}"></td>
+                                    <td hidden="hidden" id="uncrypted" th:text="${loginUser.getUncrypted()}"></td>
+                                </tr>
+
+                                <script>
+
+                                    function showPassword(item) {
+                                        let hasClass = $(item).hasClass("fa fa-eye");
+                                        if (hasClass) {
+                                            $(item).removeClass("fa fa-eye").addClass('fa fa-eye-slash');
+                                            $(item).text('******')
+                                        } else {
+                                            $(item).removeClass("fa fa-eye-slash").addClass('fa fa-eye');
+                                            $(item).text($("#uncrypted").text())
+                                        }
+                                    }
+                                </script>
+                                <tr>
+                                    <td>邮箱</td>
+                                    <!--                                    <td sec:authentication="principal.email"></td>-->
+                                    <td th:text="${loginUser.getEmail()}"></td>
+                                </tr>
+                                <tr>
+                                    <td>QQ</td>
+                                    <!--                                    <td sec:authentication="principal.qq"></td>-->
+                                    <td th:text="${loginUser.getQq()}"></td>
+                                </tr>
+                                <tr>
+                                    <td>电话</td>
+                                    <!--                                    <td sec:authentication="principal.tel"></td>-->
+                                    <td th:text="${loginUser.getTel()}"></td>
+                                </tr>
+                                <tr>
+                                    <td>学号/工号</td>
+                                    <!--                                    <td sec:authentication="principal.sid"></td>-->
+                                    <td th:text="${loginUser.getSid()}"></td>
+                                </tr>
+                            </table>
+
+                            <!--                            密码: <strong class="seller-name" th:text="${loginUser.getUncrypted()}">John Doe</strong><br>-->
+                            <!--                            姓名: <strong class="seller-name" th:text="${loginUser.getName()}">John Doe</strong><br>-->
+                            <!--                            &lt;!&ndash;                                    <p class="seller-detail" th:text="${goods.getLocation().getPosition()}">Location: <strong>Orlando</strong><br/>&ndash;&gt;-->
+                            <!--                            邮箱 : <strong th:text="${loginUser.getEmail()}">21 June 2010</strong><br>-->
+                            <!--                            QQ : <strong th:text="${loginUser.getQq()}">21 June 2010</strong><br>-->
+                            <!--                            电话 : <strong th:text="${loginUser.getTel()}">21 June 2010</strong><br>-->
+                            <!--                            学号/工号 : <strong th:text="${loginUser.getSid()}">21 June 2010</strong><br>-->
+                            <!--                            Joined : <strong th:text="${T(com.suerte.lostandfound.util.TimeUtils).formatDate(loginUser.getCreateDate())}">21 June 2010</strong></p>-->
+                        </div>
+                        <div class="widget-footer">
+                            <div class="row">
+                                <div align="center">
+                                    <button class="btn btn-warning btn-block" data-target="#sendMessageModal"
+                                            data-toggle="modal"
+                                            style="width: 50%" th:text="修改个人信息"><i class="fa fa-envelope"></i> Send
+                                        Message
+                                    </button>
+                                </div>
+                                <!--                                <div class="col-sm-6">-->
+                                <!--                                    <button class="btn btn-info btn-block"><i class="fa fa-whatsapp"></i> 0823 4223 4234</button>-->
+                                <!--                                </div>-->
+                                <!--                                <div class="col-sm-6">-->
+                                <!--                                    <button class="btn btn-warning btn-block" data-target="#sendMessageModal" data-toggle="modal"><i class="fa fa-envelope"></i> Send Message</button>-->
+                                <!--                                </div>-->
+                            </div>
+                        </div>
+                    </div>
+                    <!--                    <div class="widget">-->
+                    <!--                        <div align="center" class="widget-header">-->
+                    <!--                            <h3>个人资料</h3>-->
+                    <!--                        </div>-->
+                    <!--                        <div class="widget-body text-center">-->
+                    <!--                            &lt;!&ndash;                                    <img alt="avatar" th:src="@{/assets/img/people/gie.jpg}" class="seller-avatar img-responsive">&ndash;&gt;-->
+                    <!--                            &lt;!&ndash;                                    <h2 class="seller-name" sec:authentication="principal">John Doe</h2>&ndash;&gt;-->
+                    <!--                            &lt;!&ndash;                                    <h2 class="seller-name" sec:authentication="principal.name"></h2>&ndash;&gt;-->
+                    <!--                            &lt;!&ndash;                                    <p class="seller-detail">&ndash;&gt;-->
+                    <!--                            &lt;!&ndash;                                        Email: <strong sec:authentication="principal.email"></strong>   <br/>&ndash;&gt;-->
+                    <!--                            &lt;!&ndash;                                        Tel  : <strong sec:authentication="principal.tel"></strong>&ndash;&gt;-->
+                    <!--                            &lt;!&ndash;                                    </p>&ndash;&gt;-->
+                    <!--                            <table class="table table-responsive table-condensed table-striped table-bordered table-hover">-->
+                    <!--                                <tr>-->
+                    <!--                                    <td>账号</td>-->
+                    <!--                                    <td sec:authentication="principal.account"></td>-->
+                    <!--                                </tr>-->
+                    <!--                                <tr>-->
+                    <!--                                    <td>密码</td>-->
+                    <!--                                    <td sec:authentication="principal.uncrypted" style="border: 0"  class="fa fa-eye" onclick="showPassword(this)"></td>-->
+                    <!--                                    <td sec:authentication="principal.uncrypted" id="uncrypted" hidden="hidden"></td>-->
+                    <!--                                </tr>-->
+                    <!--                                <tr>-->
+                    <!--                                    <td>姓名</td>-->
+                    <!--                                    <td sec:authentication="principal.name"></td>-->
+                    <!--                                </tr>-->
+                    <!--                                <script>-->
+
+                    <!--                                    function showPassword(item) {-->
+                    <!--                                        let hasClass = $(item).hasClass("fa fa-eye");-->
+                    <!--                                        if (hasClass){-->
+                    <!--                                            $(item).removeClass("fa fa-eye").addClass('fa fa-eye-slash')-->
+                    <!--                                            $(item).text('******')-->
+                    <!--                                        }-->
+                    <!--                                        else{-->
+                    <!--                                            $(item).removeClass("fa fa-eye-slash").addClass('fa fa-eye')-->
+                    <!--                                            $(item).text($("#uncrypted").text())-->
+                    <!--                                        }-->
+                    <!--                                    }-->
+                    <!--                                </script>-->
+                    <!--                                <tr>-->
+                    <!--                                    <td>邮箱</td>-->
+                    <!--                                    <td sec:authentication="principal.email"></td>-->
+                    <!--                                </tr>-->
+                    <!--                                <tr>-->
+                    <!--                                    <td>QQ</td>-->
+                    <!--                                    <td sec:authentication="principal.qq"></td>-->
+                    <!--                                </tr>-->
+                    <!--                                <tr>-->
+                    <!--                                    <td>电话</td>-->
+                    <!--                                    <td sec:authentication="principal.tel"></td>-->
+                    <!--                                </tr>-->
+                    <!--                                <tr>-->
+                    <!--                                    <td>学号/工号</td>-->
+                    <!--                                    <td sec:authentication="principal.sid"></td>-->
+                    <!--                                </tr>-->
+                    <!--                            </table>-->
+
+                    <!--                        </div>-->
+                    <!--                        <div class="widget-footer">-->
+                    <!--                            <div class="row">-->
+                    <!--&lt;!&ndash;                                <div class="col-sm-6">&ndash;&gt;-->
+                    <!--&lt;!&ndash;                                    <button class="btn btn-info btn-block"><i class="fa fa-whatsapp"></i> 0823 4223 4234&ndash;&gt;-->
+                    <!--&lt;!&ndash;                                    </button>&ndash;&gt;-->
+                    <!--&lt;!&ndash;                                </div>&ndash;&gt;-->
+                    <!--                                <div class="col-sm-6">-->
+                    <!--                                    <button class="btn btn-warning btn-block" data-target="#sendMessageModal" th:text="修改个人信息"-->
+                    <!--                                            data-toggle="modal"><i class="fa fa-envelope"></i> Send Message-->
+                    <!--                                    </button>-->
+                    <!--                                </div>-->
+                    <!--                            </div>-->
+                    <!--                        </div>-->
+                    <!--                    </div>-->
+
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <!--                                    <div class="post">-->
+                            <!--                                        <div class="post-price">-->
+                            <!--                                            $ 95.45-->
+                            <!--                                        </div>-->
+                            <!--                                        <div class="post-title">-->
+                            <!--                                            <h2>Lenovo Thinkpad X1 Carbon</h2>-->
+                            <!--                                        </div>-->
+                            <!--                                        <div class="post-meta">-->
+                            <!--                                            <ul>-->
+                            <!--                                                <li><i class="fa fa-clock-o"></i> 2 minutes ago</li>-->
+                            <!--                                                <li><i class="fa fa-bars"></i> <a href="category.html">Electronic</a>,<a href="category.html">Laptop</a></li>-->
+                            <!--                                                <li><i class="fa fa-map-marker"></i> <a href="category.html">Mountain View</a></li>-->
+                            <!--                                                <li><i class="fa fa-bookmark"></i> Used</li>-->
+                            <!--                                            </ul>-->
+                            <!--                                        </div>-->
+                            <!--                                        <div class="flexslider post-images">-->
+                            <!--                                            <ul class="slides">-->
+                            <!--                                                <li data-thumb="/assets/img/products/item-1.jpg">-->
+                            <!--                                                    <img alt="" th:src="@{/assets/img/products/item-1.jpg}" />-->
+                            <!--                                                </li>-->
+                            <!--                                                <li data-thumb="/assets/img/products/item-2.jpg">-->
+                            <!--                                                    <img alt="" th:src="@{/assets/img/products/item-2.jpg}" />-->
+                            <!--                                                </li>-->
+                            <!--                                                <li data-thumb="/assets/img/products/item-3.jpg">-->
+                            <!--                                                    <img alt="" th:src="@{/assets/img/products/item-3.jpg}" />-->
+                            <!--                                                </li>-->
+                            <!--                                                <li data-thumb="/assets/img/products/item-4.jpg">-->
+                            <!--                                                    <img alt="" th:src="@{/assets/img/products/item-4.jpg}" />-->
+                            <!--                                                </li>-->
+                            <!--                                            </ul>-->
+
+                            <!--                                        </div>-->
+                            <!--                                        <div class="post-body">-->
+                            <!--                                            <h4><strong>Spesification</strong></h4>-->
+                            <!--                                            <ul>-->
+                            <!--                                                <li>Display : 14 inch Gorilla Glass</li>-->
+                            <!--                                                <li>Processor : Intel Core i7</li>-->
+                            <!--                                                <li>Memory : 4GB</li>-->
+                            <!--                                                <li>Storage : 320 GB</li>-->
+                            <!--                                                <li>Baterai : Good</li>-->
+                            <!--                                            </ul>-->
+                            <!--                                            <p>-->
+                            <!--                                                Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.-->
+                            <!--                                            </p>-->
+                            <!--                                            <p>Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur-->
+                            <!--                                            </p>-->
+                            <!--                                        </div>-->
+                            <!--                                        <div class="post-footer">-->
+                            <!--                                            <div class="row">-->
+                            <!--                                                <div class="col-xs-6">-->
+                            <!--                                                    <button class="btn btn-info"><i class="fa fa-whatsapp"></i> <span class="hidden-xs hidden-sm">0823 4223 4234</span></button>-->
+                            <!--                                                    <button class="btn btn-warning" data-target="#sendMessageModal" data-toggle="modal"><i class="fa fa-envelope"></i> <span class="hidden-xs hidden-sm">Send Message</span></button>-->
+                            <!--                                                </div>-->
+                            <!--                                                <div class="col-xs-6">-->
+                            <!--                                                    <div class="item-action pull-right">-->
+                            <!--                                                        <ul>-->
+                            <!--                                                            <li><a href="#" data-toggle="tooltip" data-placement="top" title="Save Favorite" class="btn btn-success btn"><i class="fa fa-heart"></i></a></li>-->
+                            <!--                                                            <li><a href="#" data-toggle="tooltip" data-placement="top" title="Show Details" class="btn btn-info btn"><i class="fa fa-share-alt"></i></a></li>-->
+                            <!--                                                        </ul>-->
+                            <!--                                                    </div>-->
+                            <!--                                                </div>-->
+                            <!--                                            </div>-->
+                            <!--                                        </div>-->
+                            <!--                                    </div>-->
+                        </div>
+                    </div>
+                </div>
+
+                <!--                <div class="col-md-2 col-sm-2" align="center">-->
+                <!--&lt;!&ndash;                    <canvas height="200px" id="canvasClock" width="200px"></canvas>&ndash;&gt;-->
+                <!--&lt;!&ndash;                    <script>&ndash;&gt;-->
+                <!--&lt;!&ndash;                        (function (win) {&ndash;&gt;-->
+                <!--&lt;!&ndash;                            function DrawClock(options) {&ndash;&gt;-->
+                <!--&lt;!&ndash;                                this.canvas = options.el;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                this.ctx = this.canvas.getContext('2d');//方法返回一个用于在画布上绘图的环境&ndash;&gt;-->
+                <!--&lt;!&ndash;                                this.width = this.ctx.canvas.width;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                this.height = this.ctx.canvas.height;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                this.r = this.width / 2;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                this.rem = this.width / 200;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                this.digits = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2];&ndash;&gt;-->
+
+                <!--&lt;!&ndash;                                var self = this;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                self.init();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                setInterval(function () {&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    self.init();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                }, 1000);&ndash;&gt;-->
+                <!--&lt;!&ndash;                            }&ndash;&gt;-->
+
+                <!--&lt;!&ndash;                            DrawClock.prototype = {&ndash;&gt;-->
+                <!--&lt;!&ndash;                                init: function () {&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    let ctx = this.ctx;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.clearRect(0, 0, this.width, this.height);    //在给定的矩形内清除指定的像素&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    let now = new Date();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    let hours = now.getHours();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    let minutes = now.getMinutes();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    let seconds = now.getSeconds();&ndash;&gt;-->
+
+                <!--&lt;!&ndash;                                    let hour = hours >= 12 ? hours - 12 : hours;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    let minute = minutes + seconds / 60;&ndash;&gt;-->
+
+                <!--&lt;!&ndash;                                    this.drawBackground();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    this.drawHour(hour, minute);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    this.drawMinute(minute);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    this.drawSecond(seconds);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    this.drawDot();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.restore();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                },&ndash;&gt;-->
+                <!--&lt;!&ndash;                                drawBackground: function () {&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    let ctx = this.ctx;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    let self = this;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.save();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.translate(this.r, this.r);         //重新映射画布上的 (0,0) 位置&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.beginPath();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.lineWidth = 8 * this.rem;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.arc(0, 0, this.r - ctx.lineWidth / 2, 0, 2 * Math.PI, false);    //创建弧/曲线（用于创建圆形或部分圆）&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.stroke();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.font = 16 * this.rem + "px Arial";//设置或返回文本内容的当前字体属性&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.textAlign = "center";              //设置或返回文本内容的当前对齐方式&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.textBaseline = "middle";           //设置或返回在绘制文本时使用的当前文本基线&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    this.digits.forEach(function (number, i) {&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        let rad = 2 * Math.PI / 12 * i;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        let x = Math.cos(rad) * (self.r - 33 * self.rem);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        let y = Math.sin(rad) * (self.r - 33 * self.rem);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.fillText(number, x, y);        //在画布上绘制"被填充的"文本&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    });&ndash;&gt;-->
+
+                <!--&lt;!&ndash;                                    //分钟的刻度，每分钟转6deg&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    for (let i = 0; i < 60; i++) {&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.save();                        //保存当前环境的状态&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.rotate(6 * i * Math.PI / 180); //旋转当前绘图&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.beginPath();                   //起始一条路径，或重置当前路径&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.moveTo(0, -82 * this.rem);     //把路径移动到画布中的指定点，不创建线条&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.lineTo(0, -87 * this.rem);     //添加一个新点，然后在画布中创建从该点到最后指定点的线条&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.closePath();                   //创建从当前点回到起始点的路径&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.strokeStyle = '#000';          //设置或返回用于笔触的颜色、渐变或模式&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.lineWidth = 1 * this.rem;      //设置或返回当前的线条宽度&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.stroke();                      //绘制已定义的路径&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.restore();                     //返回之前保存过的路径状态和属性&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    }&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    //小时的刻度，每小时转30deg&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    for (let i = 0; i < 12; i++) {&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.save();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.rotate(30 * i * Math.PI / 180);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.beginPath();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.moveTo(0, -79 * this.rem);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.lineTo(0, -87 * this.rem);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.closePath();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.strokeStyle = '#000';&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.lineWidth = 2 * this.rem;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.stroke();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        ctx.restore();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    }&ndash;&gt;-->
+                <!--&lt;!&ndash;                                },&ndash;&gt;-->
+                <!--&lt;!&ndash;                                drawHour: function (hour, minute) {&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    let ctx = this.ctx;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.save();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.beginPath();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    let hRad = 2 * Math.PI / 12 * hour;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    let mRad = 2 * Math.PI / 12 / 60 * minute;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.rotate(hRad + mRad);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.lineWidth = 6 * this.rem;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.lineCap = "round";                 //设置或返回线条的结束端点样式&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.moveTo(0, 10 * this.rem);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.lineTo(0, -this.r / 2);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.stroke();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.restore();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                },&ndash;&gt;-->
+                <!--&lt;!&ndash;                                drawMinute: function (minute) {&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    let ctx = this.ctx;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.save();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.beginPath();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    let rad = 2 * Math.PI / 60 * minute;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.rotate(rad);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.lineWidth = 3 * this.rem;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.lineCap = "round";&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.moveTo(0, 10 * this.rem);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.lineTo(0, -this.r + 26 * this.rem);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.stroke();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.restore();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                },&ndash;&gt;-->
+                <!--&lt;!&ndash;                                drawSecond: function (second) {&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    let ctx = this.ctx;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.save();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.beginPath();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.fillStyle = "#c14543";&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    let rad = 2 * Math.PI / 60 * second;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.rotate(rad);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.moveTo(-3 * this.rem, 20 * this.rem);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.lineTo(3 * this.rem, 20 * this.rem);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.lineTo(1, -this.r + 26 * this.rem);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.lineTo(-1, -this.r + 26 * this.rem);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.fill();    //填充当前绘图（路径）&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.restore();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                },&ndash;&gt;-->
+                <!--&lt;!&ndash;                                drawDot: function (minute) {&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    let ctx = this.ctx;&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.beginPath();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.fillStyle = "#fff";&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.arc(0, 0, 3 * this.rem, 0, 2 * Math.PI, false);&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    ctx.fill();&ndash;&gt;-->
+                <!--&lt;!&ndash;                                }&ndash;&gt;-->
+                <!--&lt;!&ndash;                            };&ndash;&gt;-->
+
+                <!--&lt;!&ndash;                            win.DrawClock = DrawClock;&ndash;&gt;-->
+                <!--&lt;!&ndash;                        })(window);&ndash;&gt;-->
+
+                <!--&lt;!&ndash;                        new DrawClock({el: document.getElementById("canvasClock")});&ndash;&gt;-->
+                <!--&lt;!&ndash;                    </script>&ndash;&gt;-->
+                <!--&lt;!&ndash;                    <div id="clock" class="light"  style="margin: 0;padding: 0">&ndash;&gt;-->
+                <!--&lt;!&ndash;                        <div class="display">&ndash;&gt;-->
+                <!--&lt;!&ndash;                            <div class="weekdays"></div>&ndash;&gt;-->
+                <!--&lt;!&ndash;                            <div class="ampm"></div>&ndash;&gt;-->
+                <!--&lt;!&ndash;                            <div class="alarm"></div>&ndash;&gt;-->
+                <!--&lt;!&ndash;                            <div class="digits"></div>&ndash;&gt;-->
+                <!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+                <!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                            <div class="widget">&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                <div class="widget-header">&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                    <h3>操作</h3>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                </div>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                <div class="widget-body">&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                    <ul class="trends">&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                        <li><a href="#">基本信息</a></li>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                        <li><a href="#">修改密码</a></li>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                        <li><a href="#">发布的寻物启事</a></li>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                        <li><a href="#">发布的失物招领</a></li>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                    </ul>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                </div>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                            </div>&ndash;&gt;-->
+                <!--                </div>-->
+            </div>
+            <div class="row">
+                <!--                <div class="col-md-4 col-sm-4" align="center">-->
+                <!--                    <canvas height="200px" id="canvasClock" width="200px"></canvas>-->
+                <!--                    <script>-->
+                <!--                        (function (win) {-->
+                <!--                            function DrawClock(options) {-->
+                <!--                                this.canvas = options.el;-->
+                <!--                                this.ctx = this.canvas.getContext('2d');//方法返回一个用于在画布上绘图的环境-->
+                <!--                                this.width = this.ctx.canvas.width;-->
+                <!--                                this.height = this.ctx.canvas.height;-->
+                <!--                                this.r = this.width / 2;-->
+                <!--                                this.rem = this.width / 200;-->
+                <!--                                this.digits = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2];-->
+
+                <!--                                var self = this;-->
+                <!--                                self.init();-->
+                <!--                                setInterval(function () {-->
+                <!--                                    self.init();-->
+                <!--                                }, 1000);-->
+                <!--                            }-->
+
+                <!--                            DrawClock.prototype = {-->
+                <!--                                init: function () {-->
+                <!--                                    let ctx = this.ctx;-->
+                <!--                                    ctx.clearRect(0, 0, this.width, this.height);    //在给定的矩形内清除指定的像素-->
+                <!--                                    let now = new Date();-->
+                <!--                                    let hours = now.getHours();-->
+                <!--                                    let minutes = now.getMinutes();-->
+                <!--                                    let seconds = now.getSeconds();-->
+
+                <!--                                    let hour = hours >= 12 ? hours - 12 : hours;-->
+                <!--                                    let minute = minutes + seconds / 60;-->
+
+                <!--                                    this.drawBackground();-->
+                <!--                                    this.drawHour(hour, minute);-->
+                <!--                                    this.drawMinute(minute);-->
+                <!--                                    this.drawSecond(seconds);-->
+                <!--                                    this.drawDot();-->
+                <!--                                    ctx.restore();-->
+                <!--                                },-->
+                <!--                                drawBackground: function () {-->
+                <!--                                    let ctx = this.ctx;-->
+                <!--                                    let self = this;-->
+                <!--                                    ctx.save();-->
+                <!--                                    ctx.translate(this.r, this.r);         //重新映射画布上的 (0,0) 位置-->
+                <!--                                    ctx.beginPath();-->
+                <!--                                    ctx.lineWidth = 8 * this.rem;-->
+                <!--                                    ctx.arc(0, 0, this.r - ctx.lineWidth / 2, 0, 2 * Math.PI, false);    //创建弧/曲线（用于创建圆形或部分圆）-->
+                <!--                                    ctx.stroke();-->
+                <!--                                    ctx.font = 16 * this.rem + "px Arial";//设置或返回文本内容的当前字体属性-->
+                <!--                                    ctx.textAlign = "center";              //设置或返回文本内容的当前对齐方式-->
+                <!--                                    ctx.textBaseline = "middle";           //设置或返回在绘制文本时使用的当前文本基线-->
+                <!--                                    this.digits.forEach(function (number, i) {-->
+                <!--                                        let rad = 2 * Math.PI / 12 * i;-->
+                <!--                                        let x = Math.cos(rad) * (self.r - 33 * self.rem);-->
+                <!--                                        let y = Math.sin(rad) * (self.r - 33 * self.rem);-->
+                <!--                                        ctx.fillText(number, x, y);        //在画布上绘制"被填充的"文本-->
+                <!--                                    });-->
+
+                <!--                                    //分钟的刻度，每分钟转6deg-->
+                <!--                                    for (let i = 0; i < 60; i++) {-->
+                <!--                                        ctx.save();                        //保存当前环境的状态-->
+                <!--                                        ctx.rotate(6 * i * Math.PI / 180); //旋转当前绘图-->
+                <!--                                        ctx.beginPath();                   //起始一条路径，或重置当前路径-->
+                <!--                                        ctx.moveTo(0, -82 * this.rem);     //把路径移动到画布中的指定点，不创建线条-->
+                <!--                                        ctx.lineTo(0, -87 * this.rem);     //添加一个新点，然后在画布中创建从该点到最后指定点的线条-->
+                <!--                                        ctx.closePath();                   //创建从当前点回到起始点的路径-->
+                <!--                                        ctx.strokeStyle = '#000';          //设置或返回用于笔触的颜色、渐变或模式-->
+                <!--                                        ctx.lineWidth = 1 * this.rem;      //设置或返回当前的线条宽度-->
+                <!--                                        ctx.stroke();                      //绘制已定义的路径-->
+                <!--                                        ctx.restore();                     //返回之前保存过的路径状态和属性-->
+                <!--                                    }-->
+                <!--                                    //小时的刻度，每小时转30deg-->
+                <!--                                    for (let i = 0; i < 12; i++) {-->
+                <!--                                        ctx.save();-->
+                <!--                                        ctx.rotate(30 * i * Math.PI / 180);-->
+                <!--                                        ctx.beginPath();-->
+                <!--                                        ctx.moveTo(0, -79 * this.rem);-->
+                <!--                                        ctx.lineTo(0, -87 * this.rem);-->
+                <!--                                        ctx.closePath();-->
+                <!--                                        ctx.strokeStyle = '#000';-->
+                <!--                                        ctx.lineWidth = 2 * this.rem;-->
+                <!--                                        ctx.stroke();-->
+                <!--                                        ctx.restore();-->
+                <!--                                    }-->
+                <!--                                },-->
+                <!--                                drawHour: function (hour, minute) {-->
+                <!--                                    let ctx = this.ctx;-->
+                <!--                                    ctx.save();-->
+                <!--                                    ctx.beginPath();-->
+                <!--                                    let hRad = 2 * Math.PI / 12 * hour;-->
+                <!--                                    let mRad = 2 * Math.PI / 12 / 60 * minute;-->
+                <!--                                    ctx.rotate(hRad + mRad);-->
+                <!--                                    ctx.lineWidth = 6 * this.rem;-->
+                <!--                                    ctx.lineCap = "round";                 //设置或返回线条的结束端点样式-->
+                <!--                                    ctx.moveTo(0, 10 * this.rem);-->
+                <!--                                    ctx.lineTo(0, -this.r / 2);-->
+                <!--                                    ctx.stroke();-->
+                <!--                                    ctx.restore();-->
+                <!--                                },-->
+                <!--                                drawMinute: function (minute) {-->
+                <!--                                    let ctx = this.ctx;-->
+                <!--                                    ctx.save();-->
+                <!--                                    ctx.beginPath();-->
+                <!--                                    let rad = 2 * Math.PI / 60 * minute;-->
+                <!--                                    ctx.rotate(rad);-->
+                <!--                                    ctx.lineWidth = 3 * this.rem;-->
+                <!--                                    ctx.lineCap = "round";-->
+                <!--                                    ctx.moveTo(0, 10 * this.rem);-->
+                <!--                                    ctx.lineTo(0, -this.r + 26 * this.rem);-->
+                <!--                                    ctx.stroke();-->
+                <!--                                    ctx.restore();-->
+                <!--                                },-->
+                <!--                                drawSecond: function (second) {-->
+                <!--                                    let ctx = this.ctx;-->
+                <!--                                    ctx.save();-->
+                <!--                                    ctx.beginPath();-->
+                <!--                                    ctx.fillStyle = "#c14543";-->
+                <!--                                    let rad = 2 * Math.PI / 60 * second;-->
+                <!--                                    ctx.rotate(rad);-->
+                <!--                                    ctx.moveTo(-3 * this.rem, 20 * this.rem);-->
+                <!--                                    ctx.lineTo(3 * this.rem, 20 * this.rem);-->
+                <!--                                    ctx.lineTo(1, -this.r + 26 * this.rem);-->
+                <!--                                    ctx.lineTo(-1, -this.r + 26 * this.rem);-->
+                <!--                                    ctx.fill();    //填充当前绘图（路径）-->
+                <!--                                    ctx.restore();-->
+                <!--                                },-->
+                <!--                                drawDot: function (minute) {-->
+                <!--                                    let ctx = this.ctx;-->
+                <!--                                    ctx.beginPath();-->
+                <!--                                    ctx.fillStyle = "#fff";-->
+                <!--                                    ctx.arc(0, 0, 3 * this.rem, 0, 2 * Math.PI, false);-->
+                <!--                                    ctx.fill();-->
+                <!--                                }-->
+                <!--                            };-->
+
+                <!--                            win.DrawClock = DrawClock;-->
+                <!--                        })(window);-->
+
+                <!--                        new DrawClock({el: document.getElementById("canvasClock")});-->
+                <!--                    </script>-->
+                <!--                    <div id="clock" class="light"  style="margin: 0;padding: 0">-->
+                <!--                        <div class="display">-->
+                <!--                            <div class="weekdays"></div>-->
+                <!--                            <div class="ampm"></div>-->
+                <!--                            <div class="alarm"></div>-->
+                <!--                            <div class="digits"></div>-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                    &lt;!&ndash;                            <div class="widget">&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                <div class="widget-header">&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                    <h3>操作</h3>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                </div>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                <div class="widget-body">&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                    <ul class="trends">&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                        <li><a href="#">基本信息</a></li>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                        <li><a href="#">修改密码</a></li>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                        <li><a href="#">发布的寻物启事</a></li>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                        <li><a href="#">发布的失物招领</a></li>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                    </ul>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                                </div>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                            </div>&ndash;&gt;-->
+                <!--                </div>-->
+            </div>
+        </div>
+    </section>
+    <div class="footer">
+        <div class="container">
+
+            <ul class="text-center footer-menu">
+                <li>Copyright &copy; 2018.Company name All rights reserved.<a href="http://sc.chinaz.com/moban/"
+                                                                              target="_blank">&#x7F51;&#x9875;&#x6A21;&#x677F;</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Send Message Modal -->
+<div aria-labelledby="sendMessageModalLabel" class="modal fade in" id="sendMessageModal" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span
+                        aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="sendMessageModalLabel">修改个人信息</h4>
+            </div>
+            <div class="modal-body">
+
+                <form action="/user/changeProfile" enctype="multipart/form-data" id="profile" method="post">
+                    <div hidden="hidden">
+                        <input id="newAvatar" name="newAvatar" type="file">
+                        <input id="newUid" name="uid" th:value="${loginUser.getId()}">
+                        <input id="oldAccount" name="olcAccount" th:value="${loginUser.getAccount()}">
+                    </div>
+                    <!--                    <input hidden name="goodsId" th:value="${goods.getId()}">-->
+                    <div class="form-group">
+                        <label class="control-label">头像:</label>
+
+                        <input id="oldAvatar" onclick="uploadAvatar()" required th:src="${loginUser.getAvatar()}"
+                               type="image">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">账号:</label>
+                        <input class="form-control input-lg" id="newAccount" name="newAccount"
+                               placeholder="账号" required th:value="${loginUser.getAccount()}" type="text">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">邮箱:</label>
+                        <input class="form-control input-lg" id="newEmail" name="newEmail"
+                               placeholder="Your email" required th:value="${loginUser.getEmail()}" type="email">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="newEmail">QQ:</label>
+                        <input class="form-control input-lg" id="newQQ" name="newQQ" placeholder="QQ号" required
+                               th:value="${loginUser.getQq()}"
+                               type="number"/>
+                    </div>
+                    <!--                    <div class="form-group">-->
+                    <!--                        <label class="control-label" for="newEmail">Tel:</label>-->
+                    <!--                        <input class="form-control input-lg" id="newTel"  placeholder="手机号" type="number" th:value="${loginUser.getTel()}"-->
+                    <!--                               required/>-->
+                    <!--                    </div>-->
+                    <div class="form-group">
+                        <label class="control-label">新密码:</label>
+                        <input class="form-control input-lg" id="newPassword" name="newPassword" placeholder="密码"
+                               required type="password">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">重新输入密码:</label>
+                        <input class="form-control input-lg" id="reNewPass" name="reNewPass" placeholder="密码" required
+                               type="password">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
+                <button class="btn btn-custom" onclick="changeProfile()" type="button"><i class="fa fa-paper-plane"></i>
+                    Send
+                </button>
+            </div>
+            <script th:inline="javascript">
+                let info = [[${info}]];
+                if (info !== null) {
+                    alert(info)
+                }
+                console.log(info)
+            </script>
+            <script>
+                function uploadAvatar() {
+                    $("#newAvatar").click();
+                    // 修改显示新上传的头像
+                    $("#newAvatar").change(function () {
+                        let file = $(this)[0].files[0];
+                        let reader = new FileReader();
+                        reader.readAsDataURL(file);
+                        reader.onload = function () {
+                            // console.log(this.result)
+                            $("#oldAvatar").attr("src", this.result);
+                        }
+                    })
+                }
+
+                function checkMobile(number) {
+                    if (number.startsWith("+86")) {
+                        number = number.substring(3);
+                    }
+
+                    if (number.startsWith("+") || number.startsWith("0")) {
+                        number = number.substring(1);
+                    }
+                    number = number.replace(" ", "").replace("-", "");
+                    return /^((13[0-9])|(14[5-9])|(15[0-3])|(15[5-9])|(166)|(17[0-8])|(18[0-9])|(19[8-9]))\d{8}$/.test(number);
+                    // return number.test("");
+                }
+
+                function changeProfile() {
+                    // let newAvatar = $("#newAvatar");
+                    let newAccount = $("#newAccount");
+                    let newEmail = $("#newEmail");
+                    let newQQ = $("#newQQ");
+                    let newPassword = $("#newPassword");
+                    let reNewPass = $("#reNewPass");
+                    // let newUid = $("#newUid");
+                    if (!checkEmail(newEmail.val())) {
+                        alert("输入的邮箱不符合格式 请重新输入");
+                        newEmail.val('');
+                        return;
+                    }
+                    if (!checkQQ(newQQ.val())) {
+                        alert("输入的QQ不符合格式 请重新输入");
+                        newQQ.val();
+                        return;
+                    }
+                    if (newPassword.val().length === 0) {
+                        alert("输入的密码不能为空");
+                        newPassword.val('');
+                        reNewPass.val('');
+                        return;
+                    }
+                    if (newPassword.val() !== reNewPass.val()) {
+                        alert("两次输入的密码不一致 请重新输入");
+                        newPassword.val('');
+                        reNewPass.val('');
+                        return;
+                    }
+                    if (newAccount.val().length < 4) {
+                        alert("账号的长度必须大于4位");
+                        newAccount.val('');
+                        return;
+                    }
+
+                    $.get("/user/listByAccount?account=" + newAccount.val() + "&oldAccount=" + $("#oldAccount").val(),
+                        function success(data) {
+                            console.log(data);
+                            if (data.data) {
+                                alert("该账号已存在");
+                            } else {
+                                $("#profile").submit()
+                            }
+                        }
+                    )
+
+
+                }
+
+                function checkEmail(str) {
+                    let reg = /^\w+((-\w+)|(\.\w+))*@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/;
+                    if (reg.test(str)) {
+                        console.log('Email格式输入正确');
+                        return true;
+                    } else {
+                        console.log('请输入正确格式的Email');
+                        return false;
+                    }
+                }
+
+                function checkQQ(str) {
+                    // 1 首位不能是0 ^[1-9]
+                    // 2 必须是 [5, 11] 位的数字 \d{4, 9}
+                    let reg = /^[1-9][0-9]{4,9}$/gim;
+                    if (reg.test(str)) {
+                        console.log('QQ号码格式输入正确');
+                        return true;
+                    } else {
+                        console.log('请输入正确格式的QQ号码');
+                        return false;
+                    }
+                }
+            </script>
+        </div>
+    </div>
+</div>
+<!-- End Message Modal -->
+
+<!-- Essentials -->
+<script th:src="@{/assets/bootstrap/js/bootstrap.min.js}"></script>
+<script th:src="@{/assets/plugins/owl-carousel/owl.carousel.js}"></script>
+<script th:src="@{/assets/plugins/counter/jquery.countTo.js}"></script>
+<script defer th:src="@{/assets/plugins/flexslider/jquery.flexslider.js}"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        // ===============Flexslider=====================
+        $('.flexslider').flexslider({
+            animation: "slide",
+            controlNav: "thumbnails",
+            directionNav: false,
+            start: function (slider) {
+                $('body').removeClass('loading');
+            }
+        });
+
+        // ==========tooltip initial=================
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
+</body>
+</html> 
