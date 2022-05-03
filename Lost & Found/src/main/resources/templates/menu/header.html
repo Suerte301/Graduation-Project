@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ch">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div th:fragment="header">
+        <header class="navbar navbar-default navbar-fixed-top navbar-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button data-target=".navbar-collapse" data-toggle="collapse" class="navbar-toggle" type="button">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a th:href="@{/user/index}" class="navbar-brand"><span class="logo"><i class="fa fa-recycle"></i> Lost & Found</span></a>
+                </div>
+
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a th:class="${operation==lost?'active':''}" th:with="lost=${T(com.suerte.lostandfound.eum.OperationEnum).LOST.getType()}" th:href="@{/user/category(operation=${lost})}" class="btn" style="font-size: medium">失物招领</a></li>
+                        <li><a th:class="${operation==found?'active':''}" th:with="found=${T(com.suerte.lostandfound.eum.OperationEnum).FOUND.getType()}" th:href="@{/user/category(operation=${found})}" class="btn" style="font-size: medium">寻物启事</a></li>
+                        <li><a th:href="@{#}" class="btn" style="font-size: medium">常见问题</a></li>
+                        <li><a th:href="@{#}" class="btn" style="font-size: medium">关于我们</a></li>
+                        <li><a th:href="@{#}" class="btn" style="font-size: medium">联系我们</a></li>
+
+                        <!--                            <li class="dropdown" th:if="${not #strings.isEmpty(session.get('test'))}">-->
+                        <li class="dropdown">
+                            <!--                                <a class="dropdown-toggle" href="#" data-toggle="dropdown" style="font-size: medium"><strong class="caret"></strong>&nbsp;帮助</a>-->
+                            <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i class="fa fa-user"></i> <strong class="caret"></strong>&nbsp;</a>
+                            <ul class="dropdown-menu">
+                                <li><a th:href="@{/user/profile}" style="font-size: medium">个人中心</a></li>
+                                <li><a th:href="@{/user/profile}" style="font-size: medium">后台管理</a></li>
+<!--                                <li><a th:href="@{#}" style="font-size: medium">发布信息</a></li>-->
+                                <li><a th:href="@{/toLogout}" style="font-size: medium">登出</a></li>
+                            </ul>
+                        </li>
+
+                        <!--                            <li class="dropdown" th:if="${#strings.isEmpty(session.get('test'))}">-->
+                        <!--                                <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i class="fa fa-user"></i> <strong class="caret"></strong>&nbsp;</a>-->
+                        <!--                                <div class="dropdown-menu dropdown-login" style="padding:15px;min-width:250px">-->
+                        <!--                                    <form>                       -->
+                        <!--                                        <div class="form-group">-->
+                        <!--                                            <div class="input-group">-->
+                        <!--                                                <span class="input-group-addon addon-login"><i class="fa fa-user"></i></span>-->
+                        <!--                                                <input type="text" placeholder="Username or email" required="required" class="form-control input-login">                                            -->
+                        <!--                                            </div>-->
+                        <!--                                        </div>-->
+                        <!--                                        <div class="form-group">-->
+                        <!--                                            <div class="input-group">-->
+                        <!--                                                <span class="input-group-addon addon-login"><i class="addon fa fa-lock"></i></span>-->
+                        <!--                                                <input type="password" placeholder="Password" required="required" class="form-control input-login">                                            -->
+                        <!--                                            </div>-->
+                        <!--                                        </div>-->
+                        <!--                                        <div class="form-group">-->
+                        <!--                                            <div class="checkbox">-->
+                        <!--                                                <label class="string optional" for="user_remember_me">-->
+                        <!--                                                    <input type="checkbox" id="user_remember_me" style="">-->
+                        <!--                                                    Remember me-->
+                        <!--                                                </label>-->
+                        <!--                                            </div>-->
+                        <!--                                        </div>-->
+                        <!--                                        <input type="submit" class="btn btn-custom btn-block" value="登录">-->
+                        <!--                                        <a th:href="@{/test/signup}" class="btn btn-custom btn-block">注册</a>-->
+                        <!--                                        <a href="#" class="btn-block text-center">Forgot password?</a>-->
+                        <!--                                    </form>                                    -->
+                        <!--                                </div>-->
+                        <!--                            </li>-->
+
+
+                    </ul>
+                </div>
+            </div>
+        </header>
+    </div>
+</body>
+</html>

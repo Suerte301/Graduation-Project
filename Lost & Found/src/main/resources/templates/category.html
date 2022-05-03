@@ -1,0 +1,540 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ch">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="robots" content="index, follow">
+        <title>LOST & FOUND</title>
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:regular,700,600&amp;latin" type="text/css" />
+        <!-- Essential styles -->
+        <link rel="stylesheet" th:href="@{/assets/bootstrap/css/bootstrap.min.css}" type="text/css">
+        <link rel="stylesheet" th:href="@{/assets/plugins/font-awesome/css/font-awesome.css}" type="text/css">
+
+        <!-- Dlapak styles -->
+        <link id="theme_style" type="text/css" th:href="@{/assets/css/style1.css}" rel="stylesheet" media="screen">
+
+        <!-- /Assets -->
+        <link rel="stylesheet" th:href="@{/assets/plugins/owl-carousel/owl.carousel.css}">
+        <link rel="stylesheet" th:href="@{/assets/plugins/owl-carousel/owl.theme.css}">
+
+        <!-- JS Library -->
+        <script th:src="@{/assets/js/jquery.js}"></script>
+
+    </head>
+    <body>
+        <div class="wrapper">
+            <div th:replace="menu/header::header(operation=${selectedOperation})"></div>
+
+            <!--            <header class="navbar navbar-default navbar-fixed-top navbar-top">-->
+<!--                <div class="container">-->
+<!--                    <div class="navbar-header">-->
+<!--                        <button data-target=".navbar-collapse" data-toggle="collapse" class="navbar-toggle" type="button">-->
+<!--                            <span class="sr-only">Toggle navigation</span>-->
+<!--                            <span class="icon-bar"></span>-->
+<!--                            <span class="icon-bar"></span>-->
+<!--                            <span class="icon-bar"></span>-->
+<!--                        </button>-->
+<!--                        <a th:href="@{/user/index}" class="navbar-brand"><span class="logo"><i class="fa fa-recycle"></i> Lost & Found</span></a>-->
+<!--                    </div>-->
+
+<!--                    <div class="navbar-collapse collapse">-->
+<!--                        <ul class="nav navbar-nav navbar-right">-->
+<!--                            <li><a  th:href="@{/user/category(operation=${T(com.suerte.lostandfound.eum.OperationEnum).LOST.getType()})}" class="btn" style="font-size: medium">失物招领</a></li>-->
+<!--                            <li><a th:href="@{/user/category(operation=${T(com.suerte.lostandfound.eum.OperationEnum).FOUND.getType()})}" class="btn" style="font-size: medium">寻物启事</a></li>-->
+<!--                            <li><a th:href="@{#}" class="btn" style="font-size: medium">常见问题</a></li>-->
+<!--                            <li><a th:href="@{#}" class="btn" style="font-size: medium">关于我们</a></li>-->
+<!--                            <li><a th:href="@{#}" class="btn" style="font-size: medium">联系我们</a></li>-->
+
+<!--                            &lt;!&ndash;                            <li class="dropdown" th:if="${not #strings.isEmpty(session.get('test'))}">&ndash;&gt;-->
+<!--                            <li class="dropdown">-->
+<!--                                &lt;!&ndash;                                <a class="dropdown-toggle" href="#" data-toggle="dropdown" style="font-size: medium"><strong class="caret"></strong>&nbsp;帮助</a>&ndash;&gt;-->
+<!--                                <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i class="fa fa-user"></i> <strong class="caret"></strong>&nbsp;</a>-->
+<!--                                <ul class="dropdown-menu">-->
+<!--                                    <li><a th:href="@{/user/profile}" style="font-size: medium">个人信息</a></li>-->
+<!--                                    <li><a th:href="@{#}" style="font-size: medium">发布信息</a></li>-->
+<!--                                    <li><a th:href="@{/toLogout}" style="font-size: medium">登出</a></li>-->
+<!--                                </ul>-->
+<!--                            </li>-->
+
+<!--                            &lt;!&ndash;                            <li class="dropdown" th:if="${#strings.isEmpty(session.get('test'))}">&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i class="fa fa-user"></i> <strong class="caret"></strong>&nbsp;</a>&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                <div class="dropdown-menu dropdown-login" style="padding:15px;min-width:250px">&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                    <form>                       &ndash;&gt;-->
+<!--                            &lt;!&ndash;                                        <div class="form-group">&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                            <div class="input-group">&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                                <span class="input-group-addon addon-login"><i class="fa fa-user"></i></span>&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                                <input type="text" placeholder="Username or email" required="required" class="form-control input-login">                                            &ndash;&gt;-->
+<!--                            &lt;!&ndash;                                            </div>&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                        </div>&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                        <div class="form-group">&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                            <div class="input-group">&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                                <span class="input-group-addon addon-login"><i class="addon fa fa-lock"></i></span>&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                                <input type="password" placeholder="Password" required="required" class="form-control input-login">                                            &ndash;&gt;-->
+<!--                            &lt;!&ndash;                                            </div>&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                        </div>&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                        <div class="form-group">&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                            <div class="checkbox">&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                                <label class="string optional" for="user_remember_me">&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                                    <input type="checkbox" id="user_remember_me" style="">&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                                    Remember me&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                                </label>&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                            </div>&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                        </div>&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                        <input type="submit" class="btn btn-custom btn-block" value="登录">&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                        <a th:href="@{/test/signup}" class="btn btn-custom btn-block">注册</a>&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                        <a href="#" class="btn-block text-center">Forgot password?</a>&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                    </form>                                    &ndash;&gt;-->
+<!--                            &lt;!&ndash;                                </div>&ndash;&gt;-->
+<!--                            &lt;!&ndash;                            </li>&ndash;&gt;-->
+
+
+<!--                        </ul>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </header>-->
+            <div class="category-search">
+                <div class="container">
+                    <div class="row category-search-box">
+                        <script th:inline="javascript">
+                            $(function () {
+                                let selectedCategory= [[${selectedCategory}]];
+                                let selectedPosition= [[${selectedPosition}]];
+                                let selectedOperation= [[${selectedOperation}]];
+                                let searchKey= [[${searchKey}]];
+
+                                // console.log(selectedOperation)
+                                $("#categoryType").val(selectedCategory.type);
+                                $("#position").val(selectedPosition.id);
+                                $("#operation").val(selectedOperation)
+                                $("#searchKey").val(searchKey)
+                            })
+                        </script>
+                        <form action="/user/category" id="searchForm">
+                            <input name="currPage" hidden="hidden" id="currPage" th:value="${resultPageList.getCurrPage()}">
+                            <div class="col-md-3 col-sm-3  cat-search-input" style="width: 20%">
+                                <select class="form-control" id="position" name="positionId">
+                                    <option selected value="-1">大致区域</option>
+                                    <option th:each="location : ${locationList}"  th:object="${location}" th:value="*{id}" th:text="*{position}"></option>
+<!--                                    <option>Motorcycle</option>-->
+<!--                                    <option>Properti</option>-->
+                                </select>
+                            </div>
+
+                            <div class="col-md-3 col-sm-3  cat-search-input" style="width: 20%">
+                                <select class="form-control" id="operation" name="operation">
+                                    <option selected value="-1">类型</option>
+                                    <option th:each="operation : ${T(com.suerte.lostandfound.eum.OperationEnum).getDefaultOps()}" th:value="${operation.type}" th:text="${operation.name}"></option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-3 col-sm-3  cat-search-input" style="width: 20%">
+                                <select class="form-control" id="categoryType" name="categoryType">
+                                    <option selected value="-1">分类</option>
+                                    <option th:each="category : ${goodsInfos}" th:object="${category}" th:value="*{type}" th:text="*{name}"></option>
+                                </select>
+                            </div>
+
+
+                            <div class="col-md-3 col-sm-3  cat-search-input" style="width: 20%">
+                                <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="I want to find...">
+                            </div>
+                            <div class="col-md-3 col-sm-3  cat-search-input" style="width: 10%">
+                                <button class="btn btn-custom btn-block" type="submit"><i class="fa fa-search"></i></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <section class="category-wrapper">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-8">
+                            &nbsp;
+                        </div>
+                        <div class="col-md-4">
+                            <ul class="breadcrumb pull-right">
+                                <li><a th:href="@{/user/index}">首页</a></li>
+                                <li><a th:text="${selectedCategory.name}"></a></li>
+<!--                                <li>详情</li>-->
+                            </ul>
+                        </div>
+                    </div>
+                    <script>
+
+                        function getCategoryItem(item){
+
+                            let categoryType=$(item).attr("categorytype");
+                            // let operation =$("#operationType");
+                            let href="/user/category?";
+                            // let location=href+"categoryType="+categoryType+"&operation="+operation.val()
+                            let location=href+"categoryType="+categoryType;
+                            window.location.href=location;
+                        }
+
+                    </script>
+                    <div class="row">
+                        <div class="col-md-3 col-sm-3">
+                            <div class="widget">
+                                <div class="widget-header">
+<!--                                    <input hidden="hidden" id="operationType" th:if="" th:value="${operationType.getType()}">-->
+                                    <h3>分类</h3>
+                                </div>
+                                <div class="widget-body">
+                                    <ul class="trends" th:each="category : ${goodsInfos}" th:object="${category}">
+                                        <li><a onclick="getCategoryItem(this)" th:categorytype="*{type}" href="#" th:text="*{name}">Smartphone</a>&nbsp;<span class="item-numbers" th:text="*{num}"></span></li>
+                                    </ul>
+                                </div>
+                            </div>
+<!--                            <div class="widget">-->
+<!--                                <div class="widget-header">-->
+<!--                                    <h3>Browse by Brand</h3>-->
+<!--                                </div>-->
+<!--                                <div class="widget-body">-->
+<!--                                    <ul class="brands">-->
+<!--                                        <li><label><input type="checkbox"> Apple</label></li>-->
+<!--                                        <li><label><input type="checkbox"> Asus</label></li>-->
+<!--                                        <li><label><input type="checkbox"> Acer</label></li>-->
+<!--                                        <li><label><input type="checkbox"> Nexus</label></li>-->
+<!--                                        <li><label><input type="checkbox"> Nokia</label></li>-->
+<!--                                        <li><label><input type="checkbox"> Lenovo</label></li>-->
+<!--                                        <li><label><input type="checkbox"> Samsung</label></li>-->
+<!--                                    </ul>-->
+<!--                                </div>  -->
+<!--                            </div>-->
+                        </div>
+                        <div class="col-md-9 col-sm-9">
+<!--                            <div class="category-header no-margin-bottom">-->
+<!--                                <div class="row">-->
+<!--                                    <div class="col-md-4  cat-search-input">-->
+<!--                                        <select class="form-control" id="location">-->
+<!--                                            <option value="-1" selected>所在大致区域</option>-->
+<!--                                            <option th:each="location:${locationList}" th:value="${location.getId()}" th:text="${location.getPosition()}">Newest</option>-->
+<!--&lt;!&ndash;                                            <option selected="">Lowest Price</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                                            <option>Highest Price</option>&ndash;&gt;-->
+<!--                                        </select>-->
+<!--                                    </div>-->
+<!--                                    <div class="col-md-4  cat-search-input">-->
+<!--                                        <select class="form-control" id="goodsType">-->
+<!--                                            <option value="-1" selected>类型</option>-->
+<!--                                            <option th:each="operation : ${T(com.suerte.lostandfound.eum.OperationEnum).values()}" th:text="${operation.name}" th:value="${operation.type}"></option>-->
+<!--                                            &lt;!&ndash;                                            <option selected="">Lowest Price</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                                            <option>Highest Price</option>&ndash;&gt;-->
+<!--                                        </select>-->
+<!--                                    </div>-->
+<!--                                    <div class="col-md-4  cat-search-input">-->
+<!--                                        <select class="form-control" id="time">-->
+<!--                                            <option selected value="-1">发布时间</option>-->
+<!--                                            <option th:each="time:${T(com.suerte.lostandfound.eum.TimeEnum).values()}" th:value="${time.type}" th:text="${time.name}">Newest</option>-->
+<!--&lt;!&ndash;                                            <option>New</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                                            <option selected="">Used</option>&ndash;&gt;-->
+<!--                                        </select>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+                            <script th:inline="javascript">
+                                function getGoods() {
+                                    let locationId = [[${resultList}]];
+                                    let timeId =[[${resultPageList}]];
+
+                                    console.log(locationId);
+                                    console.log(timeId);
+                                }
+                            </script>
+                            <div class="search-results-box">
+                                <div class="row">
+                                    <div class="col-md-12 search-results">
+                                        Keyword : <span th:text="${searchKey}"></span>  Results : <span th:text="${resultPageList.getTotalCount()}"></span> items
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-results" >
+                                <div class="row" th:if="${resultPageList.getList().size()!=0}" style="background: floralwhite;" th:each="goods:${resultPageList.getList()}" th:object="${goods}">
+                                    <div class="col-sm-12" style="border-bottom: #e3dede solid">
+                                        <div>
+                                            <div class="row">
+
+                                                <div class="col-sm-2 col-xs-3">
+                                                    <div class="item-badge featured-ads">
+                                                        <a href="#">Featured Ads</a>
+                                                    </div>
+                                                    <div class="item-img">
+                                                        <img alt="" th:if="*{not #strings.isEmpty(imgSrc)}" th:src="*{imgSrc}">
+                                                        <img alt="" th:if="*{#strings.isEmpty(imgSrc)}" th:src="@{/icons/emptyImg.png}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-8 col-xs-6">
+                                                    <div class="item-title">
+                                                        <a th:href="@{/user/detail(id=${goods.getId()})}"><h4>Lenovo A326 Black 4GB RAM</h4></a>
+                                                    </div>
+                                                    <div class="item-meta">
+                                                        <ul>
+<!--                                                            <li><i class="fa fa-bookmark"></i> <span th:text="${goods.getStatus().getMsg()}">Used</span></li>-->
+<!--                                                            <li><i class="fa fa-bars"></i> -->
+                                                            <li class="item-date"><i class="fa fa-clock-o"></i> <span th:text="${goods.getCreateDate()}">Today 10.35 am</span></li>
+<!--                                                            <li class="item-cat hidden-xs"><i class="fa fa-bars"></i> <a href="#">Electronics</a> , <a href="category.html">Smartphone</a></li>-->
+                                                            <li class="item-cat hidden-xs"><i class="fa fa-bars"></i><a th:href="@{/user/category(categoryType=${goods.getCategory().getType()})}" th:text="${goods.getCategory().getName()}">Electronic</a>
+<!--                                                            <li class="item-location hidden-xs"><a href="#"><i class="fa fa-map-marker"></i> Manchester</a></li>-->
+                                                            <li class="item-location hidden-xs"> <a th:href="@{/user/category(positionId=${goods.getLocation().getId()})}" th:text="${goods.getLocation().getPosition()}" >Mountain View</a></li>
+<!--                                                            <li class="item-type"><i class="fa fa-bookmark"></i> <span th:text="${goods.getStatus().getMsg()}">Used</span></li></li>-->
+                                                        </ul>
+                                                    </div>
+                                                </div>
+
+<!--                                                等待写-->
+                                                <div class="col-sm-2 col-xs-3">
+<!--                                                    <div class="item-price">-->
+<!--                                                        <h3>$ 100</h3>-->
+<!--                                                        <span>Negotiable</span>-->
+<!--                                                    </div>-->
+<!--                                                    <div class="item-action">-->
+<!--                                                        <ul>-->
+<!--                                                            <li><a href="#" data-toggle="tooltip" data-placement="top" title="Save Favorite" class="btn btn-default btn-sm"><i class="fa fa-heart"></i></a></li>-->
+<!--                                                            <li><a href="detail.html" data-toggle="tooltip" data-placement="top" title="Show Details" class="btn btn-success btn-sm"><i class="fa fa-eye"></i></a></li>-->
+<!--                                                        </ul>-->
+<!--                                                    </div>-->
+                                                </div>
+                                            </div>
+                                        </div>
+<!--                                        <div class="highlight-ads">-->
+
+<!--                                            <div class="row">-->
+
+<!--                                                <div class="col-sm-2 col-xs-3">-->
+<!--                                                    <div class="item-badge featured-ads">-->
+<!--                                                        <a href="#">Featured Ads</a>-->
+<!--                                                    </div>-->
+<!--                                                    <div class="item-img">-->
+<!--                                                        <img alt="" th:src="@{/assets/img/products/product-1.jpg}">-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                                <div class="col-sm-8 col-xs-6">-->
+<!--                                                    <div class="item-title">-->
+<!--                                                        <a th:href="@{/user/detail}"><h4>Lenovo A326 Black 4GB RAM</h4></a>-->
+<!--                                                    </div>-->
+<!--                                                    <div class="item-meta">-->
+<!--                                                        <ul>-->
+<!--                                                            <li class="item-date"><i class="fa fa-clock-o"></i> Today 10.35 am</li>-->
+<!--                                                            <li class="item-cat hidden-xs"><i class="fa fa-bars"></i> <a href="category.html">Electronics</a> , <a href="category.html">Smartphone</a></li>-->
+<!--                                                            <li class="item-location hidden-xs"><a href="category.html"><i class="fa fa-map-marker"></i> Manchester</a></li>-->
+<!--                                                            <li class="item-type"><i class="fa fa-bookmark"></i> New</li>-->
+<!--                                                        </ul>-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                                <div class="col-sm-2 col-xs-3">-->
+<!--                                                    <div class="item-price">-->
+<!--                                                        <h3>$ 100</h3>-->
+<!--                                                        <span>Negotiable</span>-->
+<!--                                                    </div>-->
+<!--                                                    <div class="item-action">-->
+<!--                                                        <ul>-->
+<!--                                                            <li><a href="#" data-toggle="tooltip" data-placement="top" title="Save Favorite" class="btn btn-default btn-sm"><i class="fa fa-heart"></i></a></li>-->
+<!--                                                            <li><a href="detail.html" data-toggle="tooltip" data-placement="top" title="Show Details" class="btn btn-success btn-sm"><i class="fa fa-eye"></i></a></li>-->
+<!--                                                        </ul>-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+<!--                                        <div class="">-->
+<!--                                            <div class="row">-->
+<!--                                                <div class="col-sm-2 col-xs-3">-->
+<!--                                                    <div class="item-badge hot-ads">-->
+<!--                                                        <a href="#">Hot Ads</a>-->
+<!--                                                    </div>-->
+<!--                                                    <div class="item-img">-->
+<!--                                                        <img alt="" th:src="@{/assets/img/products/product-2.jpg}">-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                                <div class="col-sm-8 col-xs-6">-->
+<!--                                                    <div class="item-title">-->
+<!--                                                        <a th:href="@{/user/detail}"><h4>Samsung Galaxy Grand Prime 530 8GB Grey</h4></a>-->
+<!--                                                    </div>-->
+<!--                                                    <div class="item-meta">-->
+<!--                                                        <ul>-->
+<!--                                                            <li class="item-date"><i class="fa fa-clock-o"></i> Today 10.35 am</li>-->
+<!--                                                            <li class="item-cat hidden-xs"><i class="fa fa-bars"></i> <a href="category.html">Electronics</a> , <a href="category.html">Smartphone</a></li>-->
+<!--                                                            <li class="item-location hidden-xs"><a href="category.html"><i class="fa fa-map-marker"></i> Manchester</a></li>-->
+
+<!--                                                            <li class="item-type"><i class="fa fa-bookmark"></i> Used</li>-->
+<!--                                                        </ul>-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                                <div class="col-sm-2 col-xs-3">-->
+<!--                                                    <div class="item-price">-->
+<!--                                                        <h3>$ 45</h3>-->
+<!--                                                        <span>Negotiable</span>-->
+<!--                                                    </div>-->
+<!--                                                    <div class="item-action">-->
+<!--                                                        <ul>-->
+<!--                                                            <li><a href="#" data-toggle="tooltip" data-placement="top" title="Save Favorite" class="btn btn-default btn-sm"><i class="fa fa-heart"></i></a></li>-->
+<!--                                                            <li><a href="detail.html" data-toggle="tooltip" data-placement="top" title="Show Details" class="btn btn-success btn-sm"><i class="fa fa-eye"></i></a></li>-->
+<!--                                                        </ul>-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+<!--                                        <div class="">-->
+<!--                                            <div class="row">-->
+<!--                                                <div class="col-sm-2 col-xs-3">-->
+<!--                                                    <div class="item-badge premium-ads">-->
+<!--                                                        <a href="#">Premium Ads</a>-->
+<!--                                                    </div>-->
+<!--                                                    <div class="item-img">-->
+<!--                                                        <img alt="" th:src="@{/assets/img/products/product-6.jpg}">-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                                <div class="col-sm-8 col-xs-6">-->
+<!--                                                    <div class="item-title">-->
+<!--                                                        <a th:href="@{/user/detail}"><h4>Samsung Tab 3 V 116</h4></a>-->
+<!--                                                    </div>-->
+<!--                                                    <div class="item-meta">-->
+<!--                                                        <ul>-->
+<!--                                                            <li class="item-date"><i class="fa fa-clock-o"></i> Today 10.35 am</li>-->
+<!--                                                            <li class="item-cat hidden-xs"><i class="fa fa-bars"></i> <a href="category.html">Electronics</a> , <a href="category.html">Smartphone</a></li>-->
+<!--                                                            <li class="item-location hidden-xs"><a href="category.html"><i class="fa fa-map-marker"></i> Manchester</a></li>-->
+<!--                                                            <li class="item-type"><i class="fa fa-bookmark"></i> Used</li>-->
+<!--                                                        </ul>-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                                <div class="col-sm-2 col-xs-3">-->
+<!--                                                    <div class="item-price">-->
+<!--                                                        <h3>$ 60</h3>-->
+<!--                                                        <span>Negotiable</span>-->
+<!--                                                    </div>-->
+<!--                                                    <div class="item-action">-->
+<!--                                                        <ul>-->
+<!--                                                            <li><a href="#" data-toggle="tooltip" data-placement="top" title="Save Favorite" class="btn btn-default btn-sm"><i class="fa fa-heart"></i></a></li>-->
+<!--                                                            <li><a href="detail.html" data-toggle="tooltip" data-placement="top" title="Show Details" class="btn btn-success btn-sm"><i class="fa fa-eye"></i></a></li>-->
+<!--                                                        </ul>-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+<!--                                        <div class=" highlight-ads">-->
+<!--                                            <div class="row">-->
+<!--                                                <div class="col-sm-2 col-xs-3">-->
+<!--                                                    <div class="item-img">-->
+<!--                                                        <img alt="" th:src="@{/assets/img/products/product-7.jpg}">-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                                <div class="col-sm-8 col-xs-6">-->
+<!--                                                    <div class="item-title">-->
+<!--                                                        <a th:href="@{/user/detail}"><h4>Sony Experia Z2 LTE</h4></a>-->
+<!--                                                    </div>-->
+<!--                                                    <div class="item-meta">-->
+<!--                                                        <ul>-->
+<!--                                                            <li class="item-date"><i class="fa fa-clock-o"></i> Today 10.35 am</li>-->
+<!--                                                            <li class="item-cat hidden-xs"><i class="fa fa-bars"></i> <a href="category.html">Electronics</a> , <a href="category.html">Smartphone</a></li>-->
+<!--                                                            <li class="item-location hidden-xs"><a href="category.html"><i class="fa fa-map-marker"></i> Manchester</a></li>-->
+<!--                                                            <li class="item-type"><i class="fa fa-bookmark"></i> New</li>-->
+<!--                                                        </ul>-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                                <div class="col-sm-2 col-xs-3">-->
+<!--                                                    <div class="item-price">-->
+<!--                                                        <h3>$ 75</h3>-->
+<!--                                                        <span>Negotiable</span>-->
+<!--                                                    </div>-->
+<!--                                                    <div class="item-action">-->
+<!--                                                        <ul>-->
+<!--                                                            <li><a href="#" data-toggle="tooltip" data-placement="top" title="Save Favorite" class="btn btn-default btn-sm"><i class="fa fa-heart"></i></a></li>-->
+<!--                                                            <li><a href="detail.html" data-toggle="tooltip" data-placement="top" title="Show Details" class="btn btn-success btn-sm"><i class="fa fa-eye"></i></a></li>-->
+<!--                                                        </ul>-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-results" th:if="${resultPageList.getList().size()==0}">
+                                <div class="row">
+                                    <div class="col-md-12 text-center" style="align-items: center;justify-content: center;display: flex;border-style: ridge; height: 500px;background: floralwhite">
+                                        <div class="item-img">
+                                            <img alt="" th:src="@{/icons/emptyItem.png}">
+                                            <span class="page-404__text" style="color: black">未找到相关的物品 请换个关键字或类型试一试</span>
+                                        </div>
+                                    </div>
+<!--                                    <div class="col-sm-12">-->
+<!--                                        <div class="highlight-ads">-->
+<!--                                            <div class="col-lg-12 ">-->
+<!--                                                <img alt="" th:src="@{/icons/emptyImg.png}">-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+                                </div>
+                            </div>
+
+                            <script>
+                                function searchGoods(obj) {
+                                    $("#currPage").val($(obj).text());
+                                    $("#searchForm").submit()
+                                }
+                            </script>
+                            <div class="row" th:if="${resultPageList.getTotalPage()!=0}" th:with="middle=${T(com.suerte.lostandfound.util.NumberUtils).round(7.0,2.0)}">
+                                <div class="col-md-12 text-right" th:with="start=${resultPageList.getCurrPage()-middle>0?(resultPageList.getTotalPage()-resultPageList.getCurrPage()+1>middle?resultPageList.getCurrPage()-middle+1:resultPageList.getTotalPage()-7+1):1}">
+
+<!--                                    <span th:value="${resultPageList.getTotalPage()-resultPageList.getCurrPage()+1<5?resultPageList.getTotalPage()-4:resultPageList.getCurrPage()}"></span>-->
+<!--                                    <span th:value="${resultPageList.getTotalPage()-resultPageList.getCurrPage()+1<5?resultPageList.getTotalPage():resultPageList.getCurrPage()+4}"></span>-->
+
+<!--                                    <button href="#" th:text="${resultPageList.getCurrPage()-middle>0?(resultPageList.getTotalPage()-resultPageList.getCurrPage()+1>middle?resultPageList.getCurrPage()-middle+1:resultPageList.getTotalPage()-7+1):1}"></button>-->
+
+
+
+                                    <ul class="pagination" th:each="pageItem:${#numbers.sequence(start,resultPageList.getTotalPage()>start+7.0-1?start+7.0-1:resultPageList.getTotalPage())}">
+<!--                                    <ul class="pagination" th:each="pageItem:${resultPageList.getTotalPage()-resultPageList.getCurrPage()+1<5?#numbers.sequence(resultPageList.getTotalPage()-6,resultPageList.getTotalPage()-2):#numbers.sequence(resultPageList.getCurrPage(),resultPageList.getCurrPage()+4)}">-->
+<!--                                    <ul class="pagination">-->
+                                        <li><a href="#" onclick="searchGoods(this)" th:text="${pageItemStat.current}"></a></li>
+<!--                                        <li><a href="#" th:text="${T(com.suerte.lostandfound.util.NumberUtils).round(5.0,2.0)}"></a></li>-->
+                                        <!--                                        <li><a href="#">2</a></li>-->
+                                        <!--                                        <li class="active"><a href="#">3</a></li>-->
+                                        <!--                                        <li><a href="#">4</a></li>-->
+                                        <!--                                        <li><a href="#">5</a></li>-->
+                                    </ul>
+
+<!--                                    <ul class="pagination" th:if="${resultPageList.getTotalPage()<=5}" th:each="pageItem:${#numbers.sequence(1,resultPageList.getTotalPage())}">-->
+<!--                                        <li><a href="#" th:text="${pageItemStat.current}"></a></li>-->
+<!--&lt;!&ndash;                                        <li><a href="#">2</a></li>&ndash;&gt;-->
+<!--&lt;!&ndash;                                        <li class="active"><a href="#">3</a></li>&ndash;&gt;-->
+<!--&lt;!&ndash;                                        <li><a href="#">4</a></li>&ndash;&gt;-->
+<!--&lt;!&ndash;                                        <li><a href="#">5</a></li>&ndash;&gt;-->
+<!--                                    </ul>-->
+
+<!--                                    <ul class="pagination" th:if="${resultPageList.getTotalPage()>5}" th:each="pageItem:${resultPageList.getTotalPage()-resultPageList.getCurrPage()>=5?#numbers.sequence(resultPageList.getCurrPage(),resultPageList.getCurrPage()+4):#numbers.sequence(resultPageList.getTotalPage()-4,resultPageList.getTotalPage())}">-->
+<!--                                        <li><a href="#" onclick="searchGoods(this)" th:text="${pageItemStat.current}"></a></li>-->
+<!--                                        &lt;!&ndash;                                        <li class="active"><a href="#">3</a></li>&ndash;&gt;-->
+<!--                                        &lt;!&ndash;                                        <li><a href="#">2</a></li>&ndash;&gt;-->
+<!--                                        &lt;!&ndash;                                        <li><a href="#">4</a></li>&ndash;&gt;-->
+<!--                                        &lt;!&ndash;                                        <li><a href="#">5</a></li>&ndash;&gt;-->
+<!--                                    </ul>-->
+
+
+
+
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="footer">
+                <div class="container">
+
+                    <ul class="text-center footer-menu">
+                        <li>Copyright &copy; 2018.Company name All rights reserved.<a target="_blank" href="http://sc.chinaz.com/moban/">&#x7F51;&#x9875;&#x6A21;&#x677F;</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- Essentials -->
+        <script th:src="@{/assets/bootstrap/js/bootstrap.min.js}"></script>
+        <script th:src="@{/assets/plugins/owl-carousel/owl.carousel.js}"></script>
+        <script th:src="@{/assets/plugins/counter/jquery.countTo.js}"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+        </script>
+    </body>
+</html> 
