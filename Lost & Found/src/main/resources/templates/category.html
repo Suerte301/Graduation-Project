@@ -258,6 +258,7 @@
                                                         <a href="#">Featured Ads</a>
                                                     </div>
                                                     <div class="item-img">
+
                                                         <img alt="" th:if="*{not #strings.isEmpty(imgSrc)}" th:src="*{imgSrc}">
                                                         <img alt="" th:if="*{#strings.isEmpty(imgSrc)}" th:src="@{/icons/emptyImg.png}">
                                                     </div>
