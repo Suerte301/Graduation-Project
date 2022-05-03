@@ -264,7 +264,7 @@
                                                 </div>
                                                 <div class="col-sm-8 col-xs-6">
                                                     <div class="item-title">
-                                                        <a th:href="@{/user/detail(id=${goods.getId()})}"><h4>Lenovo A326 Black 4GB RAM</h4></a>
+                                                        <a th:href="@{/user/detail(id=${goods.getId()})}"><h4 th:text="${goods.getTitle()}">Lenovo A326 Black 4GB RAM</h4></a>
                                                     </div>
                                                     <div class="item-meta">
                                                         <ul>
