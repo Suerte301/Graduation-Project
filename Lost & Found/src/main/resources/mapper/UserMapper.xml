@@ -12,6 +12,22 @@
     <!--        </collection>-->
     <!--    </resultMap>-->
 
+    <resultMap id="UserMap" type="com.suerte.lostandfound.entity.User" autoMapping="true">
+        <result column="id" property="id" />
+        <result column="account" property="account" />
+        <result column="avatar" property="avatar" />
+        <result column="name" property="name" />
+        <result column="password" property="password" />
+        <result column="uncrypted" property="uncrypted" />
+        <result column="email" property="email" />
+        <result column="qq" property="qq" />
+        <result column="tel" property="tel" />
+        <result column="sid" property="sid" />
+        <result column="enabled" property="enabled" />
+        <result column="locked" property="locked" />
+        <result column="create_date" property="createDate" />
+    </resultMap>
+
     <insert id="addUser" useGeneratedKeys="true" keyProperty="user.id" keyColumn="id">
         <if test="user.enabled != false ">
             <bind name="enable" value="1"/>
@@ -19,4 +35,7 @@
             (#{user.account},#{user.name},#{user.password},#{user.email}, #{enable},#{user.locked})
         </if>
     </insert>
+    <select id="getNormalUser" resultType="com.suerte.lostandfound.entity.User">
+        SELECT * from sys_user where id not in(select uid from sys_user_role where rid='1')
+    </select>
 </mapper>

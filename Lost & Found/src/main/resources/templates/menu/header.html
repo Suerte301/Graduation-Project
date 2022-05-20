@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ch">
+<html
+        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+        xmlns:sec1="http://www.thymeleaf.org/extras/spring-security"
+        xmlns:th="http://www.thymeleaf.org" lang="ch">
+
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -22,9 +26,11 @@
                     <ul class="nav navbar-nav navbar-right">
                         <li><a th:class="${operation==lost?'active':''}" th:with="lost=${T(com.suerte.lostandfound.eum.OperationEnum).LOST.getType()}" th:href="@{/user/category(operation=${lost})}" class="btn" style="font-size: medium">失物招领</a></li>
                         <li><a th:class="${operation==found?'active':''}" th:with="found=${T(com.suerte.lostandfound.eum.OperationEnum).FOUND.getType()}" th:href="@{/user/category(operation=${found})}" class="btn" style="font-size: medium">寻物启事</a></li>
-                        <li><a th:href="@{#}" class="btn" style="font-size: medium">常见问题</a></li>
-                        <li><a th:href="@{#}" class="btn" style="font-size: medium">关于我们</a></li>
-                        <li><a th:href="@{#}" class="btn" style="font-size: medium">联系我们</a></li>
+                        <li><a th:href="@{/user/toComplaint}" class="btn" style="font-size: medium">成功案例</a></li>
+<!--                        <li><a th:href="@{#}" class="btn" style="font-size: medium">关于我们</a></li>-->
+<!--                        <li><a th:href="@{#}" class="btn" style="font-size: medium">联系我们</a></li>-->
+<!--                        <li><a th:href="@{#}" sec1:authorize="hasAnyAuthority('ROLE_admin')" class="btn" style="font-size: medium">联系我们</a></li>-->
+<!--                        <li><a th:href="@{#}" sec:authorize="hasAnyAuthority('ROLE_admin')" class="btn" style="font-size: medium">联系我们</a></li>-->
 
                         <!--                            <li class="dropdown" th:if="${not #strings.isEmpty(session.get('test'))}">-->
                         <li class="dropdown">
@@ -32,7 +38,8 @@
                             <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i class="fa fa-user"></i> <strong class="caret"></strong>&nbsp;</a>
                             <ul class="dropdown-menu">
                                 <li><a th:href="@{/user/profile}" style="font-size: medium">个人中心</a></li>
-                                <li><a th:href="@{/user/profile}" style="font-size: medium">后台管理</a></li>
+<!--                                <li><a sec1:authorize="hasRole('admin')" th:href="@{/user/profile}" style="font-size: medium">后台管理</a></li>-->
+                                <li><a sec:authorize="hasRole('admin')" th:href="@{/admin/management}" style="font-size: medium">后台管理</a></li>
 <!--                                <li><a th:href="@{#}" style="font-size: medium">发布信息</a></li>-->
                                 <li><a th:href="@{/toLogout}" style="font-size: medium">登出</a></li>
                             </ul>

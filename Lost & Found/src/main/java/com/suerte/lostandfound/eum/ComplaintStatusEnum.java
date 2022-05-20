@@ -4,26 +4,27 @@ import lombok.Getter;
 
 /**
  * @Author: Demon
- * @Date: 2022/5/2
+ * @Date: 2022/5/18
  * @Description:
  */
 @Getter
-public enum FormStatusEnum {
-    APPLY_FAILED("申请失败",-1),
-    IN_APPLY("申请中",0),
-    APPLY_SUCCESS("申请成功",1);
+public enum  ComplaintStatusEnum {
+    IN_COMPLAINT("申诉中", 0),
+    COMPLAINT_FAILED("申诉失败", -1),
+    COMPLAINT_SUCCESS("申诉成功", 1);
 //    END("结束", 2);
+
 
     private String msg;
     private Integer type;
-    FormStatusEnum(String msg, Integer type) {
+    ComplaintStatusEnum(String msg, Integer type) {
         this.msg = msg;
         this.type = type;
     }
 
-    public static FormStatusEnum getStatusByType(Integer type) {
+    public static ComplaintStatusEnum getStatusByType(Integer type) {
         if (type == null) return null;
-        for (FormStatusEnum value : values()) {
+        for (ComplaintStatusEnum value : values()) {
             if (value.getType().equals(type)) {
                 return value;
             }

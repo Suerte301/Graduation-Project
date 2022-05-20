@@ -1,6 +1,8 @@
 package com.suerte.lostandfound.config;
 
 import com.suerte.lostandfound.constant.LoginConstant;
+import com.suerte.lostandfound.constant.RedisConstant;
+import com.suerte.lostandfound.entity.User;
 import com.suerte.lostandfound.service.UserService;
 import com.suerte.lostandfound.vo.HttpResult;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.web.filter.CharacterEncodingFilter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -70,6 +75,14 @@ public class MyWebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable();
 
+
+        http.cors().and().csrf().disable();
+
+        //单用户登录，如果有一个登录了，同一个用户在其他地方登录将前一个剔除下线
+        http.sessionManagement().maximumSessions(1);//.expiredSessionStrategy(expiredSessionStrategy());
+        //单用户登录，如果有一个登录了，同一个用户在其他地方不能登录
+//        http.sessionManagement().maximumSessions(1).maxSessionsPreventsLogin(true);
+
         //开启了登出页面,如果跳转不了就关闭csrf功能。或者表单来提交并且用post请求
         //默认的登出页面为login。logoutSuccessUrl可以设置登出页面
         // handler和Url冲突
@@ -77,20 +90,31 @@ public class MyWebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .invalidateHttpSession(true)
                 .deleteCookies("remove","user")
                 .logoutUrl("/toLogout")
-//                .logoutSuccessHandler(new LogoutSuccessHandler() {
-//                    @Override
-//                    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+                .logoutSuccessHandler(new LogoutSuccessHandler() {
+                    @Override
+                    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 //                        User attribute = (User) request.getSession().getAttribute(LoginConstant.USER);
 //                        request.getSession().removeAttribute(LoginConstant.USER);
-//                        redissonClient.getKeys().delete(RedisConstant.USER_LOGIN_PREFIX + attribute.getId());
-//                        // 删除Cookie
-////                        Cookie cookie = new Cookie(LoginConstant.USER, null);
-////                        cookie.setMaxAge(0);
-////                        response.addCookie(cookie);
-//                        response.sendRedirect("/toSignIn");
-//                    }
-//                });
-                .logoutSuccessUrl("/toSignIn");
+                        redissonClient.getKeys().delete(RedisConstant.USER_LOGIN_PREFIX + ((User)authentication.getPrincipal()).getId());
+                        // 删除Cookie
+//                        Cookie cookie = new Cookie(LoginConstant.USER, null);
+//                        cookie.setMaxAge(0);
+//                        response.addCookie(cookie);
+                        response.sendRedirect("/toSignIn");
+                    }
+                });
+//                .logoutSuccessUrl("/toSignIn");
+
+        //退出时情况cookies
+        http.logout().deleteCookies("JESSIONID");
+
+
+        //解决中文乱码问题
+        CharacterEncodingFilter filter = new CharacterEncodingFilter();
+        filter.setEncoding("UTF-8"); filter.setForceEncoding(true);
+        //
+        http.addFilterBefore(filter, CsrfFilter.class);
+
 
         //开启记住我功能并设置表单传上来的参数  cookie 默认保存
         http.rememberMe().rememberMeParameter("remember me");

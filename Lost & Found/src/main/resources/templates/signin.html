@@ -13,6 +13,7 @@
 	<link rel="stylesheet" th:href="@{/css/jquery.mCustomScrollbar.min.css}">
 	<link rel="stylesheet" th:href="@{/css/paymentfont.min.css}">
 	<link rel="stylesheet" th:href="@{/css/main.css}">
+	<link rel="stylesheet" th:href="@{/assets/bootstrap/css/bootstrap.min.css}" type="text/css">
 	<link id="theme_style" type="text/css" th:href="@{/assets/css/style1.css}" rel="stylesheet" media="screen">
 	<!-- Favicons -->
 	<link rel="icon" type="image/png" th:href="@{/icon/favicon-32x32.png}" sizes="32x32">
@@ -33,7 +34,7 @@
 
 					<div class="sign__content">
 						<!-- authorization form -->
-						<form th:action="@{/login}" class="sign__form" method="post" >
+						<form th:action="@{/login}" id="loginForm" class="sign__form" method="post" >
 							<a th:href="@{/toSignIn}" class="navbar-brand"><span class="logo"><i class="fa fa-recycle"></i> Lost & Found</span></a>
 							<!--							<a th:href="@{/test/index}" class="sign__logo">-->
 							<!--								<img th:src="@{/img/logo.svg}" alt="">-->
@@ -42,20 +43,113 @@
 							<input class="text-warning" style="text-align: center; color: red; background-color:transparent;border:0;" readonly th:if="${not #strings.isEmpty(#request.getAttribute('info'))}"
 								   th:value="${info.getMsg()}"/>
 							<div class="sign__group">
-								<input type="text" name="username" class="sign__input" style="background-color: #e8f0fe;color: black;" placeholder="username">
+								<input type="text" id="username" name="username" class="sign__input" style="background-color: #e8f0fe;color: black;" placeholder="username">
 							</div>
 
 							<div class="sign__group">
 								<input type="password" name="password" class="sign__input" style="background-color: #e8f0fe;color: black;" placeholder="password">
 							</div>
+							<div class="sign__group">
+								<input type="text" name="smsCode" id="smsCode" class="sign__input" style="background-color: #e8f0fe;color: black;width: 60%" placeholder="验证码">
+								<input class="btn btn-success" id="smsBtn" type="button" style="margin-left: 6%" onclick="sendMsg()" value="发送验证码">
+								<input hidden="hidden" id="phone">
+							</div>
 
+
+							<script>
+								function sendMsg() {
+									let phone="";
+									let smsBtn = $("#smsBtn");
+									$.ajax({
+										url: "/sms/getByAccount?account="+$("#username").val(),
+										method: 'get',
+										success:function (response,status) {
+											console.log(response)
+											phone=response;
+											if (phone===""){
+												return;
+											}
+											$("#phone").val(phone)
+											let formData = new FormData();
+											// let smsBtn=$("#smsCode");
+											// let smsCode =smsBtn.val().trim();
+											formData.append("phone",phone);
+											$.ajax({
+												url: "/sms/send",
+												// type: 'post',
+												method: 'post',
+												// dataType: 'json',
+												//上传文件必须写这两句话
+												/**
+												 *必须false才会自动加上正确的Content-Type
+												 */
+												contentType: false,
+												/**
+												 * 必须false才会避开jQuery对 formdata 的默认处理
+												 * XMLHttpRequest会对 formdata 进行正确的处理
+												 */
+												processData: false,
+												data : formData,
+												success:function (response,status) {
+													console.log(response)
+													if (response==="success"){
+														alert("发送短信成功");
+														let time=60;
+														let timer = setInterval(function () {
+															if (time === 0) {
+																// 清除定时器
+																clearInterval(timer);
+																smsBtn.val('发送验证码');
+																smsBtn.removeAttr("disabled")
+																time = 60000; // 这一步很重要一定将时间恢复
+															} else {
+																time--;
+																smsBtn.prop("disabled","disabled");
+																smsBtn.val( '还剩' + time + '秒重新发送');
+															}
+														},1000);
+													}else {
+														alert("发送短信失败")
+													}
+												}
+											});
+										}
+									})
+
+								}
+							</script>
 							<div class="sign__group sign__group--checkbox">
 								<input id="remember me" name="remember me" type="checkbox" checked="checked">
 								<label for="remember me">Remember Me</label>
 							</div>
 							
-							<button class="sign__btn" type="submit">Sign in</button>
+							<button class="sign__btn" type="button" onclick="toLogin()">Sign in</button>
 
+							<script>
+								function toLogin() {
+									let smsCode = $("#smsCode").val();
+									if (smsCode===""){
+										alert("请输入验证码");
+										return;
+									}
+
+									$.ajax({
+										url: "/sms/getCode?account="+$("#username").val(),
+										method: 'get',
+										success:function (response,status) {
+											console.log("response="+response)
+											if (response === "") {
+												return;
+											}
+											if (response===smsCode){
+												$("#loginForm").submit()
+											}else {
+												alert("验证码不正确")
+											}
+										}})
+
+								}
+							</script>
 <!--							<span class="sign__text">Don't have an account? <a th:href="@{/toSignUp}">Sign up!</a></span>-->
 
 							<span class="sign__text"><a th:href="@{/toForgot}">Forgot password?</a></span>

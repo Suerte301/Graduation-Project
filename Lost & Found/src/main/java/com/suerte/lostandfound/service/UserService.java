@@ -44,6 +44,10 @@ public class UserService extends ServiceImpl<UserMapper,User> implements UserDet
     private RedissonClient redissonClient;
 
 
+    public List<User> getNormalUser(){
+        return userMapper.getNormalUser();
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 

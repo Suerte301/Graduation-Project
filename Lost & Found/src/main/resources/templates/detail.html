@@ -162,8 +162,53 @@
                                             <div class="row" th:if="${goods.getStatus().getType().equals(T(com.suerte.lostandfound.eum.GoodsStatusEnum).REVIEW_PASSED.getType())}">
                                                 <div class="col-xs-6" th:if="${not isApply}">
 <!--                                                    <button class="btn btn-info"><i class="fa fa-whatsapp"></i> <span class="hidden-xs hidden-sm">0823 4223 4234</span></button>-->
-                                                    <button th:if="${goods.getOperation().getType().equals(T(com.suerte.lostandfound.eum.OperationEnum).LOST.getType())}" class="btn btn-warning" data-target="#sendMessageModal" data-toggle="modal"><i class="fa fa-envelope"></i> <span class="hidden-xs hidden-sm" th:text="提供失物">Send Message</span></button>
-                                                    <button th:if="${goods.getOperation().getType().equals(T(com.suerte.lostandfound.eum.OperationEnum).FOUND.getType())}"  class="btn btn-warning" data-target="#sendMessageModal" data-toggle="modal"><i class="fa fa-envelope"></i> <span class="hidden-xs hidden-sm" th:text="认领物品">Send Message</span></button>
+<!--                                                    <button th:if="${goods.getOperation().getType().equals(T(com.suerte.lostandfound.eum.OperationEnum).LOST.getType())}" class="btn btn-warning" data-target="#sendMessageModal" data-toggle="modal"><i class="fa fa-envelope"></i> <span class="hidden-xs hidden-sm" th:text="提供失物">Send Message</span></button>-->
+<!--                                                    <button th:if="${goods.getOperation().getType().equals(T(com.suerte.lostandfound.eum.OperationEnum).FOUND.getType())}"  class="btn btn-warning" data-target="#sendMessageModal" data-toggle="modal"><i class="fa fa-envelope"></i> <span class="hidden-xs hidden-sm" th:text="认领物品">Send Message</span></button>-->
+                                                    <button id="applyBtn" th:if="${goods.getOperation().getType().equals(T(com.suerte.lostandfound.eum.OperationEnum).LOST.getType())}" th:with="gid=${goods.getId()}" th:onclick="addApplyForm([[${gid}]])" class="btn btn-warning">
+                                                        <i class="fa fa-envelope"></i>
+                                                        <span class="hidden-xs hidden-sm" id="applymsg" th:text="提供失物">Send Message</span>
+                                                    </button>
+                                                    <button id="applyBtn" th:if="${goods.getOperation().getType().equals(T(com.suerte.lostandfound.eum.OperationEnum).FOUND.getType())}" th:with="gid=${goods.getId()}" th:onclick="addApplyForm([[${gid}]])" class="btn btn-warning">
+                                                        <i class="fa fa-envelope"></i>
+                                                        <span class="hidden-xs hidden-sm" id="applymsg" th:text="认领物品">Send Message</span>
+                                                    </button>
+                                                    <script>
+                                                        function addApplyForm(goodsId) {
+
+                                                            let applyForm = $("#applyBtn");
+
+                                                            // alert(location+locationDetail+tel+currentUser)
+                                                            $.ajax({
+                                                                type: 'post',
+                                                                url: '/user/applyForMyGoods',
+                                                                dataType: 'json',
+                                                                contentType:"application/json;charset=utf-8",
+                                                                data:JSON.stringify( {
+                                                                    // 'uid':currentUser,
+                                                                    'goodsId':goodsId,
+                                                                    // 'locationId':location.val(),
+                                                                    // 'locationDetail':locationDetail.val(),
+                                                                    // 'tel':tel.val()
+                                                                }),
+                                                                success: function (data,status) {
+                                                                    // alert(data)
+
+                                                                    console.log(data)
+                                                                    alert(data.msg)
+                                                                    applyForm.text("已申请");
+                                                                    $("#applymsg").val("已申请")
+                                                                    // applyForm.attr("disabled");
+                                                                    applyForm.prop("disabled","disabled");
+                                                                    // console.log(status)
+                                                                },
+                                                                error:function (data,status) {
+                                                                    alert('error')
+                                                                    console.log(data)
+                                                                    console.log(status)
+                                                                }
+                                                            });
+                                                        }
+                                                    </script>
                                                 </div>
                                                 <div class="col-xs-6" th:if="${isApply}">
                                                     <!--                                                    <button class="btn btn-info"><i class="fa fa-whatsapp"></i> <span class="hidden-xs hidden-sm">0823 4223 4234</span></button>-->
@@ -319,6 +364,7 @@
                                 <div class="widget-body text-center">
                                     <img alt="avatar" th:src="${goods.getUser().getAvatar()}" class="seller-avatar img-responsive">
                                     <h2 class="seller-name" th:text="${goods.getUser().getName()}">John Doe</h2>
+                                    phone: <strong th:text="${goods.getUser().getTel()}">John Doe</strong><br>
 <!--                                    <p class="seller-detail" th:text="${goods.getLocation().getPosition()}">Location: <strong>Orlando</strong><br/>-->
 <!--                                        QQ : <strong th:text="${goods.getUser().getQq()}">21 June 2010</strong></p>-->
 <!--                                        电话 : <strong th:text="${goods.getUser().getTel()}">21 June 2010</strong></p>-->
@@ -432,7 +478,7 @@
                     </div>
                     <div class="modal-footer">
                         <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>
-                        <button id="applyForm" class="btn btn-custom" th:onclick="applyForGoods([[${goods.getId()}]])" type="button"><i class="fa fa-paper-plane"></i> Send</button>
+                        <button id="applyForm" class="btn btn-custom" th:onclick="applyForGoods(${goods.getId()})" type="button"><i class="fa fa-paper-plane"></i> Send</button>
                     </div>
                     <script>
                         function checkMobile(number) {

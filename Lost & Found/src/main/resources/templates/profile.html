@@ -141,7 +141,7 @@
                                             <!--                                                <li class="list-group-item">已审核</li>-->
                                             <!--                                            </ul>-->
                                             <ul>
-                                                <li th:each="goodsStatus:${T(com.suerte.lostandfound.eum.GoodsStatusEnum).values()}">
+                                                <li th:each="goodsStatus:${T(com.suerte.lostandfound.eum.GoodsStatusEnum).getDefaultOps()}">
                                                     <a class="btn"
                                                        th:onclick="generateGoodsResult([[${goodsStatus.getType()}]],null,null,[[${goodsStatus.getMsg()}]])"
                                                        th:text="${goodsStatus.getMsg()}">已申请</a>
@@ -169,8 +169,29 @@
                                             <ul>
                                                 <li th:each="formStatus:${T(com.suerte.lostandfound.eum.FormStatusEnum).values()}">
                                                     <a class="btn"
-                                                       th:onclick="generateFormResult([[${formStatus.getType()}]],null,null,[[${formStatus.getMsg()}]],[[${T(com.suerte.lostandfound.eum.FormStatusEnum).END.getType().equals(formStatus.getType())}]])"
+                                                       th:onclick="generateFormResult([[${formStatus.getType()}]],null,null,[[${formStatus.getMsg()}]],[[${not T(com.suerte.lostandfound.eum.FormStatusEnum).IN_APPLY.getType().equals(formStatus.getType())}]])"
                                                        th:text="${formStatus.getMsg()}">已申请</a>
+                                                </li>
+                                            </ul>
+                                            <!--                                            <button th:onclick="getResult()" class="btn-menu-custom">待审核</button><br>-->
+                                            <!--                                            <button th:onclick="getResult()" class="btn-menu-custom">已审核</button><br>-->
+                                            <!--                                            <button  href="#" class="btn-menu-custom">已审核</button><br>-->
+                                            <!--                                            <div class="panel-footer">Footer</div>-->
+                                        </div>
+
+                                        <div class="panel-heading" style="border-bottom: #e3e3e3 solid">
+                                            <h4 class="panel-title">
+                                                <a class="btn btn-sm" data-toggle="collapse"
+                                                   href="#complaintOperation">申诉管理</a>
+                                            </h4>
+                                        </div>
+                                        <div class="panel-collapse collapse" id="complaintOperation">
+
+                                            <ul>
+                                                <li th:each="complaintStatus:${T(com.suerte.lostandfound.eum.ComplaintStatusEnum).values()}">
+                                                    <a class="btn"
+                                                       th:onclick="generateComplaintFormResult([[${complaintStatus.getType()}]],null,[[${complaintStatus.getMsg()}]])"
+                                                       th:text="${complaintStatus.getMsg()}">已申请</a>
                                                 </li>
                                             </ul>
                                             <!--                                            <button th:onclick="getResult()" class="btn-menu-custom">待审核</button><br>-->
@@ -186,7 +207,7 @@
                                                 $("#emptyResult").hide()
                                                 $("#resultRow").hide()
                                                 $("#pageNum").hide()
-                                                $("#searchDiv").hide()
+                                                $("#searchAllDiv").hide()
                                                 $("#graph").hide()
                                             }
                                             function getGraph() {
@@ -195,7 +216,7 @@
                                                 $("#emptyResult").hide()
                                                 $("#resultRow").hide()
                                                 $("#pageNum").hide()
-                                                $("#searchDiv").hide()
+                                                $("#searchAllDiv").hide()
 
                                             }
                                             function generateGoodsResult(type,currentPage,searchKey,typeName) {
@@ -219,6 +240,7 @@
                                                             console.log(response);
                                                             let result = response.data.result;
                                                             console.log(result);
+                                                            $("#searchAllDiv").show()
                                                             $("#searchDiv").show()
                                                             $("#currPage").text(result.currPage);
                                                             $("#totalCount").text(typeName+' total: '+result.totalCount+" items");
@@ -318,7 +340,7 @@
                                                                 });
 
                                                                 $("#searchInput").val(response.data.searchKey);
-                                                                // $("#searchDiv").show()
+                                                                // $("#searchAllDiv").show()
 
                                                             }
                                                         }
@@ -344,6 +366,7 @@
                                                         if (response.code === 500) {
                                                             alert(response.msg)
                                                         } else {
+                                                            $("#searchAllDiv").show()
                                                             $("#searchDiv").show()
                                                             console.log(response);
                                                             let result = response.data.result;
@@ -421,7 +444,7 @@
                                                                         "                            </div>\n" +
                                                                         "                        </div>";
 
-                                                                    // console.log(html)
+                                                                    console.log(html)
                                                                     resultHtml += html;
 
                                                                 }
@@ -450,7 +473,149 @@
                                                                 });
 
                                                                 $("#searchInput").val(response.data.searchKey);
-                                                                // $("#searchDiv").show()
+                                                                // $("#searchAllDiv").show()
+
+                                                            }
+                                                        }
+                                                    }
+                                                )
+
+                                            }
+
+                                            function generateComplaintFormResult(type,currentPage,typeName) {
+                                                // console.log(flag+"----")
+                                                $("#goodsInfo").hide();
+                                                if ((typeof(searchKey)==='undefined')){
+                                                    searchKey="";
+                                                }
+                                                console.log(searchKey)
+                                                $("#graph").hide()
+                                                // let searchInput = $("#searchInput").val();
+                                                $.get(
+                                                    "/complaint/getByStatus?status=" + type+(currentPage===null?'':"&currPage="+currentPage),
+                                                    function success(response, status) {
+                                                        // console.log(response)
+                                                        // console.log(status)
+
+                                                        if (response.code === 500) {
+                                                            alert(response.msg)
+                                                        } else {
+                                                            // $("#searchAllDiv").show()
+                                                            console.log(response);
+                                                            let result = response.data.result;
+                                                            console.log(result);
+                                                            $("#searchDiv").hide()
+                                                            $("#searchAllDiv").show()
+                                                            $("#currPage").text(result.currPage);
+                                                            $("#totalCount").text(typeName+'  total: '+result.totalCount+" items");
+                                                            // $("#pageSize").text(result.pageSize);
+                                                            // $("#totalCount").text(result.totalCount);
+                                                            // $("#totalPage").text(result.totalPage);
+
+                                                            // alert(type)
+                                                            if (result.totalCount === 0) {
+                                                                $("#resultRow").hide();
+                                                                $("#emptyResult").show()
+                                                                $("#pageNum").hide()
+                                                            } else {
+                                                                $("#resultRow").html('');
+                                                                // $("#emptyResult").hide('');
+                                                                let applyList = result.list;
+                                                                let resultHtml = "";
+
+                                                                for (let apply of applyList) {
+                                                                    // console.log(goods);
+                                                                    console.log(apply);
+                                                                    let goodsImg = apply.applyForm.goodsRes.imgSrc === '' ? '/icons/emptyImg.png' : apply.applyForm.goodsRes.imgSrc;
+                                                                    let goods=apply.applyForm.goodsRes;
+                                                                    let html = "\n<div class=\"row\">\n" +
+                                                                        "                            <div class=\"col-sm-12\" style='border-bottom: #e3dede solid'>\n" +
+                                                                        "                                <div class=\"row\" >\n" +
+                                                                        "                                    <div class=\"col-sm-2 col-xs-3\">\n" +
+                                                                        "                                        <div class=\"item-badge featured-ads\">\n" +
+                                                                        "                                            <a href=\"#\">Featured Ads</a>\n" +
+                                                                        "                                        </div>\n" +
+                                                                        "                                        <div class=\"item-img\">\n" +
+                                                                        "                                            <img alt=\"\" src=\"" + goodsImg +
+                                                                        "\">\n" +
+                                                                        "                                        </div>\n" +
+                                                                        "                                    </div>\n" +
+                                                                        "                                    <div class=\"col-sm-8 col-xs-6\">\n" +
+                                                                        "                                        <div class=\"item-title\">\n" +
+                                                                        "                                            <!--                                                <a th:href=\"@{/user/detail(id=${goods.getId()})}\"><h4>Lenovo A326 Black 4GB RAM</h4></a>-->\n" +
+                                                                        "                                            <a href=\"/user/detail?id="+goods.id+"\"><h4>"+goods.title+"</h4></a>\n" +
+                                                                        "                                        </div>\n" +
+                                                                        "                                        <div class=\"item-meta\">\n" +
+                                                                        //         <li><i class="fa fa-clock-o"></i><span th:text="${other.getCreateDate()}">2 minutes ago</span> </li>
+                                                                        //     <li><i class="fa fa-bars"></i> <a th:href="@{/user/category(categoryType=${other.getCategory().getType()})}" th:text="${other.getCategory().getName()}">Electronic</a>
+                                                                        // <li><i class="fa fa-map-marker"></i> <a th:href="@{/user/category(positionId=${other.getLocation().getId()})}" th:text="${other.getLocation().getPosition()}" >Mountain View</a></li>
+                                                                        "                                            <ul>\n" +
+                                                                        // "                                                <li class=\"item-date\"><i class=\"fa fa-clock-o\"></i> "+apply.createDate+"</li>\n" +
+                                                                        "                                                <li class=\"item-cat hidden-xs\"><i class=\"fa fa-bars\"></i>" +apply.user.name+"</li>\n" +
+                                                                        "                                                <li class=\"item-location hidden-xs\"><a href=\"/user/category?positionId="+goods.location.id+"\"><i class=\"fa fa-map-marker\"></i>"+goods.location.position+"</a></li>\n" +
+                                                                        // "                                                <li class=\"item-cat hidden-xs\"><i class=\"fa fa-bars\"></i> <a href=\"/user/category?categoryType="+goods.categoryType+"\">Electronics</a>\n" +
+                                                                        // "                                                <li class=\"item-location hidden-xs\"><a href=\"/user/category?positionId="+goods.locationId+"\"><i class=\"fa fa-map-marker\"></i> Manchester</a></li>\n" +
+                                                                        // "                                                <li class=\"item-type\"><i class=\"fa fa-bookmark\"></i> New</li>\n" +
+                                                                        "                                            </ul>\n" +
+                                                                        "                                        </div>\n" +
+                                                                        "                                    </div>\n" +
+                                                                        "                                    <div class=\"col-sm-2 col-xs-3\">\n" +
+                                                                        "                                        <div class=\"item-price\">\n" +
+                                                                        "                                            <h4>"+goods.operationName+"</h4>\n" +
+                                                                        // "                                            <span>Negotiable</span>\n" +
+                                                                        "                                        </div>\n" +
+                                                                        "                                        <div class=\"item-action\">\n" +
+                                                                        "                                            <ul>\n" +
+
+                                                                        "<li class=\"popover-options\"> <a href=\"#\"  data-container=\"body\" data-toggle=\"popover\" data-content=\""+apply.applyForm.popUpDetail+"\" title=\"Show Details\" style='color: #fff;background-color: #5cb85c;border-color: #4cae4c;' class=\"btn btn-success btn-default btn-sm\"> <i class=\"fa fa-eye\"></i>查看详情 </a> </li>"+
+                                                                        // "<li class='popover-options'><a href='#' data-container='body' data-toggle='popover' data-content='"+apply.applyForm.popUpDetail+"' title='Show Details' class='btn btn-success btn-default btn-sm'><i class='fa fa-eye'></i>查看详情</a></li>"+
+                                                                        // "                                                <li><a href=\"#\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Save Favorite\" class=\"btn btn-default btn-sm\"><i class=\"fa fa-heart\"></i></a></li>\n" +
+                                                                        // "                                                <li><a href=\"detail.html\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Show Details\" class=\"btn btn-success btn-sm\"><i class=\"fa fa-eye\"></i></a></li>\n" +
+                                                                        "                                            </ul>\n" +
+
+                                                                        " <script>" +
+                                                                        "$(function () {" +
+                                                                        "$('.popover-options a').popover({html:true,trigger: 'focus'});" +
+                                                                        "})" +
+                                                                        "<\/script>"+
+                                                                        "                                        </div>\n" +
+                                                                        "                                    </div>\n" +
+                                                                        "                                </div>\n" +
+                                                                        "\n" +
+                                                                        "                            </div>\n" +
+                                                                        "                        </div>";
+
+                                                                    console.log(html)
+                                                                    resultHtml += html;
+
+                                                                }
+                                                                $("#emptyResult").hide();
+                                                                $("#resultRow").html(resultHtml);
+                                                                $("#resultRow").show();
+
+                                                                $("#pagination").val('');
+                                                                let pageHtml = "";
+
+                                                                let pageNum=5.0;
+
+                                                                let middle = Math.round(pageNum / 2.0);
+                                                                let startPage = result.currPage - middle > 0 ? (result.totalPage - result.currPage + 1 > middle ? result.currPage - middle + 1 : result.totalPage - pageNum + 1) : 1
+                                                                let end = result.totalPage > startPage +pageNum - 1 ? startPage + pageNum- 1 : result.totalPage;
+                                                                for (let i = startPage; i <= end; i++) {
+                                                                    pageHtml += "\n<li><a onclick=\"generateComplaintFormResult("+type+","+i+","+typeName+")\">"+i+"</a></li>\n";
+                                                                }
+                                                                console.log(pageHtml);
+                                                                $("#pagination").html(pageHtml)
+                                                                $("#pageNum").show()
+                                                                // $("#searchInput").on("click",generateGoodsResult(type,currentPage));
+                                                                $("#searchBtn").click(function () {
+
+                                                                    generateComplaintFormResult(type,currentPage,typeName)
+                                                                });
+
+                                                                // $("#searchInput").val(response.data.searchKey);
+                                                                // $("#searchDiv").hide()
+                                                                // $("#searchAllDiv").show()
 
                                                             }
                                                         }
@@ -680,7 +845,7 @@
                         <div class="col-md-6">
                             <!-- 为 ECharts 准备一个定义了宽高的 DOM -->
                             <div id="goodsHistogram" style="height: 300px;width: 100%;margin: 0"></div>
-                            <script type="text/javascript">
+                            <script type="text/javascript" th:inline="javascript">
                                 var defaultOption = {
                                     // 全局调色盘。
                                     defaultColor: [
@@ -730,151 +895,252 @@
                                 // 基于准备好的dom，初始化echarts实例
                                 let myChart = echarts.init($("#goodsHistogram").get(0));
 
-                                // 指定图表的配置项和数据
-                                let option = {
-                                    title: {
-                                        text: '发布物品统计'
-                                    },
-                                    tooltip: {},
-                                    legend: {
-                                        data: ['销量'],
-                                        // orient: 'vertical',
-                                        // orient: 'horizontal',
-                                        right: 10,
-                                        // top: 'center'
-                                    },
-                                    // grid:{
-                                    //     containLabel: true
-                                    //     // show: true,
-                                    //     // backgroundColor:"#000",//设置图表背景色（注：如果使用背景色必须配合show:true）
-                                    //     top:10,
-                                    //     bottom:10,
-                                    //     left:10,
-                                    //     right:10
-                                    // },
-                                    xAxis: {
-                                        data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
-                                    },
-                                    yAxis: {},
-                                    series: [
-                                        {
-                                            name: '销量',
-                                            type: 'bar',
-                                            data: [5, 20, 36, 10, 10, 20],
-                                            itemStyle:{
-                                                normal:{
-                                                    color: function (params) {
-                                                        // 柱状图颜色
-                                                        // return defaultOption.barColor[params.dataIndex];
-                                                        let randomIndex=Math.floor(Math.random()*defaultOption.barColor.length)
-                                                        return defaultOption.barColor[randomIndex];
+                                myChart.showLoading();
+                                // // 指定图表的配置项和数据
+                                // let option = {
+                                //     title: {
+                                //         text: '发布物品统计'
+                                //     },
+                                //     tooltip: {},
+                                //     legend: {
+                                //         data: ['销量'],
+                                //         // orient: 'vertical',
+                                //         // orient: 'horizontal',
+                                //         right: 10,
+                                //         // top: 'center'
+                                //     },
+                                //     // grid:{
+                                //     //     containLabel: true
+                                //     //     // show: true,
+                                //     //     // backgroundColor:"#000",//设置图表背景色（注：如果使用背景色必须配合show:true）
+                                //     //     top:10,
+                                //     //     bottom:10,
+                                //     //     left:10,
+                                //     //     right:10
+                                //     // },
+                                //     xAxis: {
+                                //         data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+                                //     },
+                                //     yAxis: {},
+                                //     series: [
+                                //         {
+                                //             name: '销量',
+                                //             type: 'bar',
+                                //             data: [5, 20, 36, 10, 10, 20],
+                                //             itemStyle:{
+                                //                 normal:{
+                                //                     color: function (params) {
+                                //                         // 柱状图颜色
+                                //                         // return defaultOption.barColor[params.dataIndex];
+                                //                         let randomIndex=Math.floor(Math.random()*defaultOption.barColor.length)
+                                //                         return defaultOption.barColor[randomIndex];
+                                //                     }
+                                //                 }
+                                //             }
+                                //         }
+                                //     ]
+                                // };
+                                // console.log(option.xAxis.data+"")
+
+                                $.get(
+                                    "/goods/getGoodsByUid/"+[[${loginUser.id}]],
+                                    function (response,status) {
+                                        let data = response.data;
+                                        console.log(data)
+                                        // for (let dataKey in data) {
+                                        //     let userGoodsInfo = data[dataKey];
+                                        let userGoodsInfo = data[0];
+                                        let userXAxis=[];
+                                        let seriesData=[];
+
+                                        let datas=[];
+                                        console.log(userGoodsInfo)
+                                        for(let xName in userGoodsInfo){
+                                            console.log(xName+"-->"+userGoodsInfo[xName])
+                                            userXAxis.push(xName)
+                                            seriesData.push(userGoodsInfo[xName])
+                                            datas.push({
+                                                // 根据名字对应到相应的系列
+                                                name: xName,
+                                                type: 'bar',
+                                                data: userGoodsInfo[xName],
+                                                itemStyle:{
+                                                    normal:{
+                                                        color: function (params) {
+                                                            // 柱状图颜色
+                                                            // return defaultOption.barColor[params.dataIndex];
+                                                            let randomIndex=Math.floor(Math.random()*defaultOption.barColor.length)
+                                                            return defaultOption.barColor[randomIndex];
+                                                        }
                                                     }
                                                 }
-                                            }
+                                            })
                                         }
-                                    ]
-                                };
 
-                                // 使用刚指定的配置项和数据显示图表。
-                                myChart.setOption(option);
+                                        console.log(datas)
+                                        // option.xAxis=userXAxis;
+                                        // option.series[0].data=seriesData;
+                                        // console.log(option.xAxis)
+                                        // console.log(option.series[0].data)
 
 
-                                window.onresize=function () {
-                                    myChart.resize();
-                                }
+                                        myChart.hideLoading();    //隐藏加载动画
+                                        myChart.setOption({        //加载数据图表
+                                            title: {
+                                                text: '发布物品统计'
+                                            },
+                                            tooltip: {},
+                                            legend: {
+                                                data: ['物品发布数量'],
+                                                // data: userXAxis,
+                                                // orient: 'vertical',
+                                                // orient: 'horizontal',
+                                                right: 10,
+                                                // top: 'center'
+                                            },
+                                            xAxis: {
+                                                data: userXAxis
+                                            },
+                                            yAxis: {},
+                                            // series: datas
+                                            series: [{
+                                                // 根据名字对应到相应的系列
+                                                name: "物品发布数量",
+                                                type: 'bar',
+                                                data: seriesData,
+                                                itemStyle:{
+                                                    normal:{
+                                                        color: function (params) {
+                                                             // 柱状图颜色
+                                                            // return defaultOption.barColor[params.dataIndex];
+                                                            let randomIndex=Math.floor(Math.random()*defaultOption.barColor.length)
+                                                            return defaultOption.barColor[randomIndex];
+                                                        }
+                                                    }
+                                                }
+                                            }]
+                                        });
+
+
+
+
+                                        //
+                                        // // 使用刚指定的配置项和数据显示图表。
+                                        // myChart.setOption(option);
+                                        //
+                                        //
+                                        // window.onresize=function () {
+                                        //     myChart.resize();
+                                        // }
+                                        // }
+                                        // console.log(status)
+                                    }
+                                )
+
                             </script>
 
                         </div>
                         <div class="col-md-6" style="float: right">
                             <div id="applyFormHistogram" style="height: 300px;width: 100%;margin: 0"></div>
-                            <script type="text/javascript">
+                            <script type="text/javascript" th:inline="javascript">
                                 // 基于准备好的dom，初始化echarts实例
                                 let myApplyChart = echarts.init($("#applyFormHistogram").get(0));
 
-                                // 指定图表的配置项和数据
-                                option = {
-                                    title: {
-                                        text: "申请物品统计",
-                                        show: true
-                                    },
-                                    tooltip: {
-                                        trigger: 'item',
-                                        color:"red",
-                                        //formatter: "{a} <br/>{b} : {c}  ({d}%)"
-                                        formatter: function(data) {
-                                            // console.log(data)
-                                            return data.name +"("+data.percent+"%)"+ '<br/>'; //将小数转化为百分数显示
-                                        }
-                                    },
-                                    legend: {
-                                        orient: 'vertical',
-                                        x: 'left',
-                                        data: ['A', 'B', 'C', 'D', 'E']
-                                    },
-                                    series: [
-                                        {
-                                            type: 'pie',
-                                            // radius: ['50%', '70%'],
-                                            avoidLabelOverlap: false,
-                                            label: {
-                                                show: false,
-                                                // position: 'center',
-                                                emphasis: {
-                                                    show: false
-                                                }
-                                            },
-                                            labelLine: {
-                                                show: false
-                                            },
-                                            // emphasis: {
-                                            //     label: {
-                                            //         show: true,
-                                            //         fontSize: '30',
-                                            //         fontWeight: 'bold'
-                                            //     }
-                                            // },
-                                            itemStyle:{
-                                                normal:{
-                                                    color: function (params) {
-                                                        // 柱状图颜色
-                                                        // return defaultOption.barColor[params.dataIndex];
-                                                        let randomIndex=Math.floor(Math.random()*defaultOption.pieColor.length)
-                                                        return defaultOption.pieColor[randomIndex];
-                                                    }
-                                                }
-                                            },
-                                            // color: defaultOption.pieColor,
-                                            // stillShowZeroSum: false,
-                                            data: [
-                                                {
-                                                    value: 3,
-                                                    name: '直接访问'
-                                                },
-                                                {
-                                                    value: 2,
-                                                    name: '联盟广告'
-                                                },
-                                                {
-                                                    value: 1,
-                                                    name: '搜索引擎'
-                                                }
-                                            ],
-                                            radius: '70%'
-                                        }
-                                    ]
-                                };
-                                // 使用刚指定的配置项和数据显示图表。
-                                myApplyChart.setOption(option);
+                                myApplyChart.showLoading();
 
-                                window.onresize=function () {
-                                    myApplyChart.resize();
-                                }
+                                $.get(
+                                    "/applyform/getApplyByUid/"+[[${loginUser.id}]],
+                                    function (response,status) {
+                                        let data = response.data;
+                                        console.log(data);
+                                        let datas=[];
+                                        for (let dataKey in data[0]) {
+                                            datas.push({
+                                                name: dataKey,
+                                                value: data[0][dataKey]
+                                            })
+                                        }
+
+                                        console.log(datas)
+                                        // 指定图表的配置项和数据
+                                        option = {
+                                            title: {
+                                                text: "申请物品统计",
+                                                show: true,
+                                                left:'center'
+                                            },
+                                            tooltip: {
+                                                trigger: 'item',
+                                                color:"red",
+                                                //formatter: "{a} <br/>{b} : {c}  ({d}%)"
+                                                formatter: function(data) {
+                                                    // console.log(data)
+                                                    return data.name +"("+data.percent+"%) : "+data.value+ '个 <br/>'; //将小数转化为百分数显示
+                                                }
+                                            },
+                                            legend: {
+                                                orient: 'vertical',
+                                                // x: 'left',
+                                                right: 10,
+                                                // data: ['A', 'B', 'C', 'D', 'E']
+                                            },
+                                            series: [
+                                                {
+                                                    type: 'pie',
+                                                    // radius: ['50%', '70%'],
+                                                    avoidLabelOverlap: false,
+                                                    label: {
+                                                        show: false,
+                                                        // position: 'center',
+                                                        emphasis: {
+                                                            show: false
+                                                        }
+                                                    },
+                                                    labelLine: {
+                                                        show: false
+                                                    },
+                                                    emphasis: {
+                                                        label: {
+                                                            show: true,
+                                                            fontSize: '30',
+                                                            fontWeight: 'bold'
+                                                        }
+                                                    },
+                                                    itemStyle:{
+                                                        normal:{
+                                                            color: function (params) {
+                                                                // 柱状图颜色
+                                                                // return defaultOption.barColor[params.dataIndex];
+                                                                let randomIndex=Math.floor(Math.random()*defaultOption.pieColor.length)
+                                                                return defaultOption.pieColor[randomIndex];
+                                                            }
+                                                        }
+                                                    },
+                                                    // color: defaultOption.pieColor,
+                                                    // stillShowZeroSum: false,
+                                                    data: datas,
+                                                    radius: '70%'
+                                                }
+                                            ]
+                                        };
+
+                                        myApplyChart.hideLoading();
+                                        // 使用刚指定的配置项和数据显示图表。
+                                        myApplyChart.setOption(option);
+
+                                        window.onresize=function () {
+                                            myApplyChart.resize();
+                                        }
+
+                                    }
+                                )
+
                             </script>
                         </div>
                     </div>
 
-                    <div class="row" hidden="hidden" style="margin-bottom: 10px;padding-left: 2%;padding-right: 2%" id="searchDiv">
-                        输入标题: <input type="text" class="search-input" id="searchInput"> <a class="btn btn-success" id="searchBtn">搜索</a>
+                    <div class="row" hidden="hidden" style="margin-bottom: 10px;padding-left: 2%;padding-right: 2%" id="searchAllDiv">
+                        <div id="searchDiv">输入标题: <input type="text" class="search-input" id="searchInput"> <a class="btn btn-success" id="searchBtn">搜索</a></div>
                         <div style="float: right" >
                             <span style="font-size: 25px" id="totalCount" class="text-info"></span>
                         </div>
@@ -964,9 +1230,10 @@
                 </div>
                 <div class="col-md-3 col-sm-3">
                     <div class="widget">
-                        <div class="widget-header">
+                        <div class="widget-header text-center">
                             <!--                                    <h3>Seller</h3>-->
-                            <h3>用户</h3>
+                            <h3 sec:authorize="hasRole('admin')">管理员</h3>
+                            <h3 sec:authorize="!hasRole('admin')">用户</h3>
                         </div>
                         <div class="widget-body text-center">
                             <img alt="avatar" class="seller-avatar img-responsive" th:src="${loginUser.getAvatar()}">

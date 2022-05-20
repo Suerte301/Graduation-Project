@@ -35,4 +35,10 @@ public class GoodsSearchReq extends PageReq {
     @NotNull(message = "searchKey 不能为null" )
     private String searchKey="";
 
+    @ApiModelProperty(value = "搜索的物品title的key", required = false)
+    @NotNull(message = "searchKey 不能为null" )
+    private Integer goodStatus=-2;
+
+
+
 }

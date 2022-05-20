@@ -24,12 +24,12 @@ public class ApplyForm implements Serializable {
     String id;
 
     Integer uid;
-
-    String locationId;
-
-    String locationDetail;
+//
+//    String locationId;
+//
+//    String locationDetail;
     // 用户电话
-    String tel;
+//    String tel;
     // 物品Id
     String goodsId;
     // 状态

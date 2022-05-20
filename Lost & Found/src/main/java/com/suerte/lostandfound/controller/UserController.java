@@ -1,17 +1,22 @@
 package com.suerte.lostandfound.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.suerte.lostandfound.config.minio.MinioItem;
 import com.suerte.lostandfound.config.minio.MinioProperties;
 import com.suerte.lostandfound.config.minio.MinioTemplate;
 import com.suerte.lostandfound.constant.AvatarConstant;
 import com.suerte.lostandfound.constant.RedisConstant;
 import com.suerte.lostandfound.entity.*;
+import com.suerte.lostandfound.eum.ComplaintStatusEnum;
+import com.suerte.lostandfound.eum.FormStatusEnum;
 import com.suerte.lostandfound.eum.GoodsStatusEnum;
 import com.suerte.lostandfound.eum.OperationEnum;
 import com.suerte.lostandfound.service.*;
@@ -22,6 +27,7 @@ import com.suerte.lostandfound.util.QueryPage;
 import com.suerte.lostandfound.vo.HttpResult;
 import com.suerte.lostandfound.vo.req.GoodsSearchReq;
 import com.suerte.lostandfound.vo.req.ProfileReq;
+import com.suerte.lostandfound.vo.res.ApplyFormRes;
 import com.suerte.lostandfound.vo.res.CategoryRes;
 import com.suerte.lostandfound.vo.res.GoodsRes;
 import io.swagger.annotations.ApiOperation;
@@ -38,9 +44,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -70,9 +74,11 @@ public class UserController {
     private MinioTemplate minioTemplate;
     @Autowired
     private MinioProperties minioProperties;
+    @Autowired
+    private ApplyFormService applyFormService;
 
     @GetMapping({"index", "/"})
-    public ModelAndView index(HttpServletRequest request,Authentication authentication) {
+    public ModelAndView index(HttpServletRequest request, Authentication authentication) {
         ModelAndView modelAndView = new ModelAndView("index");
         int i = 0;
         Iterator<String> iterator = redissonClient.getKeys().getKeysByPattern("*" + RedisConstant.USER_LOGIN_PREFIX + "*").iterator();
@@ -82,7 +88,7 @@ public class UserController {
         }
 
         User user = (User) authentication.getPrincipal();
-        List<CategoryRes> goodsInfo = categoryService.getGoodsInfo(GoodsStatusEnum.REVIEW_PASSED.getType(),user.getId());
+        List<CategoryRes> goodsInfo = categoryService.getGoodsInfo(GoodsStatusEnum.REVIEW_PASSED.getType(), user.getId());
         int totalGoods = goodsInfo.stream().mapToInt(CategoryRes::getNum).sum();
 
         List<User> users = userService.list();
@@ -127,9 +133,9 @@ public class UserController {
                         .eq(!positionId.equals("-1"), Goods::getLocationId, positionId)
                         .eq(operation != -1, Goods::getType, operation)
                         .eq(categoryType != -1, Goods::getCategoryType, categoryType)
-                        .eq(Goods::getStatus,1)
+                        .eq(Goods::getStatus, GoodsStatusEnum.REVIEW_PASSED.getType())
                         .like(ObjectUtil.isNotEmpty(searchKey), Goods::getTitle, searchKey)
-                        .notIn(ObjectUtil.isNotEmpty(userApply.size()),Goods::getId,userApply.stream().map(ApplyForm::getGoodsId).collect(Collectors.toList())));
+                        .notIn(!userApply.isEmpty(), Goods::getId, userApply.stream().map(ApplyForm::getGoodsId).collect(Collectors.toList())));
 
 //        PageInfo<Goods> goodsPageInfo = new PageInfo<>(page);
         PageInfo goodsPageInfo = new PageInfo<>(page);
@@ -161,9 +167,9 @@ public class UserController {
             goodsRes.setImgSrcList(i.getImgSrcList());
             goodsRes.setImgSrc(i.getImgSrc());
             goodsRes.setDescription(i.getDescription());
-            goodsRes.setLocation(i.getLocationId().equals("-1")? Location.DEFAULT:locationService.getById(i.getLocationId()));
+            goodsRes.setLocation(i.getLocationId().equals("-1") ? Location.DEFAULT : locationService.getById(i.getLocationId()));
             goodsRes.setTitle(i.getTitle());
-            goodsRes.setCategory(categoryService.getOne(new LambdaQueryWrapper<Category>().eq(Category::getType,i.getCategoryType())));
+            goodsRes.setCategory(categoryService.getOne(new LambdaQueryWrapper<Category>().eq(Category::getType, i.getCategoryType())));
             goodsRes.setId(i.getId());
             goodsRes.setCreateDate(DateUtil.formatDateTime(i.getCreateDate()));
 //            goodsRes.setStatus(GoodsStatusEnum.getStatusByType(i.getStatus()));
@@ -221,7 +227,7 @@ public class UserController {
     @GetMapping("detail")
     public ModelAndView detail(@RequestParam(value = "id", required = true) String id,
                                Integer status,
-                               Authentication authentication,HttpServletRequest request) {
+                               Authentication authentication, HttpServletRequest request) {
         Goods goods = goodsService.getById(id);
         ModelAndView modelAndView = new ModelAndView("detail");
 
@@ -250,7 +256,7 @@ public class UserController {
                 int randomAvatar = ThreadLocalRandom.current().nextInt(9) + 1;
                 MinioItem minioItem = allObjectsByPrefix.get(randomAvatar);
 //                objectName = minioItem.getObjectName();
-                objectName =minioTemplate.objectUrl(minioProperties.getBucketName(), minioItem.getObjectName());
+                objectName = minioTemplate.objectUrl(minioProperties.getBucketName(), minioItem.getObjectName());
 //                ThreadLocalRandom.current().nextInt(10)
             }
 //            user.setAvatar(minioTemplate.objectUrl(minioProperties.getBucketName(), objectName));
@@ -308,7 +314,7 @@ public class UserController {
             return other;
         }).collect(Collectors.toList());
         User loginUser = (User) authentication.getPrincipal();
-        List<CategoryRes> goodsInfo = categoryService.getGoodsInfo(GoodsStatusEnum.REVIEW_PASSED.getType(),loginUser.getId());
+        List<CategoryRes> goodsInfo = categoryService.getGoodsInfo(GoodsStatusEnum.REVIEW_PASSED.getType(), loginUser.getId());
 
         List<Location> locationList = locationService.list();
 
@@ -317,8 +323,7 @@ public class UserController {
         List<ApplyForm> list = applyFormService.list(new LambdaQueryWrapper<ApplyForm>().eq(ApplyForm::getGoodsId, goods.getId()).eq(ApplyForm::getUid, loginUser.getId()));
 
 
-
-        modelAndView.addObject("isApply", list.size()>0);
+        modelAndView.addObject("isApply", list.size() > 0);
 //        if (list.size()>0) {
 //            modelAndView.addObject("applyStatus", FormStatusEnum.getStatusByType(list.get(0).getStatus()));
 //        }
@@ -350,7 +355,7 @@ public class UserController {
                 List<MinioItem> allObjectsByPrefix = minioTemplate.getAllObjectsByPrefix(minioProperties.getBucketName(), AvatarConstant.DEFAULT_AVATAR_PATH, true);
                 int randomAvatar = ThreadLocalRandom.current().nextInt(9) + 1;
                 MinioItem minioItem = allObjectsByPrefix.get(randomAvatar);
-                objectName =minioTemplate.objectUrl(minioProperties.getBucketName(), minioItem.getObjectName());
+                objectName = minioTemplate.objectUrl(minioProperties.getBucketName(), minioItem.getObjectName());
 
 //                ThreadLocalRandom.current().nextInt(10)
             }
@@ -360,7 +365,7 @@ public class UserController {
             log.error("访问MinIo失败 报错原因 {} 报错位置 {}", e.getMessage(), Arrays.toString(e.getStackTrace()));
         }
 
-        modelAndView.addObject("loginUser",user);
+        modelAndView.addObject("loginUser", user);
 
 
         List<Category> categoryList = categoryService.list();
@@ -376,14 +381,14 @@ public class UserController {
     }
 
     @PostMapping("changeProfile")
-    public ModelAndView changeProfile(MultipartFile newAvatar, @Validated ProfileReq profileReq, Authentication authentication, RedirectAttributes attributes){
-        String info="修改成功";
+    public ModelAndView changeProfile(MultipartFile newAvatar, @Validated ProfileReq profileReq, Authentication authentication, RedirectAttributes attributes) {
+        String info = "修改成功";
         ModelAndView modelAndView = new ModelAndView("redirect:/user/profile");
         String newPassword = profileReq.getNewPassword();
         String reNewPass = profileReq.getReNewPass();
 
-        if (ObjectUtil.hasEmpty(newPassword,newPassword)||!newPassword.equals(reNewPass)){
-            modelAndView.addObject("info","修改失败,两次输入的密码不一样");
+        if (ObjectUtil.hasEmpty(newPassword, newPassword) || !newPassword.equals(reNewPass)) {
+            modelAndView.addObject("info", "修改失败,两次输入的密码不一样");
             return modelAndView;
         }
 
@@ -394,15 +399,15 @@ public class UserController {
 
         String suffix = FileUtil.getSuffix(newAvatar.getOriginalFilename());
         String newFileName = IdUtil.simpleUUID() + '.' + suffix;
-        if (newAvatar.getSize()!=0){
-            try (InputStream inputStream = newAvatar.getInputStream()){
-                minioTemplate.putFile(minioProperties.getBucketName(), newFileName,inputStream,newAvatar.getContentType());
+        if (newAvatar.getSize() != 0) {
+            try (InputStream inputStream = newAvatar.getInputStream()) {
+                minioTemplate.putFile(minioProperties.getBucketName(), newFileName, inputStream, newAvatar.getContentType());
                 String avatar = minioTemplate.objectUrl(minioProperties.getBucketName(), newFileName);
                 user.setAvatar(avatar);
                 one.setAvatar(avatar);
-            }catch (Exception e){
-                log.error("上传新头像失败 报错原因{} 报错位置 {}",e.getMessage(),Arrays.toString(e.getStackTrace()));
-                info="上传新头像失败";
+            } catch (Exception e) {
+                log.error("上传新头像失败 报错原因{} 报错位置 {}", e.getMessage(), Arrays.toString(e.getStackTrace()));
+                info = "上传新头像失败";
             }
         }
 
@@ -428,7 +433,7 @@ public class UserController {
                 List<MinioItem> allObjectsByPrefix = minioTemplate.getAllObjectsByPrefix(minioProperties.getBucketName(), AvatarConstant.DEFAULT_AVATAR_PATH, true);
                 int randomAvatar = ThreadLocalRandom.current().nextInt(9) + 1;
                 MinioItem minioItem = allObjectsByPrefix.get(randomAvatar);
-                objectName =minioTemplate.objectUrl(minioProperties.getBucketName(), minioItem.getObjectName());
+                objectName = minioTemplate.objectUrl(minioProperties.getBucketName(), minioItem.getObjectName());
 
 //                ThreadLocalRandom.current().nextInt(10)
             }
@@ -440,8 +445,8 @@ public class UserController {
         userService.saveOrUpdate(one);
 
         // 重定向传值
-        attributes.addFlashAttribute("loginUser",user);
-        attributes.addFlashAttribute("info",info);
+        attributes.addFlashAttribute("loginUser", user);
+        attributes.addFlashAttribute("info", info);
 
 //        modelAndView.addObject("loginUser",user);
 //        modelAndView.addObject("info",info);
@@ -455,7 +460,6 @@ public class UserController {
 
     }
 
-
     @ApiOperation("物品提交 ")
     @PostMapping("/submitGoods")
     public void submitGoods() {
@@ -464,54 +468,52 @@ public class UserController {
         //  每月找到失误前三的人会有额外礼品
     }
 
-    @Autowired
-    private ApplyFormService applyFormService;
-
     @ApiOperation("物品申请 ")
     @PostMapping("/applyForMyGoods")
     @ResponseBody
-    public HttpResult applyForMyGoods(@RequestBody ApplyForm applyReq,Authentication authentication) {
+    public HttpResult applyForMyGoods(@RequestBody ApplyForm applyReq, Authentication authentication) {
         System.out.println(applyReq);
-        String locationId = applyReq.getLocationId();
-        String locationDetail = applyReq.getLocationDetail();
+//        String locationId = applyReq.getLocationId();
+//        String locationDetail = applyReq.getLocationDetail();
 //        String uid = applyReq.getUid();
-        String tel = applyReq.getTel();
+//        String tel = applyReq.getTel();
 
         // TODO: 2022/4/16 物品申请 此时对对应的失物招领或者寻物启事进行申请获取
         //  需要添加例如学生号，物品信息等信息提交申请 申请通过后  会有人在指定时间上门送货
         //  此时对应的提供信息的用户会添加积分
         String goodsId = applyReq.getGoodsId();
 
-        if (!CheckUtils.isMobileNO(tel)){
-            return HttpResult.error("电话号码格式错误 请重新输入!");
-        }
+//        if (!CheckUtils.isMobileNO(tel)){
+//            return HttpResult.error("电话号码格式错误 请重新输入!");
+//        }
         User user = (User) authentication.getPrincipal();
 
-        if (ObjectUtil.hasEmpty(locationId,user.getId(),goodsId,locationDetail)){
-            return HttpResult.error("必填参数不能为空 请重新输入");
-        }
+//        if (ObjectUtil.hasEmpty(locationI/d,user.getId(),goodsId,locationDetail)){
+//            return HttpResult.error("必填参数不能为空 请重新输入");
+//        }
 
         List<ApplyForm> list = applyFormService.list(new LambdaQueryWrapper<ApplyForm>().eq(ApplyForm::getGoodsId, goodsId).eq(ApplyForm::getUid, user.getId()));
-        if (list.size()>0){
+        if (list.size() > 0) {
             return HttpResult.error("您已经申请过此物品 请不要重复申请");
         }
 
         ApplyForm applyForm = new ApplyForm();
         applyForm.setId(IdUtil.simpleUUID());
         applyForm.setGoodsId(goodsId);
-        applyForm.setLocationId(locationId);
-        applyForm.setLocationDetail(locationDetail);
-        applyForm.setTel(tel);
+//        applyForm.setLocationId(locationId);
+//        applyForm.setLocationDetail(locationDetail);
+//        applyForm.setTel(tel);
+        applyForm.setCreateDate(new Date());
         applyForm.setUid(user.getId());
-        boolean flag =true;
+        boolean flag = true;
         try {
-            flag=applyFormService.save(applyForm);
-        }catch (Exception e){
-            log.error("物品申请报错 报错信息{} 报错位置{}",e.getMessage(),Arrays.toString(e.getStackTrace()));
-            flag=false;
+            flag = applyFormService.save(applyForm);
+        } catch (Exception e) {
+            log.error("物品申请报错 报错信息{} 报错位置{}", e.getMessage(), Arrays.toString(e.getStackTrace()));
+            flag = false;
         }
 
-        return flag?HttpResult.ok("提交成功 工作人员将会在近日联系您 请保持手机畅通"):HttpResult.error("申请失败 请稍后再去申请");
+        return flag ? HttpResult.ok("提交成功 工作人员将会在近日联系您 请保持手机畅通") : HttpResult.error("申请失败 请稍后再去申请");
     }
 
     @ApiOperation("兑换商品")
@@ -520,12 +522,35 @@ public class UserController {
         // TODO: 2022/4/16 利用本人所得积分来兑换物品
     }
 
+    @GetMapping("/getNormalUsers")
+    @ResponseBody
+    public HttpResult getNormalUsers() {
+        return HttpResult.ok(userService.getNormalUser());
+    }
+
+
+    @Autowired
+    private ComplaintFormService complaintFormService;
+
+
     @ApiOperation("物品申诉")
     @PostMapping("/complaint")
-    public void complaint() {
+    @ResponseBody
+    public Boolean complaint(@RequestParam("applyId") String applyId, Authentication authentication) {
         // TODO: 2022/4/16 如果发现自己的物品被其他人领走  可以对其提出申诉，填写对应信息后
         //  由管理员来联系双方进行解决   为防止恶意申诉，每个月只允许申诉 3 次 积分可兑换次数
         //  兑换的次数当月有效 次数不累计
+        final ComplaintForm complaintForm = new ComplaintForm();
+        complaintForm.setUid(((User)authentication.getPrincipal()).getId());
+        complaintForm.setApplyId(applyId);
+        boolean save = true;
+        try {
+            save=complaintFormService.save(complaintForm);
+        }catch (Exception e){
+            save=false;
+            log.error("添加申诉报错");
+        }
+        return save;
     }
 
     @GetMapping("list")
@@ -537,11 +562,198 @@ public class UserController {
 
     @GetMapping("listByAccount")
     @ResponseBody
-    public HttpResult listByAccount(String account,String oldAccount) {
+    public HttpResult listByAccount(String account, String oldAccount) {
 
         User oldUser = userService.getOne(new LambdaQueryWrapper<User>().eq(ObjectUtil.isNotEmpty(oldAccount), User::getAccount, oldAccount));
         User newUser = userService.getOne(new LambdaQueryWrapper<User>().eq(ObjectUtil.isNotEmpty(account), User::getAccount, account));
-        return HttpResult.ok(ObjectUtil.isNotEmpty(newUser)&&!oldUser.getId().equals(newUser.getId()));
+        return HttpResult.ok(ObjectUtil.isNotEmpty(newUser) && !oldUser.getId().equals(newUser.getId()));
+    }
+
+
+
+    @GetMapping("/toComplaint")
+    public ModelAndView toComplaint(GoodsSearchReq goodsSearchReq, Authentication authentication) {
+
+        ModelAndView modelAndView = new ModelAndView("complaint");
+
+        Integer categoryType = goodsSearchReq.getCategoryType();
+        Integer operation = goodsSearchReq.getOperation();
+        String positionId = goodsSearchReq.getPositionId();
+        String searchKey = goodsSearchReq.getSearchKey();
+
+        OperationEnum operationByType = OperationEnum.getOperationByType(operation);
+
+        Category defaultCategory = categoryType == -1 ? Category.DEFAULT : categoryService.getOne(new LambdaQueryWrapper<Category>()
+                .eq(Category::getType, categoryType), false);
+
+        Location defaultLocation = positionId.equals("-1") ? Location.DEFAULT : locationService.getOne(new LambdaQueryWrapper<Location>()
+                .eq(Location::getId, positionId), false);
+
+
+        User user = (User) authentication.getPrincipal();
+
+//
+////        // 申请成功
+//        List<String> userApply = applyFormService.list(new LambdaQueryWrapper<ApplyForm>()
+//                .eq(ApplyForm::getStatus, FormStatusEnum.APPLY_SUCCESS.getType())).stream().map(ApplyForm::getGoodsId).collect(Collectors.toList());
+//
+//        // 没有被申诉  size=0
+//        // 申诉中  size=0
+//        List<ComplaintForm> complaintForms = complaintFormService.list(new LambdaQueryWrapper<ComplaintForm>()
+////                .in(!userApply.isEmpty(), ComplaintForm::getApplyId, userApply.stream().map(ApplyForm::getId).collect(Collectors.toList()))
+////                .ne(ComplaintForm::getStatus, ComplaintStatusEnum.IN_COMPLAINT.getType()));
+//                .eq(ComplaintForm::getStatus, ComplaintStatusEnum.IN_COMPLAINT.getType()));
+////                .notIn(!applyIds.isEmpty(),ApplyForm::getId,applyIds));
+//
+//        // 没有被申诉的物品
+//        // 申诉中的物品
+//        List<String> collect = complaintForms.stream().map(i -> applyFormService.getById(i.getApplyId())).map(ApplyForm::getGoodsId).collect(Collectors.toList());
+//
+//        // 没有被申诉物品和申请成功的物品的交集
+////        final Set<String> strings = CollectionUtil.intersectionDistinct(collect.isEmpty()?userApply:collect, userApply);
+//        // 申诉物品和申请成功的物品的差集--申请成功未被申诉
+//        final Collection<String> strings = CollectionUtil.disjunction(collect, userApply);
+
+//        complaintFormService.list(new LambdaQueryWrapper<ComplaintForm>().in(ComplaintForm::getApplyId))
+
+
+        final List<String> collect = goodsService.list(
+                new LambdaQueryWrapper<Goods>()
+                        .eq(!positionId.equals("-1"), Goods::getLocationId, positionId)
+                        .eq(operation != -1, Goods::getType, operation)
+                        .eq(categoryType != -1, Goods::getCategoryType, categoryType)
+                        .eq(Goods::getStatus,GoodsStatusEnum.REVIEW_PASSED.getType())
+                        .like(ObjectUtil.isNotEmpty(searchKey), Goods::getTitle, searchKey)).stream().map(Goods::getId).collect(Collectors.toList());
+
+        List<String> userApply1 =collect.isEmpty()?new ArrayList<>():applyFormService.list(new LambdaQueryWrapper<ApplyForm>()
+                .eq(ApplyForm::getStatus, FormStatusEnum.APPLY_SUCCESS.getType())
+                .in(ApplyForm::getGoodsId,collect)
+        ).stream().map(ApplyForm::getId).collect(Collectors.toList());
+
+        // 没有被申诉  size=0
+        // 申诉中  size=0
+        List<ComplaintForm> complaintForms1 = complaintFormService.list(new LambdaQueryWrapper<ComplaintForm>()
+//                .in(!userApply.isEmpty(), ComplaintForm::getApplyId, userApply.stream().map(ApplyForm::getId).collect(Collectors.toList()))
+//                .ne(ComplaintForm::getStatus, ComplaintStatusEnum.IN_COMPLAINT.getType()));
+                .eq(ComplaintForm::getStatus, ComplaintStatusEnum.IN_COMPLAINT.getType()));
+//                .notIn(!applyIds.isEmpty(),ApplyForm::getId,applyIds));
+
+        // 没有被申诉的物品
+        // 申诉中的物品
+        List<String> collect1 = complaintForms1.stream().map(i -> applyFormService.getById(i.getApplyId())).map(ApplyForm::getId).collect(Collectors.toList());
+
+        // 申诉物品和申请成功的物品的差集--申请成功未被申诉
+//        final Collection<String> strings = CollectionUtil.disjunction(collect1, userApply1);
+        // 主要是为了删除申诉中的申请，先去并集再去差集
+        final Collection<String> strings = CollectionUtil.disjunction(CollectionUtil.union(collect1, userApply1), collect1);
+        // 如果没有申请成功的表单则为空,
+
+//                        .in(Goods::getId, strings));
+
+        IPage<ApplyForm> page =strings.isEmpty()?new Page<>():applyFormService.page(
+                new QueryPage<ApplyForm>().getPage(goodsSearchReq),
+                new LambdaQueryWrapper<ApplyForm>().in(ApplyForm::getId,strings));
+//        PageInfo<Goods> goodsPageInfo = new PageInfo<>(page);
+        PageInfo goodsPageInfo = new PageInfo<>(page);
+
+        List<ApplyFormRes> list = page.getRecords().stream().map(i -> {
+            final Goods goods = goodsService.getById(i.getGoodsId());
+            String[] split = goods.getImgSrc().split(",");
+//            if (split.length==1&&ObjectUtil.isEmpty(split[0])){
+//                i.setImgSrc(ImgConstant.DEFAULT_IMG_PATH);
+//                split[0]=ImgConstant.DEFAULT_IMG_PATH;
+//            }
+            goods.setImgSrc(split[0]);
+            goods.setImgSrcList(Arrays.asList(split));
+
+            ApplyFormRes applyFormRes = new ApplyFormRes();
+
+            final GoodsRes goodsRes = new GoodsRes();
+//            goodsRes.setOperation(OperationEnum.getOperationByType(i.getType()));
+            OperationEnum iOperationByType = OperationEnum.getOperationByType(goods.getType());
+            goodsRes.setOperation(iOperationByType);
+            goodsRes.setOperationName(iOperationByType.getName());
+            goodsRes.setOperationType(iOperationByType.getType());
+
+            GoodsStatusEnum statusByType = GoodsStatusEnum.getStatusByType(i.getStatus());
+            goodsRes.setStatus(statusByType);
+            goodsRes.setStatusName(statusByType.getMsg());
+            goodsRes.setStatusType(statusByType.getType());
+
+            goodsRes.setUser(userService.getById(i.getUid()));
+            goodsRes.setImgSrcList(goods.getImgSrcList());
+            goodsRes.setImgSrc(goods.getImgSrc());
+            goodsRes.setDescription(goods.getDescription());
+            goodsRes.setLocation(goods.getLocationId().equals("-1") ? Location.DEFAULT : locationService.getById(goods.getLocationId()));
+            goodsRes.setTitle(goods.getTitle());
+            goodsRes.setCategory(categoryService.getOne(new LambdaQueryWrapper<Category>().eq(Category::getType, goods.getCategoryType())));
+            goodsRes.setId(i.getGoodsId());
+            goodsRes.setCreateDate(DateUtil.formatDateTime(i.getCreateDate()));
+            applyFormRes.setId(i.getId());
+            applyFormRes.setGoodsRes(goodsRes);
+            final ApplyForm applyForm = applyFormService.list(new LambdaQueryWrapper<ApplyForm>().eq(ApplyForm::getId, i.getId())).get(0);
+            final User byId = userService.getById(applyForm.getUid());
+            applyFormRes.setApplyUser(byId);
+            String imgSrcStr=ObjectUtil.isNotEmpty(goodsRes.getImgSrc())?goodsRes.getImgSrc():"/icons/emptyImg.png";
+            applyFormRes.setPopUpDetail("标题: <span>" + goodsRes.getTitle() + "</span>" +"<br>"+
+                    "拾取地址: <span>" + goodsRes.getLocation().getPosition() + "</span>" +"<br>"+
+                    "描述: <span>" + goodsRes.getDescription() + "</span>" +"<br>"+
+                    "图片: <img src='" + imgSrcStr + "'/>" +"<br>"+
+                    "发布用户: <span>" + goodsRes.getUser().getName() + "</span>" +"<br>"+
+                    "类型: <span>" + goodsRes.getOperationName() + "</span>" +"<br>"+
+                    "发布日期: <span>" + goodsRes.getCreateDate() + "</span>" +"<br>"+
+                    "申请人: <span>" + applyFormRes.getApplyUser().getName() + "</span>");
+//            goodsRes.setStatus(GoodsStatusEnum.getStatusByType(i.getStatus()));
+            return applyFormRes;
+        }).collect(Collectors.toList());
+
+        goodsPageInfo.setList(list);
+//        List<Goods> list = goodsPageInfo.getList();
+//        list.forEach(i -> {
+//            String[] split = i.getImgSrc().split(",");
+////            if (split.length==1&&ObjectUtil.isEmpty(split[0])){
+////                i.setImgSrc(ImgConstant.DEFAULT_IMG_PATH);
+////                split[0]=ImgConstant.DEFAULT_IMG_PATH;
+////            }
+//            i.setImgSrc(split[0]);
+//            i.setImgSrcList(Arrays.asList(split));
+//        });
+//        goodsPageInfo.setList(list);
+
+//        List<Goods> resultList = goodsService.list(new LambdaQueryWrapper<Goods>()
+//                .eq(!positionId.equals("-1"), Goods::getLocationId, positionId)
+//                .eq(operation != -1, Goods::getType, operation)
+//                .eq(categoryType == -1, Goods::getCategoryType, categoryType)
+//                .like(ObjectUtil.isNotEmpty(searchKey), Goods::getTitle, searchKey));
+
+        List<CategoryRes> goodsInfo = categoryService.getGoodsInfo(GoodsStatusEnum.REVIEW_PASSED.getType(), user.getId());
+        List<Location> locationList = locationService.list();
+
+
+        // 位置列表
+        modelAndView.addObject("locationList", locationList);
+        // 物品统计信息
+        modelAndView.addObject("goodsInfos", goodsInfo);
+
+        // 选择的Category
+        modelAndView.addObject("selectedCategory", defaultCategory);
+        // 选择的Position
+        modelAndView.addObject("selectedPosition", defaultLocation);
+        // 选择的Operation
+        modelAndView.addObject("selectedOperation", operationByType.getType());
+        // 搜索的keyword
+        modelAndView.addObject("searchKey", searchKey);
+
+
+        // 审核通过的结果集
+//        modelAndView.addObject("resultList", resultList);
+        modelAndView.addObject("resultPageList", goodsPageInfo);
+
+
+//        modelAndView.addObject("categoryList", categoryList);
+
+
+        return modelAndView;
     }
 
     @DeleteMapping("del")

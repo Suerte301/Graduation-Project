@@ -3,4 +3,30 @@
 <mapper namespace="com.suerte.lostandfound.mapper.GoodsMapper">
 
 
+    <resultMap id="UserGoodsMap" type="com.suerte.lostandfound.vo.res.UserGoodsRes" autoMapping="true">
+        <result column="reviewing" property="reviewing"/>
+        <result column="reviewedFail" property="reviewedFail"/>
+        <result column="reviewedPass" property="reviewedPass"/>
+    </resultMap>
+
+    <select id="getGoodsByUid"  resultMap="UserGoodsMap" useCache="false">
+        SELECT
+        sum(CASE status WHEN #{inProgress} THEN 1 ELSE 0 END)  AS reviewing,
+        sum(CASE status WHEN #{success} THEN 1 ELSE 0 END)  AS reviewedPass,
+        sum(CASE status WHEN #{failed} THEN 1 ELSE 0 END)  AS reviewedFail
+        FROM tb_goods
+        <if test="uid!=null">
+        where uid=#{uid}
+        </if>
+        ;
+
+<!--        select  * from tb_goods-->
+<!--        <if test="id!=null">-->
+<!--            <where>-->
+<!--                uid=#{uid}-->
+<!--            </where>-->
+<!--        </if>-->
+<!--        group by uid-->
+
+    </select>
 </mapper>

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ch">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <title>LOST & FOUND</title>
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:regular,700,600&amp;latin" type="text/css" />
+    <!-- Essential styles -->
+    <link rel="stylesheet" th:href="@{/assets/bootstrap/css/bootstrap.min.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/assets/plugins/font-awesome/css/font-awesome.css}" type="text/css">
+
+    <!-- Dlapak styles -->
+    <link id="theme_style" type="text/css" th:href="@{/assets/css/style1.css}" rel="stylesheet" media="screen">
+
+    <!-- /Assets -->
+    <link rel="stylesheet" th:href="@{/assets/plugins/owl-carousel/owl.carousel.css}">
+    <link rel="stylesheet" th:href="@{/assets/plugins/owl-carousel/owl.theme.css}">
+
+    <!-- JS Library -->
+    <script th:src="@{/assets/js/jquery.js}"></script>
+
+</head>
+<body>
+<div class="wrapper">
+    <div th:replace="menu/header::header(operation=${selectedOperation})"></div>
+
+    <div class="category-search">
+        <div class="container">
+            <div class="row category-search-box">
+                <script th:inline="javascript">
+                    $(function () {
+                        let selectedCategory= [[${selectedCategory}]];
+                        let selectedPosition= [[${selectedPosition}]];
+                        let selectedOperation= [[${selectedOperation}]];
+                        let searchKey= [[${searchKey}]];
+
+                        // console.log(selectedOperation)
+                        $("#categoryType").val(selectedCategory.type);
+                        $("#position").val(selectedPosition.id);
+                        $("#operation").val(selectedOperation)
+                        $("#searchKey").val(searchKey)
+                    })
+                </script>
+                <form action="/user/toComplaint" id="searchForm">
+                    <input name="currPage" hidden="hidden" id="currPage" th:value="${resultPageList.getCurrPage()}">
+                    <div class="col-md-3 col-sm-3  cat-search-input" style="width: 20%">
+                        <select class="form-control" id="position" name="positionId">
+                            <option selected value="-1">大致区域</option>
+                            <option th:each="location : ${locationList}"  th:object="${location}" th:value="*{id}" th:text="*{position}"></option>
+                            <!--                                    <option>Motorcycle</option>-->
+                            <!--                                    <option>Properti</option>-->
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 col-sm-3  cat-search-input" style="width: 20%">
+                        <select class="form-control" id="operation" name="operation">
+                            <option selected value="-1">类型</option>
+                            <option th:each="operation : ${T(com.suerte.lostandfound.eum.OperationEnum).getDefaultOps()}" th:value="${operation.type}" th:text="${operation.name}"></option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 col-sm-3  cat-search-input" style="width: 20%">
+                        <select class="form-control" id="categoryType" name="categoryType">
+                            <option selected value="-1">分类</option>
+                            <option th:each="category : ${goodsInfos}" th:object="${category}" th:value="*{type}" th:text="*{name}"></option>
+                        </select>
+                    </div>
+
+
+                    <div class="col-md-3 col-sm-3  cat-search-input" style="width: 20%">
+                        <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="I want to find...">
+                    </div>
+                    <div class="col-md-3 col-sm-3  cat-search-input" style="width: 10%">
+                        <button class="btn btn-custom btn-block" type="submit"><i class="fa fa-search"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <section class="category-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    &nbsp;
+                </div>
+                <div class="col-md-4">
+                    <ul class="breadcrumb pull-right">
+                        <li><a th:href="@{/user/index}">首页</a></li>
+                        <li><a th:text="${selectedCategory.name}"></a></li>
+                        <!--                                <li>详情</li>-->
+                    </ul>
+                </div>
+            </div>
+            <script>
+
+                function getCategoryItem(item){
+
+                    let categoryType=$(item).attr("categorytype");
+                    // let operation =$("#operationType");
+                    let href="/user/category?";
+                    // let location=href+"categoryType="+categoryType+"&operation="+operation.val()
+                    let location=href+"categoryType="+categoryType;
+                    window.location.href=location;
+                }
+
+            </script>
+            <div class="row">
+<!--                <div class="col-md-3 col-sm-3">-->
+<!--                    <div class="widget">-->
+<!--                        <div class="widget-header">-->
+<!--                            &lt;!&ndash;                                    <input hidden="hidden" id="operationType" th:if="" th:value="${operationType.getType()}">&ndash;&gt;-->
+<!--                            <h3>分类</h3>-->
+<!--                        </div>-->
+<!--                        <div class="widget-body">-->
+<!--                            <ul class="trends" th:each="category : ${goodsInfos}" th:object="${category}">-->
+<!--                                <li><a onclick="getCategoryItem(this)" th:categorytype="*{type}" href="#" th:text="*{name}">Smartphone</a>&nbsp;<span class="item-numbers" th:text="*{num}"></span></li>-->
+<!--                            </ul>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    &lt;!&ndash;                            <div class="widget">&ndash;&gt;-->
+<!--                    &lt;!&ndash;                                <div class="widget-header">&ndash;&gt;-->
+<!--                    &lt;!&ndash;                                    <h3>Browse by Brand</h3>&ndash;&gt;-->
+<!--                    &lt;!&ndash;                                </div>&ndash;&gt;-->
+<!--                    &lt;!&ndash;                                <div class="widget-body">&ndash;&gt;-->
+<!--                    &lt;!&ndash;                                    <ul class="brands">&ndash;&gt;-->
+<!--                    &lt;!&ndash;                                        <li><label><input type="checkbox"> Apple</label></li>&ndash;&gt;-->
+<!--                    &lt;!&ndash;                                        <li><label><input type="checkbox"> Asus</label></li>&ndash;&gt;-->
+<!--                    &lt;!&ndash;                                        <li><label><input type="checkbox"> Acer</label></li>&ndash;&gt;-->
+<!--                    &lt;!&ndash;                                        <li><label><input type="checkbox"> Nexus</label></li>&ndash;&gt;-->
+<!--                    &lt;!&ndash;                                        <li><label><input type="checkbox"> Nokia</label></li>&ndash;&gt;-->
+<!--                    &lt;!&ndash;                                        <li><label><input type="checkbox"> Lenovo</label></li>&ndash;&gt;-->
+<!--                    &lt;!&ndash;                                        <li><label><input type="checkbox"> Samsung</label></li>&ndash;&gt;-->
+<!--                    &lt;!&ndash;                                    </ul>&ndash;&gt;-->
+<!--                    &lt;!&ndash;                                </div>  &ndash;&gt;-->
+<!--                    &lt;!&ndash;                            </div>&ndash;&gt;-->
+<!--                </div>-->
+                <div class="col-md-9 col-sm-9" style="margin-left:12.5%">
+                    <!--                            <div class="category-header no-margin-bottom">-->
+                    <!--                                <div class="row">-->
+                    <!--                                    <div class="col-md-4  cat-search-input">-->
+                    <!--                                        <select class="form-control" id="location">-->
+                    <!--                                            <option value="-1" selected>所在大致区域</option>-->
+                    <!--                                            <option th:each="location:${locationList}" th:value="${location.getId()}" th:text="${location.getPosition()}">Newest</option>-->
+                    <!--&lt;!&ndash;                                            <option selected="">Lowest Price</option>&ndash;&gt;-->
+                    <!--&lt;!&ndash;                                            <option>Highest Price</option>&ndash;&gt;-->
+                    <!--                                        </select>-->
+                    <!--                                    </div>-->
+                    <!--                                    <div class="col-md-4  cat-search-input">-->
+                    <!--                                        <select class="form-control" id="goodsType">-->
+                    <!--                                            <option value="-1" selected>类型</option>-->
+                    <!--                                            <option th:each="operation : ${T(com.suerte.lostandfound.eum.OperationEnum).values()}" th:text="${operation.name}" th:value="${operation.type}"></option>-->
+                    <!--                                            &lt;!&ndash;                                            <option selected="">Lowest Price</option>&ndash;&gt;-->
+                    <!--&lt;!&ndash;                                            <option>Highest Price</option>&ndash;&gt;-->
+                    <!--                                        </select>-->
+                    <!--                                    </div>-->
+                    <!--                                    <div class="col-md-4  cat-search-input">-->
+                    <!--                                        <select class="form-control" id="time">-->
+                    <!--                                            <option selected value="-1">发布时间</option>-->
+                    <!--                                            <option th:each="time:${T(com.suerte.lostandfound.eum.TimeEnum).values()}" th:value="${time.type}" th:text="${time.name}">Newest</option>-->
+                    <!--&lt;!&ndash;                                            <option>New</option>&ndash;&gt;-->
+                    <!--&lt;!&ndash;                                            <option selected="">Used</option>&ndash;&gt;-->
+                    <!--                                        </select>-->
+                    <!--                                    </div>-->
+                    <!--                                </div>-->
+                    <!--                            </div>-->
+                    <script th:inline="javascript">
+                        function getGoods() {
+                            let locationId = [[${resultList}]];
+                            let timeId =[[${resultPageList}]];
+
+                            console.log(locationId);
+                            console.log(timeId);
+                        }
+                    </script>
+                    <div class="search-results-box">
+                        <div class="row">
+                            <div class="col-md-12 search-results">
+                                Keyword : <span th:text="${searchKey}"></span>  Results : <span th:text="${resultPageList.getTotalCount()}"></span> items
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-results" >
+                        <div class="row" th:if="${resultPageList.getList().size()!=0}" style="background: floralwhite;" th:each="goods:${resultPageList.getList()}" th:object="${goods}">
+                            <div class="col-sm-12" style="border-bottom: #e3dede solid">
+                                <div>
+                                    <div class="row">
+
+                                        <div class="col-sm-2 col-xs-3">
+                                            <div class="item-badge featured-ads">
+                                                <a href="#">Featured Ads</a>
+                                            </div>
+                                            <div class="item-img">
+
+                                                <img alt="" th:if="${not #strings.isEmpty(goods.getGoodsRes().getImgSrc())}" th:src="${goods.getGoodsRes().getImgSrc()}">
+                                                <img alt="" th:if="${#strings.isEmpty(goods.getGoodsRes().getImgSrc())}" th:src="@{/icons/emptyImg.png}">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-8 col-xs-6">
+                                            <div class="item-title">
+                                                <a th:href="@{/user/detail(id=${goods.getGoodsRes().getId()})}"><h4 th:text="${goods.getGoodsRes().getTitle()}">Lenovo A326 Black 4GB RAM</h4></a>
+                                            </div>
+                                            <div class="item-meta">
+                                                <ul>
+                                                    <!--                                                            <li><i class="fa fa-bookmark"></i> <span th:text="${goods.getStatus().getMsg()}">Used</span></li>-->
+                                                    <!--                                                            <li><i class="fa fa-bars"></i> -->
+                                                    <li class="item-date"><i class="fa fa-clock-o"></i> <span th:text="${goods.getGoodsRes().getCreateDate()}">Today 10.35 am</span></li>
+                                                    <!--                                                            <li class="item-cat hidden-xs"><i class="fa fa-bars"></i> <a href="#">Electronics</a> , <a href="category.html">Smartphone</a></li>-->
+                                                    <li class="item-cat hidden-xs"><i class="fa fa-bars"></i><a th:href="@{/user/category(categoryType=${goods.getGoodsRes().getCategory().getType()})}" th:text="${goods.getGoodsRes().getCategory().getName()}">Electronic</a>
+                                                        <!--                                                            <li class="item-location hidden-xs"><a href="#"><i class="fa fa-map-marker"></i> Manchester</a></li>-->
+                                                    <li class="item-location hidden-xs"> <a th:href="@{/user/category(positionId=${goods.getGoodsRes().getLocation().getId()})}" th:text="${goods.getGoodsRes().getLocation().getPosition()}" >Mountain View</a></li>
+                                                    <!--                                                            <li class="item-type"><i class="fa fa-bookmark"></i> <span th:text="${goods.getStatus().getMsg()}">Used</span></li></li>-->
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        <!--                                                等待写-->
+                                        <div class="col-sm-2 col-xs-3">
+
+                                            <div class="item-price" style="text-align: center">
+                                                <span>申请人</span>
+                                                <h3 th:text="${goods.getGoodsRes().getUser().getName()}">Negotiable</h3>
+                                            </div>
+                                            <div class="item-action" align="center">
+                                                <ul>
+                                                    <li class="popover-options"><a href="#"  data-container="body" data-toggle="popover" th:data-content="${goods.getPopUpDetail()}" title="Show Details" class="btn btn-success btn-default btn-sm"><i class="fa fa-eye"></i>查看详情</a></li>
+                                                    <li>
+<!--                                                        标题: <span th:text="${goods.getTitle()}"></span>-->
+<!--                                                        拾取地址: <span th:text="${goods.getLocation().getPosition()}"></span>-->
+<!--                                                        描述: <textarea th:text="${goods.getDescription()}"></textarea>-->
+<!--                                                        图片: <img th:src="${goods.getImgSrc()}"/>-->
+<!--                                                        发布用户: <span th:text="${goods.getUser().getName()}"></span>-->
+<!--                                                        类型: <span th:text="${goods.getOperationName()}"></span>-->
+<!--                                                        发布日期: <span th:text="${goods.getCreateDate()}"></span>-->
+<!--                                                        申请人: <span th:text="${goods.getApplyUser().getName()}"></span>-->
+                                                        <a href="#" data-toggle="tooltip" data-placement="top" th:onclick="complaint()" title="申诉" class="btn btn-danger btn-default btn-sm">
+                                                            <i class="fa fa-edit"></i>
+                                                            申诉
+                                                        </a>
+                                                        <script>
+                                                            function complaint() {
+                                                                let flag = confirm("确认要申诉吗?");
+                                                                if (flag){
+                                                                    // $.ajax({
+                                                                    //     type: 'post',
+                                                                    //     url: '/user/applyForMyGoods',
+                                                                    //     dataType: 'json',
+                                                                    //     contentType:"application/json;charset=utf-8",
+                                                                    //     data:JSON.stringify( {
+                                                                    //         // 'uid':currentUser,
+                                                                    //         'goodsId':goodsId,
+                                                                    //         'locationId':location.val(),
+                                                                    //         'locationDetail':locationDetail.val(),
+                                                                    //         'tel':tel.val()
+                                                                    //     }),
+                                                                    //     success: function (data,status) {
+                                                                    //         // alert(data)
+                                                                    //
+                                                                    //         console.log(data)
+                                                                    //         alert(data.msg)
+                                                                    //         applyForm.val("已申请");
+                                                                    //         applyForm.attr("disabled");
+                                                                    //
+                                                                    //         // console.log(status)
+                                                                    //     },
+                                                                    //     error:function (data,status) {
+                                                                    //         alert('error')
+                                                                    //         console.log(data)
+                                                                    //         console.log(status)
+                                                                    //     }
+                                                                    // });
+                                                                }
+                                                            }
+                                                        </script>
+                                                    </li>
+
+<!--                                                    <p class="popover-options">-->
+<!--                                                        <a href="#" type="button" class="btn btn-warning" title="<h2>Title</h2>"-->
+<!--                                                           data-container="body" data-toggle="popover" data-content="-->
+<!--         <h4>Popover 中的一些内容 —— options 方法</h4>">-->
+<!--                                                            Popover-->
+<!--                                                        </a>-->
+<!--                                                    </p>-->
+                                                </ul>
+                                                <script>
+                                                    $(function () {
+                                                        $(".popover-options a").popover({html:true,trigger: 'focus'});
+                                                    })
+                                                </script>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-results" th:if="${resultPageList.getList().size()==0}">
+                        <div class="row">
+                            <div class="col-md-12 text-center" style="align-items: center;justify-content: center;display: flex;border-style: ridge; height: 500px;background: floralwhite">
+                                <div class="item-img">
+                                    <img alt="" th:src="@{/icons/emptyItem.png}">
+                                    <span class="page-404__text" style="color: black">未找到相关的物品 请换个关键字或类型试一试</span>
+                                </div>
+                            </div>
+                            <!--                                    <div class="col-sm-12">-->
+                            <!--                                        <div class="highlight-ads">-->
+                            <!--                                            <div class="col-lg-12 ">-->
+                            <!--                                                <img alt="" th:src="@{/icons/emptyImg.png}">-->
+                            <!--                                            </div>-->
+                            <!--                                        </div>-->
+                            <!--                                    </div>-->
+                        </div>
+                    </div>
+
+                    <script>
+                        function searchGoods(obj) {
+                            $("#currPage").val($(obj).text());
+                            $("#searchForm").submit()
+                        }
+                    </script>
+                    <div class="row" th:if="${resultPageList.getTotalPage()!=0}" th:with="middle=${T(com.suerte.lostandfound.util.NumberUtils).round(7.0,2.0)}">
+                        <div class="col-md-12 text-right" th:with="start=${resultPageList.getCurrPage()-middle>0?(resultPageList.getTotalPage()-resultPageList.getCurrPage()+1>middle?resultPageList.getCurrPage()-middle+1:resultPageList.getTotalPage()-7+1):1}">
+
+                            <!--                                    <span th:value="${resultPageList.getTotalPage()-resultPageList.getCurrPage()+1<5?resultPageList.getTotalPage()-4:resultPageList.getCurrPage()}"></span>-->
+                            <!--                                    <span th:value="${resultPageList.getTotalPage()-resultPageList.getCurrPage()+1<5?resultPageList.getTotalPage():resultPageList.getCurrPage()+4}"></span>-->
+
+                            <!--                                    <button href="#" th:text="${resultPageList.getCurrPage()-middle>0?(resultPageList.getTotalPage()-resultPageList.getCurrPage()+1>middle?resultPageList.getCurrPage()-middle+1:resultPageList.getTotalPage()-7+1):1}"></button>-->
+
+
+
+                            <ul class="pagination" th:each="pageItem:${#numbers.sequence(start,resultPageList.getTotalPage()>start+7.0-1?start+7.0-1:resultPageList.getTotalPage())}">
+                                <!--                                    <ul class="pagination" th:each="pageItem:${resultPageList.getTotalPage()-resultPageList.getCurrPage()+1<5?#numbers.sequence(resultPageList.getTotalPage()-6,resultPageList.getTotalPage()-2):#numbers.sequence(resultPageList.getCurrPage(),resultPageList.getCurrPage()+4)}">-->
+                                <!--                                    <ul class="pagination">-->
+                                <li><a href="#" onclick="searchGoods(this)" th:text="${pageItemStat.current}"></a></li>
+                                <!--                                        <li><a href="#" th:text="${T(com.suerte.lostandfound.util.NumberUtils).round(5.0,2.0)}"></a></li>-->
+                                <!--                                        <li><a href="#">2</a></li>-->
+                                <!--                                        <li class="active"><a href="#">3</a></li>-->
+                                <!--                                        <li><a href="#">4</a></li>-->
+                                <!--                                        <li><a href="#">5</a></li>-->
+                            </ul>
+
+                            <!--                                    <ul class="pagination" th:if="${resultPageList.getTotalPage()<=5}" th:each="pageItem:${#numbers.sequence(1,resultPageList.getTotalPage())}">-->
+                            <!--                                        <li><a href="#" th:text="${pageItemStat.current}"></a></li>-->
+                            <!--&lt;!&ndash;                                        <li><a href="#">2</a></li>&ndash;&gt;-->
+                            <!--&lt;!&ndash;                                        <li class="active"><a href="#">3</a></li>&ndash;&gt;-->
+                            <!--&lt;!&ndash;                                        <li><a href="#">4</a></li>&ndash;&gt;-->
+                            <!--&lt;!&ndash;                                        <li><a href="#">5</a></li>&ndash;&gt;-->
+                            <!--                                    </ul>-->
+
+                            <!--                                    <ul class="pagination" th:if="${resultPageList.getTotalPage()>5}" th:each="pageItem:${resultPageList.getTotalPage()-resultPageList.getCurrPage()>=5?#numbers.sequence(resultPageList.getCurrPage(),resultPageList.getCurrPage()+4):#numbers.sequence(resultPageList.getTotalPage()-4,resultPageList.getTotalPage())}">-->
+                            <!--                                        <li><a href="#" onclick="searchGoods(this)" th:text="${pageItemStat.current}"></a></li>-->
+                            <!--                                        &lt;!&ndash;                                        <li class="active"><a href="#">3</a></li>&ndash;&gt;-->
+                            <!--                                        &lt;!&ndash;                                        <li><a href="#">2</a></li>&ndash;&gt;-->
+                            <!--                                        &lt;!&ndash;                                        <li><a href="#">4</a></li>&ndash;&gt;-->
+                            <!--                                        &lt;!&ndash;                                        <li><a href="#">5</a></li>&ndash;&gt;-->
+                            <!--                                    </ul>-->
+
+
+
+
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="footer">
+        <div class="container">
+
+            <ul class="text-center footer-menu">
+                <li>Copyright &copy; 2018.Company name All rights reserved.<a target="_blank" href="http://sc.chinaz.com/moban/">&#x7F51;&#x9875;&#x6A21;&#x677F;</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- Essentials -->
+<script th:src="@{/assets/bootstrap/js/bootstrap.min.js}"></script>
+<script th:src="@{/assets/plugins/owl-carousel/owl.carousel.js}"></script>
+<script th:src="@{/assets/plugins/counter/jquery.countTo.js}"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
+</body>
+</html>

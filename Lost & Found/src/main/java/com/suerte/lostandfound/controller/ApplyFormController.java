@@ -19,16 +19,15 @@ import com.suerte.lostandfound.util.QueryPage;
 import com.suerte.lostandfound.vo.HttpResult;
 import com.suerte.lostandfound.vo.req.ApplyFormReq;
 import com.suerte.lostandfound.vo.res.ApplyRes;
+import com.suerte.lostandfound.vo.res.UserApplyRes;
+import com.suerte.lostandfound.vo.res.UserGoodsRes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -77,10 +76,9 @@ public class ApplyFormController {
             applyRes.setGoods(byId);
             applyRes.setOperationName(operationByType.getName());
             applyRes.setOperationType(operationByType.getType());
-            applyRes.setLocation(i.getLocationId().equals("-1")? Location.DEFAULT:locationService.getById(i.getLocationId()));
-            applyRes.setLocationDetail(i.getLocationDetail());
+            applyRes.setLocation(byId.getLocationId().equals("-1")? Location.DEFAULT:locationService.getById(byId.getLocationId()));
             applyRes.setStatus(FormStatusEnum.getStatusByType(i.getStatus()));
-            applyRes.setTel(i.getTel());
+//            applyRes.setTel(i.getTel());
             applyRes.setUser(userService.getById(i.getUid()));
             applyRes.setId(i.getId());
             applyRes.setCreateDate(DateUtil.formatDateTime(i.getCreateDate()));
@@ -94,6 +92,39 @@ public class ApplyFormController {
         map.put("searchKey", Optional.ofNullable(applyFormReq.getTitle()).orElse(""));
 
         return HttpResult.ok(map);
+    }
+
+
+
+
+    @GetMapping("getApplyByUid/{id}")
+    @ResponseBody
+    public HttpResult getApplyByUid(@PathVariable("id")Integer id){
+        List<UserApplyRes> goodsByUid = applyFormService.getApplyFormByUid(id);
+
+        Map<String,Integer> map = new HashMap<>();
+        List<Map<String,Integer>> collect = goodsByUid.stream().map(i -> {
+
+            map.put("申请失败", i==null?0:i.getFailed());
+            map.put("申请中", i==null?0:i.getInProgress());
+            map.put("申请成功", i==null?0:i.getSuccess());
+//            map.put("结束", i==null?0:i.getEnd());
+//            map.put("申诉中", i==null?0:i.getInComplaint());
+//            map.put("申诉失败", i==null?0:i.getComplaintFailed());
+//            map.put("申诉成功", i==null?0:i.getComplaintSuccess());
+
+//            if (i!=null){
+//                map.put("申请失败", i.getFailed());
+//                map.put("申请中", i.getInProgress());
+//                map.put("申请成功", i.getSuccess());
+//                map.put("结束", i.getEnd());
+//                map.put("申诉中", i.getInComplaint());
+//                map.put("申诉失败", i.getComplaintFailed());
+//                map.put("申诉成功", i.getComplaintSuccess());
+//            }
+            return map;
+        }).collect(Collectors.toList());
+        return HttpResult.ok(collect);
     }
 
 

@@ -2,6 +2,9 @@ package com.suerte.lostandfound.eum;
 
 import lombok.Getter;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @Author: Demon
  * @Date: 2022/4/26
@@ -13,7 +16,8 @@ public enum GoodsStatusEnum {
 
     REVIEW_FAILED("审核失败", -1),
     REVIEWING("审核中", 0),
-    REVIEW_PASSED("审核通过", 1);
+    REVIEW_PASSED("审核通过", 1),
+    ALL("所有", -2);
 
     private String msg;
     private Integer type;
@@ -30,6 +34,13 @@ public enum GoodsStatusEnum {
             }
         }
         return null;
+    }
+
+
+    public static List<GoodsStatusEnum> getDefaultOps(){
+        return Arrays.asList(REVIEW_FAILED,
+                REVIEWING,
+                REVIEW_PASSED);
     }
 
 }

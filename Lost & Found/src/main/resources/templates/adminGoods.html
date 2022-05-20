@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ch"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:th="http://www.thymeleaf.org">
+
+<!--      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"-->
+<!--      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"-->
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="index, follow" name="robots">
+    <title>LOST & FOUND</title>
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:regular,700,600&amp;latin" rel="stylesheet"
+          type="text/css"/>
+    <!-- Essential styles -->
+    <link rel="stylesheet" th:href="@{/assets/bootstrap/css/bootstrap.min.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/assets/plugins/font-awesome/css/font-awesome.css}" type="text/css">
+
+    <!-- Dlapak styles -->
+    <link id="theme_style" media="screen" rel="stylesheet" th:href="@{/assets/css/style1.css}" type="text/css">
+
+    <!-- /Assets -->
+    <link rel="stylesheet" th:href="@{/assets/plugins/owl-carousel/owl.carousel.css}">
+    <link rel="stylesheet" th:href="@{/assets/plugins/owl-carousel/owl.theme.css}">
+    <link media="screen" rel="stylesheet" th:href="@{/assets/plugins/flexslider/flexslider.css}" type="text/css"/>
+
+    <!--    clock    -->
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}"/>
+    <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+
+    <!-- JS Library -->
+    <script th:src="@{/assets/js/jquery.js}"></script>
+    <script th:src="@{/assets/js/jquery.min.js}"></script>
+    <script th:src="@{/assets/js/moment.min.js}"></script>
+    <script th:src="@{/assets/js/script.js}"></script>
+    <script th:src="@{/assets/js/echarts.min.js}"></script>
+
+</head>
+<body>
+<div class="wrapper">
+    <!--    <div th:replace="menu/header::header"></div>-->
+    <div th:replace="menu/header::header(operation=${selectedOperation})"></div>
+
+    <section class="main" style="margin-left: 7%">
+        <div class="container" style="margin: 0;width: 100%">
+            <!--            <div class="row" >-->
+            <!--                <div class="col-md-12" style="margin-left: 90%">-->
+            <!--                    <ul class="breadcrumb pull-left">-->
+            <!--                        <li><a th:href="@{/user/index}">Home</a></li>-->
+            <!--                        <li><a th:href="@{/user/category}">Category</a></li>-->
+            <!--                        <li>Profile</li>-->
+            <!--                    </ul>-->
+            <!--                </div>-->
+            <!--            </div>-->
+
+            <div class="row">
+                <div class="col-md-3 col-sm-3" style="width: 15%">
+                    <div class="widget">
+                        <div align="center" class="widget-header">
+                            <!--                                    <input hidden="hidden" id="operationType" th:if="" th:value="${operationType.getType()}">-->
+                            <h3>操作</h3>
+                        </div>
+                        <div class="widget-body text-center">
+
+                            <ul class="trends">
+                                <div class="panel-group">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading" style="border-bottom: #e3e3e3 solid">
+                                            <h4 class="panel-title">
+                                                <a class="btn btn-sm" href="/admin/management">首页</a>
+                                            </h4>
+                                        </div>
+                                        <div class="panel-heading" style="border-bottom: #e3e3e3 solid">
+                                            <h4 class="panel-title">
+                                                <a class="btn btn-sm" href="/goods/adminGoods" >物品信息管理</a>
+                                                <!--                                                <a class="btn btn-sm" onclick="showGoodsTable()">发布物品</a>-->
+                                            </h4>
+                                        </div>
+                                        <div class="panel-heading" style="border-bottom: #e3e3e3 solid">
+                                            <h4 class="panel-title">
+                                                <a class="btn btn-sm" onclick="">申请信息管理</a>
+                                                <!--                                                <a class="btn btn-sm" onclick="showGoodsTable()">发布物品</a>-->
+                                            </h4>
+                                        </div>
+                                        <div class="panel-heading" style="border-bottom: #e3e3e3 solid">
+                                            <h4 class="panel-title">
+                                                <a class="btn btn-sm" onclick="">用户信息管理</a>
+                                                <!--                                                <a class="btn btn-sm" onclick="showGoodsTable()">发布物品</a>-->
+                                            </h4>
+                                        </div>
+
+                                        <div class="panel-heading" style="border-bottom: #e3e3e3 solid">
+                                            <h4 class="panel-title">
+                                                <a class="btn btn-sm" onclick="">申诉信息管理</a>
+                                                <!--                                                <a class="btn btn-sm" onclick="showGoodsTable()">发布物品</a>-->
+                                            </h4>
+                                        </div>
+                                        <div class="panel-heading" style="border-bottom: #e3e3e3 solid">
+                                            <h4 class="panel-title">
+                                                <a class="btn btn-sm" onclick="">发布物品审核</a>
+                                                <!--                                                <a class="btn btn-sm" onclick="showGoodsTable()">发布物品</a>-->
+                                            </h4>
+                                        </div>
+
+                                        <script>
+                                            function showGoodsTable() {
+                                                // $("#goodsInfo").show();
+                                                // $("#goodsInfo").hide();
+                                                // $("#emptyResult").hide()
+                                                // $("#resultRow").hide()
+                                                // $("#pageNum").hide()
+                                                // $("#searchDiv").hide()
+                                                // $("#graph").hide()
+                                            }
+
+
+                                            function deleteGoods(id) {
+                                                $.ajax({
+                                                    url: "/goods/del/"+id,
+                                                    method: "delete",
+                                                    success: function (response,status) {
+                                                        console.log(response)
+                                                        alert(response.msg)
+                                                        if (response.code!==500){
+                                                            window.location.reload();
+                                                        }
+                                                    }
+                                                })
+
+                                            }
+                                            function deleteForm(id) {
+                                                $.ajax({
+                                                    url: "/applyform/del/"+id,
+                                                    method: "delete",
+                                                    success: function (response,status) {
+                                                        console.log(response)
+                                                        alert(response.msg)
+                                                        if (response.code!==500){
+                                                            window.location.reload();
+                                                        }
+                                                    }
+                                                })
+                                            }
+
+                                        </script>
+
+                                    </div>
+                                </div>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6" style="margin-left: 5%;margin-right: 5%">
+
+
+
+                    <div class="row"  style="margin-bottom: 10px;padding-left: 2%;padding-right: 2%" id="searchDiv">
+                        <div class="row center-block text-center" style="margin-left: 7%">
+                            <script th:inline="javascript">
+                                $(function () {
+                                    let selectedCategory= [[${selectedCategory}]];
+                                    let selectedPosition= [[${selectedPosition}]];
+                                    let selectedOperation= [[${selectedOperation}]];
+                                    let searchKey= [[${searchKey}]];
+                                    let goodStatus= [[${selectGoodStatus}]];
+
+                                    // console.log(selectedOperation)
+                                    $("#categoryType").val(selectedCategory.type);
+                                    $("#position").val(selectedPosition.id);
+                                    $("#operation").val(selectedOperation)
+                                    $("#searchKey").val(searchKey)
+                                    $("#goodStatus").val(goodStatus)
+                                })
+                            </script>
+                            <form action="" id="searchForm">
+                                <input name="currPage" hidden="hidden" id="currPage" th:value="${resultPageList.getCurrPage()}">
+                                <div class="col-md-2 col-sm-2  cat-search-input" style="width: 20%">
+                                    <select class="form-control" id="position" name="positionId">
+                                        <option selected value="-1">大致区域</option>
+                                        <option th:each="location : ${locationList}"  th:object="${location}" th:value="*{id}" th:text="*{position}"></option>
+                                        <!--                                    <option>Motorcycle</option>-->
+                                        <!--                                    <option>Properti</option>-->
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2 col-sm-2  cat-search-input" style="width: 15%">
+                                    <select class="form-control" id="operation" name="operation">
+                                        <option selected value="-1">类型</option>
+                                        <option th:each="operation : ${T(com.suerte.lostandfound.eum.OperationEnum).getDefaultOps()}" th:value="${operation.type}" th:text="${operation.name}"></option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2 col-sm-2  cat-search-input" style="width: 15%">
+                                    <select class="form-control" id="categoryType" name="categoryType">
+                                        <option selected value="-1">分类</option>
+                                        <option th:each="category : ${goodsInfos}" th:object="${category}" th:value="*{type}" th:text="*{name}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2 col-sm-2  cat-search-input" style="width: 15%">
+                                    <select class="form-control" id="goodStatus" name="goodStatus">
+                                        <option selected value="-2">状态</option>
+                                        <option th:each="goodStatus : ${T(com.suerte.lostandfound.eum.GoodsStatusEnum).getDefaultOps()}" th:object="${goodStatus}" th:value="*{type}" th:text="*{msg}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2 col-sm-2  cat-search-input" style="width: 20%">
+                                    <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="I want to find...">
+                                </div>
+                                <div class="col-md-2 col-sm-2  cat-search-input" style="width: 10%">
+                                    <button class="btn btn-custom btn-block" type="submit"><i class="fa fa-search"></i></button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!--                    <div class="list-results" th:if="${resultPageList.getList().size()!=0}" style="background: floralwhite;" th:each="goods:${resultPageList.getList()}" th:object="${goods}">-->
+
+                    <!--                    <div class="list-results" th:if="${resultPageList.getList().size()==0}">-->
+                    <div class="list-results" id="emptyResult">
+                        <div class="row" style="margin: 0">
+
+                            <div class="col-md-12 text-center"
+                                 style="align-items: center;justify-content: center;display: flex; height: 500px;">
+                                <table class="table table-bordered table-condensed table-striped table-hover table-responsive text-center">
+                                    <tr>
+                                        <th class="text-center" th:each="name: ${names}" th:text="${name}"></th>
+                                    </tr>
+                                    <tr th:each="goods:${resultPageList.getList()}">
+                                        <td th:text="${goods.getTitle()}"></td>
+                                        <td th:text="${goods.getLocation().getPosition()}"></td>
+                                        <td th:text="${goods.getDescription()}"></td>
+                                        <td><img th:src="${goods.getImgSrc()}"></td>
+                                        <td th:text="${goods.getUser().getName()}"></td>
+                                        <td th:text="${goods.getCreateDate()}"></td>
+                                        <td th:text="${goods.getStatusName()}"></td>
+                                        <td th:text="${goods.getOperationName()}"></td>
+                                        <td th:text="${goods.getCategory().getName()}"></td>
+                                        <td>
+                                            <input type="button" class="btn btn-success" value="修改">
+                                            <input type="button" class="btn btn-danger" value="删除">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <script>
+                                function searchGoods(obj) {
+                                    $("#currPage").val($(obj).text());
+                                    $("#searchForm").submit()
+                                }
+                            </script>
+                            <div class="row" th:if="${resultPageList.getTotalPage()!=0}" th:with="middle=${T(com.suerte.lostandfound.util.NumberUtils).round(7.0,2.0)}">
+                                <div class="col-md-12 text-right" th:with="start=${resultPageList.getCurrPage()-middle>0?(resultPageList.getTotalPage()-resultPageList.getCurrPage()+1>middle?resultPageList.getCurrPage()-middle+1:resultPageList.getTotalPage()-7+1):1}">
+
+                                    <!--                                    <span th:value="${resultPageList.getTotalPage()-resultPageList.getCurrPage()+1<5?resultPageList.getTotalPage()-4:resultPageList.getCurrPage()}"></span>-->
+                                    <!--                                    <span th:value="${resultPageList.getTotalPage()-resultPageList.getCurrPage()+1<5?resultPageList.getTotalPage():resultPageList.getCurrPage()+4}"></span>-->
+
+                                    <!--                                    <button href="#" th:text="${resultPageList.getCurrPage()-middle>0?(resultPageList.getTotalPage()-resultPageList.getCurrPage()+1>middle?resultPageList.getCurrPage()-middle+1:resultPageList.getTotalPage()-7+1):1}"></button>-->
+
+
+
+                                    <ul class="pagination" th:each="pageItem:${#numbers.sequence(start,resultPageList.getTotalPage()>start+7.0-1?start+7.0-1:resultPageList.getTotalPage())}">
+                                        <!--                                    <ul class="pagination" th:each="pageItem:${resultPageList.getTotalPage()-resultPageList.getCurrPage()+1<5?#numbers.sequence(resultPageList.getTotalPage()-6,resultPageList.getTotalPage()-2):#numbers.sequence(resultPageList.getCurrPage(),resultPageList.getCurrPage()+4)}">-->
+                                        <!--                                    <ul class="pagination">-->
+                                        <li><a href="#" onclick="searchGoods(this)" th:text="${pageItemStat.current}"></a></li>
+                                        <!--                                        <li><a href="#" th:text="${T(com.suerte.lostandfound.util.NumberUtils).round(5.0,2.0)}"></a></li>-->
+                                        <!--                                        <li><a href="#">2</a></li>-->
+                                        <!--                                        <li class="active"><a href="#">3</a></li>-->
+                                        <!--                                        <li><a href="#">4</a></li>-->
+                                        <!--                                        <li><a href="#">5</a></li>-->
+                                    </ul>
+
+                                    <!--                                    <ul class="pagination" th:if="${resultPageList.getTotalPage()<=5}" th:each="pageItem:${#numbers.sequence(1,resultPageList.getTotalPage())}">-->
+                                    <!--                                        <li><a href="#" th:text="${pageItemStat.current}"></a></li>-->
+                                    <!--&lt;!&ndash;                                        <li><a href="#">2</a></li>&ndash;&gt;-->
+                                    <!--&lt;!&ndash;                                        <li class="active"><a href="#">3</a></li>&ndash;&gt;-->
+                                    <!--&lt;!&ndash;                                        <li><a href="#">4</a></li>&ndash;&gt;-->
+                                    <!--&lt;!&ndash;                                        <li><a href="#">5</a></li>&ndash;&gt;-->
+                                    <!--                                    </ul>-->
+
+                                    <!--                                    <ul class="pagination" th:if="${resultPageList.getTotalPage()>5}" th:each="pageItem:${resultPageList.getTotalPage()-resultPageList.getCurrPage()>=5?#numbers.sequence(resultPageList.getCurrPage(),resultPageList.getCurrPage()+4):#numbers.sequence(resultPageList.getTotalPage()-4,resultPageList.getTotalPage())}">-->
+                                    <!--                                        <li><a href="#" onclick="searchGoods(this)" th:text="${pageItemStat.current}"></a></li>-->
+                                    <!--                                        &lt;!&ndash;                                        <li class="active"><a href="#">3</a></li>&ndash;&gt;-->
+                                    <!--                                        &lt;!&ndash;                                        <li><a href="#">2</a></li>&ndash;&gt;-->
+                                    <!--                                        &lt;!&ndash;                                        <li><a href="#">4</a></li>&ndash;&gt;-->
+                                    <!--                                        &lt;!&ndash;                                        <li><a href="#">5</a></li>&ndash;&gt;-->
+                                    <!--                                    </ul>-->
+
+
+
+
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row" id="pageNum">
+                        <div class="col-md-12 text-right">
+                            <!--                            <a class="btn" id="currPage"></a>-->
+                            <ul class="pagination" id="pagination">
+
+                            </ul>
+
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="col-md-3 col-sm-3" align="center">
+                    <canvas height="200px" id="canvasClock" width="200px"></canvas>
+                    <script>
+                        (function (win) {
+                            function DrawClock(options) {
+                                this.canvas = options.el;
+                                this.ctx = this.canvas.getContext('2d');//方法返回一个用于在画布上绘图的环境
+                                this.width = this.ctx.canvas.width;
+                                this.height = this.ctx.canvas.height;
+                                this.r = this.width / 2;
+                                this.rem = this.width / 200;
+                                this.digits = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2];
+
+                                var self = this;
+                                self.init();
+                                setInterval(function () {
+                                    self.init();
+                                }, 1000);
+                            }
+
+                            DrawClock.prototype = {
+                                init: function () {
+                                    let ctx = this.ctx;
+                                    ctx.clearRect(0, 0, this.width, this.height);    //在给定的矩形内清除指定的像素
+                                    let now = new Date();
+                                    let hours = now.getHours();
+                                    let minutes = now.getMinutes();
+                                    let seconds = now.getSeconds();
+
+                                    let hour = hours >= 12 ? hours - 12 : hours;
+                                    let minute = minutes + seconds / 60;
+
+                                    this.drawBackground();
+                                    this.drawHour(hour, minute);
+                                    this.drawMinute(minute);
+                                    this.drawSecond(seconds);
+                                    this.drawDot();
+                                    ctx.restore();
+                                },
+                                drawBackground: function () {
+                                    let ctx = this.ctx;
+                                    let self = this;
+                                    ctx.save();
+                                    ctx.translate(this.r, this.r);         //重新映射画布上的 (0,0) 位置
+                                    ctx.beginPath();
+                                    ctx.lineWidth = 8 * this.rem;
+                                    ctx.arc(0, 0, this.r - ctx.lineWidth / 2, 0, 2 * Math.PI, false);    //创建弧/曲线（用于创建圆形或部分圆）
+                                    ctx.stroke();
+                                    ctx.font = 16 * this.rem + "px Arial";//设置或返回文本内容的当前字体属性
+                                    ctx.textAlign = "center";              //设置或返回文本内容的当前对齐方式
+                                    ctx.textBaseline = "middle";           //设置或返回在绘制文本时使用的当前文本基线
+                                    this.digits.forEach(function (number, i) {
+                                        let rad = 2 * Math.PI / 12 * i;
+                                        let x = Math.cos(rad) * (self.r - 33 * self.rem);
+                                        let y = Math.sin(rad) * (self.r - 33 * self.rem);
+                                        ctx.fillText(number, x, y);        //在画布上绘制"被填充的"文本
+                                    });
+
+                                    //分钟的刻度，每分钟转6deg
+                                    for (let i = 0; i < 60; i++) {
+                                        ctx.save();                        //保存当前环境的状态
+                                        ctx.rotate(6 * i * Math.PI / 180); //旋转当前绘图
+                                        ctx.beginPath();                   //起始一条路径，或重置当前路径
+                                        ctx.moveTo(0, -82 * this.rem);     //把路径移动到画布中的指定点，不创建线条
+                                        ctx.lineTo(0, -87 * this.rem);     //添加一个新点，然后在画布中创建从该点到最后指定点的线条
+                                        ctx.closePath();                   //创建从当前点回到起始点的路径
+                                        ctx.strokeStyle = '#000';          //设置或返回用于笔触的颜色、渐变或模式
+                                        ctx.lineWidth = 1 * this.rem;      //设置或返回当前的线条宽度
+                                        ctx.stroke();                      //绘制已定义的路径
+                                        ctx.restore();                     //返回之前保存过的路径状态和属性
+                                    }
+                                    //小时的刻度，每小时转30deg
+                                    for (let i = 0; i < 12; i++) {
+                                        ctx.save();
+                                        ctx.rotate(30 * i * Math.PI / 180);
+                                        ctx.beginPath();
+                                        ctx.moveTo(0, -79 * this.rem);
+                                        ctx.lineTo(0, -87 * this.rem);
+                                        ctx.closePath();
+                                        ctx.strokeStyle = '#000';
+                                        ctx.lineWidth = 2 * this.rem;
+                                        ctx.stroke();
+                                        ctx.restore();
+                                    }
+                                },
+                                drawHour: function (hour, minute) {
+                                    let ctx = this.ctx;
+                                    ctx.save();
+                                    ctx.beginPath();
+                                    let hRad = 2 * Math.PI / 12 * hour;
+                                    let mRad = 2 * Math.PI / 12 / 60 * minute;
+                                    ctx.rotate(hRad + mRad);
+                                    ctx.lineWidth = 6 * this.rem;
+                                    ctx.lineCap = "round";                 //设置或返回线条的结束端点样式
+                                    ctx.moveTo(0, 10 * this.rem);
+                                    ctx.lineTo(0, -this.r / 2);
+                                    ctx.stroke();
+                                    ctx.restore();
+                                },
+                                drawMinute: function (minute) {
+                                    let ctx = this.ctx;
+                                    ctx.save();
+                                    ctx.beginPath();
+                                    let rad = 2 * Math.PI / 60 * minute;
+                                    ctx.rotate(rad);
+                                    ctx.lineWidth = 3 * this.rem;
+                                    ctx.lineCap = "round";
+                                    ctx.moveTo(0, 10 * this.rem);
+                                    ctx.lineTo(0, -this.r + 26 * this.rem);
+                                    ctx.stroke();
+                                    ctx.restore();
+                                },
+                                drawSecond: function (second) {
+                                    let ctx = this.ctx;
+                                    ctx.save();
+                                    ctx.beginPath();
+                                    ctx.fillStyle = "#c14543";
+                                    let rad = 2 * Math.PI / 60 * second;
+                                    ctx.rotate(rad);
+                                    ctx.moveTo(-3 * this.rem, 20 * this.rem);
+                                    ctx.lineTo(3 * this.rem, 20 * this.rem);
+                                    ctx.lineTo(1, -this.r + 26 * this.rem);
+                                    ctx.lineTo(-1, -this.r + 26 * this.rem);
+                                    ctx.fill();    //填充当前绘图（路径）
+                                    ctx.restore();
+                                },
+                                drawDot: function (minute) {
+                                    let ctx = this.ctx;
+                                    ctx.beginPath();
+                                    ctx.fillStyle = "#fff";
+                                    ctx.arc(0, 0, 3 * this.rem, 0, 2 * Math.PI, false);
+                                    ctx.fill();
+                                }
+                            };
+
+                            win.DrawClock = DrawClock;
+                        })(window);
+
+                        new DrawClock({el: document.getElementById("canvasClock")});
+                    </script>
+                    <div id="clock" class="light"  style="margin: 0;padding: 0">
+                        <div class="display">
+                            <div class="weekdays"></div>
+                            <div class="ampm"></div>
+                            <div class="alarm"></div>
+                            <div class="digits"></div>
+                        </div>
+                    </div>
+                    <!--                            <div class="widget">-->
+                    <!--                                <div class="widget-header">-->
+                    <!--                                    <h3>操作</h3>-->
+                    <!--                                </div>-->
+                    <!--                                <div class="widget-body">-->
+                    <!--                                    <ul class="trends">-->
+                    <!--                                        <li><a href="#">基本信息</a></li>-->
+                    <!--                                        <li><a href="#">修改密码</a></li>-->
+                    <!--                                        <li><a href="#">发布的寻物启事</a></li>-->
+                    <!--                                        <li><a href="#">发布的失物招领</a></li>-->
+                    <!--                                    </ul>-->
+                    <!--                                </div>-->
+                    <!--                            </div>-->
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <div class="footer">
+        <div class="container">
+
+            <ul class="text-center footer-menu">
+                <li>Copyright &copy; 2018.Company name All rights reserved.<a href="http://sc.chinaz.com/moban/"
+                                                                              target="_blank">&#x7F51;&#x9875;&#x6A21;&#x677F;</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Send Message Modal -->
+<div aria-labelledby="sendMessageModalLabel" class="modal fade in" id="sendMessageModal" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span
+                        aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="sendMessageModalLabel">修改个人信息</h4>
+            </div>
+            <div class="modal-body">
+
+                <form action="/user/changeProfile" enctype="multipart/form-data" id="profile" method="post">
+                    <div hidden="hidden">
+                        <input id="newAvatar" name="newAvatar" type="file">
+                        <input id="newUid" name="uid" th:value="${loginUser.getId()}">
+                        <input id="oldAccount" name="olcAccount" th:value="${loginUser.getAccount()}">
+                    </div>
+                    <!--                    <input hidden name="goodsId" th:value="${goods.getId()}">-->
+                    <div class="form-group">
+                        <label class="control-label">头像:</label>
+
+                        <input id="oldAvatar" onclick="uploadAvatar()" required th:src="${loginUser.getAvatar()}"
+                               type="image">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">账号:</label>
+                        <input class="form-control input-lg" id="newAccount" name="newAccount"
+                               placeholder="账号" required th:value="${loginUser.getAccount()}" type="text">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">邮箱:</label>
+                        <input class="form-control input-lg" id="newEmail" name="newEmail"
+                               placeholder="Your email" required th:value="${loginUser.getEmail()}" type="email">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="newEmail">QQ:</label>
+                        <input class="form-control input-lg" id="newQQ" name="newQQ" placeholder="QQ号" required
+                               th:value="${loginUser.getQq()}"
+                               type="number"/>
+                    </div>
+                    <!--                    <div class="form-group">-->
+                    <!--                        <label class="control-label" for="newEmail">Tel:</label>-->
+                    <!--                        <input class="form-control input-lg" id="newTel"  placeholder="手机号" type="number" th:value="${loginUser.getTel()}"-->
+                    <!--                               required/>-->
+                    <!--                    </div>-->
+                    <div class="form-group">
+                        <label class="control-label">新密码:</label>
+                        <input class="form-control input-lg" id="newPassword" name="newPassword" placeholder="密码"
+                               required type="password">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">重新输入密码:</label>
+                        <input class="form-control input-lg" id="reNewPass" name="reNewPass" placeholder="密码" required
+                               type="password">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
+                <button class="btn btn-custom" onclick="changeProfile()" type="button"><i class="fa fa-paper-plane"></i>
+                    Send
+                </button>
+            </div>
+            <script th:inline="javascript">
+                let info = [[${info}]];
+                if (info !== null) {
+                    alert(info)
+                }
+                console.log(info)
+            </script>
+            <script>
+                function uploadAvatar() {
+                    $("#newAvatar").click();
+                    // 修改显示新上传的头像
+                    $("#newAvatar").change(function () {
+                        let file = $(this)[0].files[0];
+                        let reader = new FileReader();
+                        reader.readAsDataURL(file);
+                        reader.onload = function () {
+                            // console.log(this.result)
+                            $("#oldAvatar").attr("src", this.result);
+                        }
+                    })
+                }
+
+                function checkMobile(number) {
+                    if (number.startsWith("+86")) {
+                        number = number.substring(3);
+                    }
+
+                    if (number.startsWith("+") || number.startsWith("0")) {
+                        number = number.substring(1);
+                    }
+                    number = number.replace(" ", "").replace("-", "");
+                    return /^((13[0-9])|(14[5-9])|(15[0-3])|(15[5-9])|(166)|(17[0-8])|(18[0-9])|(19[8-9]))\d{8}$/.test(number);
+                    // return number.test("");
+                }
+
+                function changeProfile() {
+                    // let newAvatar = $("#newAvatar");
+                    let newAccount = $("#newAccount");
+                    let newEmail = $("#newEmail");
+                    let newQQ = $("#newQQ");
+                    let newPassword = $("#newPassword");
+                    let reNewPass = $("#reNewPass");
+                    // let newUid = $("#newUid");
+                    if (!checkEmail(newEmail.val())) {
+                        alert("输入的邮箱不符合格式 请重新输入");
+                        newEmail.val('');
+                        return;
+                    }
+                    if (!checkQQ(newQQ.val())) {
+                        alert("输入的QQ不符合格式 请重新输入");
+                        newQQ.val();
+                        return;
+                    }
+                    if (newPassword.val().length === 0) {
+                        alert("输入的密码不能为空");
+                        newPassword.val('');
+                        reNewPass.val('');
+                        return;
+                    }
+                    if (newPassword.val() !== reNewPass.val()) {
+                        alert("两次输入的密码不一致 请重新输入");
+                        newPassword.val('');
+                        reNewPass.val('');
+                        return;
+                    }
+                    if (newAccount.val().length < 4) {
+                        alert("账号的长度必须大于4位");
+                        newAccount.val('');
+                        return;
+                    }
+
+                    $.get("/user/listByAccount?account=" + newAccount.val() + "&oldAccount=" + $("#oldAccount").val(),
+                        function success(data) {
+                            console.log(data);
+                            if (data.data) {
+                                alert("该账号已存在");
+                            } else {
+                                $("#profile").submit()
+                            }
+                        }
+                    )
+
+
+                }
+
+                function checkEmail(str) {
+                    let reg = /^\w+((-\w+)|(\.\w+))*@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/;
+                    if (reg.test(str)) {
+                        console.log('Email格式输入正确');
+                        return true;
+                    } else {
+                        console.log('请输入正确格式的Email');
+                        return false;
+                    }
+                }
+
+                function checkQQ(str) {
+                    // 1 首位不能是0 ^[1-9]
+                    // 2 必须是 [5, 11] 位的数字 \d{4, 9}
+                    let reg = /^[1-9][0-9]{4,9}$/gim;
+                    if (reg.test(str)) {
+                        console.log('QQ号码格式输入正确');
+                        return true;
+                    } else {
+                        console.log('请输入正确格式的QQ号码');
+                        return false;
+                    }
+                }
+            </script>
+        </div>
+    </div>
+</div>
+<!-- End Message Modal -->
+
+<!-- Essentials -->
+<script th:src="@{/assets/bootstrap/js/bootstrap.min.js}"></script>
+<script th:src="@{/assets/plugins/owl-carousel/owl.carousel.js}"></script>
+<script th:src="@{/assets/plugins/counter/jquery.countTo.js}"></script>
+<script defer th:src="@{/assets/plugins/flexslider/jquery.flexslider.js}"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        // ===============Flexslider=====================
+        $('.flexslider').flexslider({
+            animation: "slide",
+            controlNav: "thumbnails",
+            directionNav: false,
+            start: function (slider) {
+                $('body').removeClass('loading');
+            }
+        });
+
+        // ==========tooltip initial=================
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
+</body>
+</html>
