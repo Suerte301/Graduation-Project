@@ -127,7 +127,7 @@
 
 							<script>
 								function toLogin() {
-									let smsCode = $("#smsCode").val();
+									let smsCode = $("#smsCode").val().trim();
 									if (smsCode===""){
 										alert("请输入验证码");
 										return;

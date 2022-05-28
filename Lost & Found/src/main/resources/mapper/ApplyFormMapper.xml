@@ -7,7 +7,6 @@
         <result property="failed" column="failed"/>
         <result property="inProgress" column="inProgress"/>
         <result property="success" column="success"/>
-        <result property="end" column="end"/>
     </resultMap>
 
     <select id="getApplyFormByUid" resultMap="userFormMap" useCache="false">

@@ -195,10 +195,12 @@
 
                                                                     console.log(data)
                                                                     alert(data.msg)
-                                                                    applyForm.text("已申请");
-                                                                    $("#applymsg").val("已申请")
-                                                                    // applyForm.attr("disabled");
-                                                                    applyForm.prop("disabled","disabled");
+                                                                    if (data.code!==500) {
+                                                                        applyForm.text("已申请");
+                                                                        $("#applymsg").val("已申请")
+                                                                        // applyForm.attr("disabled");
+                                                                        applyForm.prop("disabled", "disabled");
+                                                                    }
                                                                     // console.log(status)
                                                                 },
                                                                 error:function (data,status) {

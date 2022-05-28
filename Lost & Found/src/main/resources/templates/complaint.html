@@ -233,42 +233,40 @@
 <!--                                                        类型: <span th:text="${goods.getOperationName()}"></span>-->
 <!--                                                        发布日期: <span th:text="${goods.getCreateDate()}"></span>-->
 <!--                                                        申请人: <span th:text="${goods.getApplyUser().getName()}"></span>-->
-                                                        <a href="#" data-toggle="tooltip" data-placement="top" th:onclick="complaint()" title="申诉" class="btn btn-danger btn-default btn-sm">
+                                                        <a href="#" data-toggle="tooltip" data-placement="top" th:onclick="complaint(${loginUser.getId()},${goods.getId()})" title="申诉" class="btn btn-danger btn-default btn-sm">
                                                             <i class="fa fa-edit"></i>
                                                             申诉
                                                         </a>
                                                         <script>
-                                                            function complaint() {
+                                                            function complaint(uid,applyId) {
                                                                 let flag = confirm("确认要申诉吗?");
                                                                 if (flag){
-                                                                    // $.ajax({
-                                                                    //     type: 'post',
-                                                                    //     url: '/user/applyForMyGoods',
-                                                                    //     dataType: 'json',
-                                                                    //     contentType:"application/json;charset=utf-8",
-                                                                    //     data:JSON.stringify( {
-                                                                    //         // 'uid':currentUser,
-                                                                    //         'goodsId':goodsId,
-                                                                    //         'locationId':location.val(),
-                                                                    //         'locationDetail':locationDetail.val(),
-                                                                    //         'tel':tel.val()
-                                                                    //     }),
-                                                                    //     success: function (data,status) {
-                                                                    //         // alert(data)
-                                                                    //
-                                                                    //         console.log(data)
-                                                                    //         alert(data.msg)
-                                                                    //         applyForm.val("已申请");
-                                                                    //         applyForm.attr("disabled");
-                                                                    //
-                                                                    //         // console.log(status)
-                                                                    //     },
-                                                                    //     error:function (data,status) {
-                                                                    //         alert('error')
-                                                                    //         console.log(data)
-                                                                    //         console.log(status)
-                                                                    //     }
-                                                                    // });
+                                                                    let formData = new FormData();
+                                                                    formData.append("applyId",applyId);
+                                                                    formData.append("uid",uid);
+                                                                    $.ajax({
+                                                                        type: 'post',
+                                                                        url: '/complaint/add',
+                                                                        contentType:"application/json;charset=utf-8",
+                                                                        data:formData,
+                                                                        success: function (data,status) {
+                                                                            // alert(data)
+
+                                                                            console.log(data)
+                                                                            alert(data.msg)
+                                                                            if (data.code!==500){
+                                                                                window.location.reload();
+                                                                            }
+
+
+                                                                            // console.log(status)
+                                                                        },
+                                                                        error:function (data,status) {
+                                                                            alert('error')
+                                                                            console.log(data)
+                                                                            console.log(status)
+                                                                        }
+                                                                    });
                                                                 }
                                                             }
                                                         </script>

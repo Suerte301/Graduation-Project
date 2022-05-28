@@ -1,10 +1,12 @@
 package com.suerte.lostandfound.controller;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.suerte.lostandfound.entity.*;
+import com.suerte.lostandfound.eum.ComplaintStatusEnum;
 import com.suerte.lostandfound.eum.FormStatusEnum;
 import com.suerte.lostandfound.eum.GoodsStatusEnum;
 import com.suerte.lostandfound.eum.OperationEnum;
@@ -22,11 +24,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -110,7 +110,7 @@ public class ComplaintFormController {
             goodsRes.setCreateDate(DateUtil.formatDateTime(goods.getCreateDate()));
 
 
-
+            applyFormRes.setStatus(FormStatusEnum.getStatusByType(byId.getStatus()));
 
             applyFormRes.setGoodsRes(goodsRes);
             String imgSrcStr=ObjectUtil.isNotEmpty(goodsRes.getImgSrc())?goodsRes.getImgSrc():"/icons/emptyImg.png";
@@ -126,6 +126,7 @@ public class ComplaintFormController {
 
             complaintRes.setApplyForm(applyFormRes);
             complaintRes.setStatus(i.getStatus());
+            complaintRes.setStatusEnum(ComplaintStatusEnum.getStatusByType(i.getStatus()));
             complaintRes.setId(i.getId());
 
             return complaintRes;
@@ -138,4 +139,36 @@ public class ComplaintFormController {
 
         return HttpResult.ok(map);
     }
+
+    @PostMapping("/add")
+    @ResponseBody
+    public HttpResult add(Authentication authentication,
+                          @RequestParam("applyId")String applyId,
+                          @RequestParam("uid")String uidString
+                          ){
+
+        final ComplaintForm complaintForm = new ComplaintForm();
+
+        Integer uid=null;
+        if (ObjectUtil.isEmpty(uidString)||uid.equals("null")){
+            uid=((User)authentication.getPrincipal()).getId();
+        }else {
+            uid=Integer.valueOf(uidString);
+        }
+        complaintForm.setId(IdUtil.simpleUUID());
+        complaintForm.setApplyId(applyId);
+        complaintForm.setUid(uid);
+        complaintForm.setStatus(ComplaintStatusEnum.IN_COMPLAINT.getType());
+        boolean save =true;
+        try {
+            save = complaintFormService.save(complaintForm);
+        }catch (Exception e){
+            log.error("添加申诉失败 报错原因{} 报错位置 {}",e.getMessage(), Arrays.toString(e.getStackTrace()));
+            save=false;
+        }
+
+
+        return save?HttpResult.ok("成功"):HttpResult.error("失败");
+    }
+
 }

@@ -17,6 +17,8 @@ public enum GoodsStatusEnum {
     REVIEW_FAILED("审核失败", -1),
     REVIEWING("审核中", 0),
     REVIEW_PASSED("审核通过", 1),
+    BE_APPLIED("被申请", 2),
+    END("结束",3),
     ALL("所有", -2);
 
     private String msg;
@@ -40,7 +42,16 @@ public enum GoodsStatusEnum {
     public static List<GoodsStatusEnum> getDefaultOps(){
         return Arrays.asList(REVIEW_FAILED,
                 REVIEWING,
-                REVIEW_PASSED);
+                REVIEW_PASSED,BE_APPLIED,END);
     }
+
+
+
+    public static List<GoodsStatusEnum> getAdminDefaultOps(){
+        return Arrays.asList(
+                REVIEW_FAILED,REVIEWING,
+                REVIEW_PASSED,END);
+    }
+
 
 }

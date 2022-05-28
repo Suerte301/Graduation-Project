@@ -302,6 +302,8 @@
                                                                         "                                        <div class=\"item-action\">\n" +
                                                                         "                                            <ul>\n" +
                                                                         "                                                <li><a href=\"#\" onclick='deleteGoods(\""+goods.id+"\")' title=\"撤销\" class=\"btn btn-default btn-sm\"><i class=\"fa fa-remove\"></i></a></li>\n" +
+                                                                            (type===2?"<li><a href=\"#\" onclick='toApplySuccess(\""+goods.id+"\")' title=\"通过\" class=\"btn btn-default btn-sm\"><i class=\"fa fa-edit\"></i></a></li>\n":"")+
+                                                                            (type===2?"<li><a href=\"#\" onclick='toApplyFailed(\""+goods.id+"\")' title=\"不通过\" class=\"btn btn-default btn-sm\"><i class=\"fa fa-edit\"></i></a></li>\n":"")+
                                                                         // "                                                <li><a href=\"detail.html\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Show Details\" class=\"btn btn-success btn-sm\"><i class=\"fa fa-eye\"></i></a></li>\n" +
                                                                         "                                            </ul>\n" +
                                                                         "                                        </div>\n" +
@@ -433,7 +435,7 @@
                                                                         "                                        <div class=\"item-action\">\n" +
                                                                         "                                            <ul>\n" +
                                                                         "                                                <li><a onclick='deleteForm(\""+apply.id+"\")' title=\"撤销\" class=\"btn btn-default btn-sm\"><i class=\"fa fa-remove\"></i></a></li>\n" +
-                                                                        (flag?"                                                <li><a href=\"#\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"申诉\" class=\"btn btn-default btn-sm\"><i class=\"fa fa-edit\"></i></a></li>\n":"") +
+                                                                        (flag?"                                                <li><a onclick=\"complaint('','"+apply.id+"')\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"申诉\" class=\"btn btn-default btn-sm\"><i class=\"fa fa-edit\"></i></a></li>\n":"") +
                                                                         // "                                                <li><a href=\"#\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Save Favorite\" class=\"btn btn-default btn-sm\"><i class=\"fa fa-heart\"></i></a></li>\n" +
                                                                         // "                                                <li><a href=\"detail.html\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Show Details\" class=\"btn btn-success btn-sm\"><i class=\"fa fa-eye\"></i></a></li>\n" +
                                                                         "                                            </ul>\n" +
@@ -480,6 +482,44 @@
                                                     }
                                                 )
 
+                                            }
+
+                                            function complaint(uid,applyId) {
+                                                let flag = confirm("确认要申诉吗?");
+                                                if (flag){
+                                                    let formData = new FormData();
+                                                    formData.append("applyId",applyId);
+                                                    formData.append("uid",uid);
+                                                    console.log(formData.get("applyId"))
+                                                    console.log(formData.get("uid"))
+                                                    $.ajax({
+                                                        type: 'post',
+                                                        url: '/complaint/add',
+                                                        data:formData,
+                                                        contentType: false,
+                                                        /**
+                                                         * 必须false才会避开jQuery对 formdata 的默认处理
+                                                         * XMLHttpRequest会对 formdata 进行正确的处理
+                                                         */
+                                                        processData: false,
+                                                        success: function (data,status) {
+                                                            // alert(data)
+                                                            console.log(data)
+                                                            alert(data.msg)
+                                                            if (500 !== data.code){
+                                                                window.location.reload();
+                                                            }
+
+
+                                                            // console.log(status)
+                                                        },
+                                                        error:function (data,status) {
+                                                            alert('error')
+                                                            console.log(data)
+                                                            console.log(status)
+                                                        }
+                                                    });
+                                                }
                                             }
 
                                             function generateComplaintFormResult(type,currentPage,typeName) {
@@ -624,6 +664,35 @@
 
                                             }
 
+                                            function toApplyFailed(id) {
+                                                $.ajax({
+                                                    url: "/goods/toApplyFailed/"+id,
+                                                    method: "post",
+                                                    success: function (response,status) {
+                                                        console.log(response)
+                                                        alert(response.msg)
+                                                        if (response.code!==500){
+                                                            window.location.reload();
+                                                        }
+                                                    }
+                                                })
+
+                                            }
+
+                                            function toApplySuccess(id) {
+                                                $.ajax({
+                                                    url: "/goods/toApplySuccess/"+id,
+                                                    method: "post",
+                                                    success: function (response,status) {
+                                                        console.log(response)
+                                                        alert(response.msg)
+                                                        if (response.code!==500){
+                                                            window.location.reload();
+                                                        }
+                                                    }
+                                                })
+
+                                            }
 
                                             function deleteGoods(id) {
                                                 $.ajax({

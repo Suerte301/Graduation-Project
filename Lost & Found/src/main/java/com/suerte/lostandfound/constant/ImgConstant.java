@@ -6,6 +6,6 @@ package com.suerte.lostandfound.constant;
  * @Description:
  */
 public interface ImgConstant {
-    String DEFAULT_IMG_PATH="emptyImg.png";
-    String DEFAULT_ITEM_PATH="emptyItem.png";
+    String DEFAULT_IMG_PATH="/icons/emptyImg.png";
+    String DEFAULT_ITEM_PATH="/icons/emptyItem.png";
 }

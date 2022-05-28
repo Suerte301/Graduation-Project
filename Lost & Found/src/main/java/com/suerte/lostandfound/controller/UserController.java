@@ -320,10 +320,12 @@ public class UserController {
 
 //        User loginUser = (User) request.getSession().getAttribute(LoginConstant.USER);
 //        User loginUser = (User) authentication.getPrincipal();
-        List<ApplyForm> list = applyFormService.list(new LambdaQueryWrapper<ApplyForm>().eq(ApplyForm::getGoodsId, goods.getId()).eq(ApplyForm::getUid, loginUser.getId()));
+        List<ApplyForm> list = applyFormService.list(new LambdaQueryWrapper<ApplyForm>().eq(ApplyForm::getGoodsId, goods.getId())
+                .eq(ApplyForm::getUid, loginUser.getId())
+        .eq(ApplyForm::getStatus,FormStatusEnum.APPLY_FAILED));
 
 
-        modelAndView.addObject("isApply", list.size() > 0);
+        modelAndView.addObject("isApply", !list.isEmpty());
 //        if (list.size()>0) {
 //            modelAndView.addObject("applyStatus", FormStatusEnum.getStatusByType(list.get(0).getStatus()));
 //        }
@@ -493,9 +495,11 @@ public class UserController {
 //        }
 
         List<ApplyForm> list = applyFormService.list(new LambdaQueryWrapper<ApplyForm>().eq(ApplyForm::getGoodsId, goodsId).eq(ApplyForm::getUid, user.getId()));
-        if (list.size() > 0) {
-            return HttpResult.error("您已经申请过此物品 请不要重复申请");
-        }
+//        if (list.size() > 0) {
+//            return HttpResult.error("您已经申请过此物品 请不要重复申请");
+//        }
+
+
 
         ApplyForm applyForm = new ApplyForm();
         applyForm.setId(IdUtil.simpleUUID());
@@ -507,7 +511,10 @@ public class UserController {
         applyForm.setUid(user.getId());
         boolean flag = true;
         try {
+            Goods byId = goodsService.getById(goodsId);
             flag = applyFormService.save(applyForm);
+            byId.setStatus(GoodsStatusEnum.BE_APPLIED.getType());
+            goodsService.saveOrUpdate(byId);
         } catch (Exception e) {
             log.error("物品申请报错 报错信息{} 报错位置{}", e.getMessage(), Arrays.toString(e.getStackTrace()));
             flag = false;
@@ -622,7 +629,7 @@ public class UserController {
                         .eq(!positionId.equals("-1"), Goods::getLocationId, positionId)
                         .eq(operation != -1, Goods::getType, operation)
                         .eq(categoryType != -1, Goods::getCategoryType, categoryType)
-                        .eq(Goods::getStatus,GoodsStatusEnum.REVIEW_PASSED.getType())
+                        .eq(Goods::getStatus,GoodsStatusEnum.END.getType())
                         .like(ObjectUtil.isNotEmpty(searchKey), Goods::getTitle, searchKey)).stream().map(Goods::getId).collect(Collectors.toList());
 
         List<String> userApply1 =collect.isEmpty()?new ArrayList<>():applyFormService.list(new LambdaQueryWrapper<ApplyForm>()
@@ -694,6 +701,7 @@ public class UserController {
             final ApplyForm applyForm = applyFormService.list(new LambdaQueryWrapper<ApplyForm>().eq(ApplyForm::getId, i.getId())).get(0);
             final User byId = userService.getById(applyForm.getUid());
             applyFormRes.setApplyUser(byId);
+            applyFormRes.setStatus(FormStatusEnum.getStatusByType(i.getStatus()));
             String imgSrcStr=ObjectUtil.isNotEmpty(goodsRes.getImgSrc())?goodsRes.getImgSrc():"/icons/emptyImg.png";
             applyFormRes.setPopUpDetail("标题: <span>" + goodsRes.getTitle() + "</span>" +"<br>"+
                     "拾取地址: <span>" + goodsRes.getLocation().getPosition() + "</span>" +"<br>"+
@@ -748,6 +756,7 @@ public class UserController {
         // 审核通过的结果集
 //        modelAndView.addObject("resultList", resultList);
         modelAndView.addObject("resultPageList", goodsPageInfo);
+        modelAndView.addObject("loginUser", authentication.getPrincipal());
 
 
 //        modelAndView.addObject("categoryList", categoryList);

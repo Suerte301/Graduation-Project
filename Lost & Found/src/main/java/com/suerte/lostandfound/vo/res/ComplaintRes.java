@@ -2,6 +2,7 @@ package com.suerte.lostandfound.vo.res;
 
 import com.suerte.lostandfound.entity.ApplyForm;
 import com.suerte.lostandfound.entity.User;
+import com.suerte.lostandfound.eum.ComplaintStatusEnum;
 import lombok.Data;
 
 /**
@@ -15,4 +16,5 @@ public class ComplaintRes {
     private User user;
     private ApplyFormRes applyForm;
     private Integer status;
+    private ComplaintStatusEnum statusEnum;
 }

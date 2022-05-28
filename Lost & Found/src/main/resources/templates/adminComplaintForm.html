@@ -163,52 +163,26 @@
                         <div class="row center-block text-center" style="margin-left: 7%">
                             <script th:inline="javascript">
                                 $(function () {
-                                    let selectedCategory= [[${selectedCategory}]];
-                                    let selectedPosition= [[${selectedPosition}]];
-                                    let selectedOperation= [[${selectedOperation}]];
+
                                     let searchKey= [[${searchKey}]];
-                                    let goodStatus= [[${selectGoodStatus}]];
+                                    let selectType= [[${selectType}]];
 
                                     // console.log(selectedOperation)
-                                    $("#categoryType").val(selectedCategory.type);
-                                    $("#position").val(selectedPosition.id);
-                                    $("#operation").val(selectedOperation)
+
                                     $("#searchKey").val(searchKey)
-                                    $("#goodStatus").val(goodStatus)
+                                    $("#type").val(selectType)
                                 })
                             </script>
-                            <form action="" id="searchForm">
+                            <form action="/admin/complaintForm" id="searchForm">
                                 <input name="currPage" hidden="hidden" id="currPage" th:value="${resultPageList.getCurrPage()}">
                                 <div class="col-md-2 col-sm-2  cat-search-input" style="width: 20%">
-                                    <select class="form-control" id="position" name="positionId">
-                                        <option selected value="-1">大致区域</option>
-                                        <option th:each="location : ${locationList}"  th:object="${location}" th:value="*{id}" th:text="*{position}"></option>
-                                        <!--                                    <option>Motorcycle</option>-->
-                                        <!--                                    <option>Properti</option>-->
-                                    </select>
-                                </div>
-
-                                <div class="col-md-2 col-sm-2  cat-search-input" style="width: 15%">
-                                    <select class="form-control" id="operation" name="operation">
-                                        <option selected value="-1">类型</option>
-                                        <option th:each="operation : ${T(com.suerte.lostandfound.eum.OperationEnum).getDefaultOps()}" th:value="${operation.type}" th:text="${operation.name}"></option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-2 col-sm-2  cat-search-input" style="width: 15%">
-                                    <select class="form-control" id="categoryType" name="categoryType">
-                                        <option selected value="-1">分类</option>
-                                        <option th:each="category : ${goodsInfos}" th:object="${category}" th:value="*{type}" th:text="*{name}"></option>
-                                    </select>
+                                    <input type="text" id="searchKey" name="name" class="form-control" placeholder="I want to find...">
                                 </div>
                                 <div class="col-md-2 col-sm-2  cat-search-input" style="width: 15%">
-                                    <select class="form-control" id="goodStatus" name="goodStatus">
+                                    <select class="form-control" id="status" name="status">
                                         <option selected value="-2">状态</option>
-                                        <option th:each="goodStatus : ${T(com.suerte.lostandfound.eum.GoodsStatusEnum).getAdminDefaultOps()}" th:object="${goodStatus}" th:value="*{type}" th:text="*{msg}"></option>
+                                        <option th:each="complaintStatus : ${T(com.suerte.lostandfound.eum.ComplaintStatusEnum).values()}" th:object="${complaintStatus}" th:value="*{type}" th:text="*{msg}"></option>
                                     </select>
-                                </div>
-                                <div class="col-md-2 col-sm-2  cat-search-input" style="width: 20%">
-                                    <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="I want to find...">
                                 </div>
                                 <div class="col-md-2 col-sm-2  cat-search-input" style="width: 10%">
                                     <button class="btn btn-custom btn-block" type="submit"><i class="fa fa-search"></i></button>
@@ -224,29 +198,44 @@
                         <div class="row" style="margin: 0">
 
                             <div class="col-md-12 text-center">
-<!--                                     style="align-items: center;justify-content: center;display: flex; height: 500px;"-->
+<!--                                style="align-items: center;justify-content: center;display: flex; height: 500px;"-->
                                 <h2 th:if="${resultPageList.getTotalCount()==0}">未找到对应物品</h2>
                                 <table th:if="${resultPageList.getTotalCount()>0}" class="table table-bordered table-condensed table-striped table-hover table-responsive text-center">
                                     <tr>
                                         <th class="text-center" th:each="name: ${names}" th:text="${name}"></th>
                                     </tr>
-                                    <tr th:each="goods:${resultPageList.getList()}">
-                                        <td th:text="${goods.getTitle()}"></td>
-                                        <td hidden th:text="${goods.getId()}"></td>
-                                        <td th:text="${goods.getLocation().getPosition()}"></td>
-                                        <td th:text="${goods.getDescription()}"></td>
-                                        <td><img th:src="${goods.getImgSrc()}"></td>
-                                        <td th:text="${goods.getUser().getName()}"></td>
-                                        <td th:text="${goods.getCreateDate()}"></td>
-                                        <td th:text="${goods.getStatusName()}"></td>
-                                        <td th:text="${goods.getOperationName()}"></td>
-                                        <td th:text="${goods.getCategory().getName()}"></td>
+                                    <tr th:each="applyForm:${resultPageList.getList()}" >
+                                        <td th:text="${applyForm.getId()}" hidden></td>
+                                        <td th:text="${applyForm.getApplyForm().getGoodsRes().getTitle()}"></td>
+                                        <td th:text="${applyForm.getApplyForm().getGoodsRes().getLocation().getPosition()}"></td>
+<!--                                        <td th:text="${applyForm.getGoodsRes().getDescription()}"></td>-->
+                                        <td><img style="height: 50px" th:src="${applyForm.getApplyForm().getGoodsRes().getImgSrc()}"></td>
+
+
+                                        <td th:text="${applyForm.getApplyForm().getGoodsRes().getUser().getName()}"></td>
+
+<!--                                        <td th:text="${user.getPassword()}"></td>-->
+                                        <td th:text="${applyForm.getApplyForm().getGoodsRes().getCreateDate()}"></td>
+<!--                                        <td th:text="${user.getCreateDate()}"></td>-->
+                                        <td th:text="${applyForm.getApplyForm().getGoodsRes().getOperationName()}"></td>
+                                        <td th:text="${applyForm.getApplyForm().getGoodsRes().getCategory().getName()}"></td>
+                                        <td th:text="${applyForm.getStatusEnum().getMsg()}"></td>
+                                        <td th:text="${applyForm.getApplyForm().getApplyUser().getName()}"></td>
+                                        <td th:text="${applyForm.getUser().getName()}"></td>
                                         <td>
+<!--                                            <p class="popover-options"><input type="button" data-container="body" data-toggle="popover" th:data-content="${applyForm.getPopUpDetail()}" title="Show Details" class="btn btn-success btn-default btn-sm"><i class="fa fa-eye"></i>查看详情</input></p>-->
                                             <input type="button" class="btn btn-success" value="修改">
+<!--                                            <input type="button" class="btn btn-success" value="重置密码">-->
                                             <input type="button" class="btn btn-danger" value="删除">
                                         </td>
                                     </tr>
+                                    <script>
+                                        $(function () {
+                                            $(".popover-options a").popover({html:true,trigger: 'focus'});
+                                        })
+                                    </script>
                                 </table>
+
                             </div>
                             <script>
                                 function searchGoods(obj) {

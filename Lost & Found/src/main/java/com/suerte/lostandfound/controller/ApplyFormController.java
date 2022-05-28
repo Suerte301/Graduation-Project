@@ -62,7 +62,7 @@ public class ApplyFormController {
 
         List<String> goodsList = goodsService.list(new LambdaQueryWrapper<Goods>().like(ObjectUtil.isNotEmpty(applyFormReq.getTitle()), Goods::getTitle, applyFormReq.getTitle())).stream().map(Goods::getId).collect(Collectors.toList());
         User principal = (User) authentication.getPrincipal();
-        IPage<ApplyForm> page = applyFormService.page(new QueryPage<ApplyForm>().getPage(applyFormReq), new LambdaQueryWrapper<ApplyForm>()
+        IPage<ApplyForm> page = goodsList.isEmpty()?new QueryPage<ApplyForm>().getPage(applyFormReq):applyFormService.page(new QueryPage<ApplyForm>().getPage(applyFormReq), new LambdaQueryWrapper<ApplyForm>()
                 .eq(ApplyForm::getStatus, applyFormReq.getStatus())
                 .in(ObjectUtil.isNotEmpty(goodsList.size()),ApplyForm::getGoodsId,goodsList)
                 .eq(ApplyForm::getUid, principal.getId()));

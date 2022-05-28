@@ -10,24 +10,24 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.suerte.lostandfound.config.minio.MinioProperties;
 import com.suerte.lostandfound.config.minio.MinioTemplate;
 import com.suerte.lostandfound.entity.*;
+import com.suerte.lostandfound.eum.FormStatusEnum;
 import com.suerte.lostandfound.eum.GoodsStatusEnum;
 import com.suerte.lostandfound.eum.OperationEnum;
-import com.suerte.lostandfound.service.CategoryService;
-import com.suerte.lostandfound.service.GoodsService;
-import com.suerte.lostandfound.service.LocationService;
-import com.suerte.lostandfound.service.UserService;
+import com.suerte.lostandfound.service.*;
 import com.suerte.lostandfound.util.PageInfo;
 import com.suerte.lostandfound.util.QueryPage;
 import com.suerte.lostandfound.vo.HttpResult;
 import com.suerte.lostandfound.vo.req.AddGoodsReq;
 import com.suerte.lostandfound.vo.req.GoodsSearchReq;
 import com.suerte.lostandfound.vo.req.GoodsStatusReq;
+import com.suerte.lostandfound.vo.res.ApplyFormRes;
 import com.suerte.lostandfound.vo.res.CategoryRes;
 import com.suerte.lostandfound.vo.res.GoodsRes;
 import com.suerte.lostandfound.vo.res.UserGoodsRes;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -114,6 +114,7 @@ public class GoodsController {
             goodsRes.setCategory(categoryService.getOne(new LambdaQueryWrapper<Category>().eq(Category::getType,i.getCategoryType())));
             goodsRes.setId(i.getId());
             goodsRes.setCreateDate(DateUtil.formatDateTime(i.getCreateDate()));
+
 //            goodsRes.setStatus(GoodsStatusEnum.getStatusByType(i.getStatus()));
             return goodsRes;
         }).collect(Collectors.toList());
@@ -160,6 +161,48 @@ public class GoodsController {
             flag=false;
         }
         return flag?HttpResult.ok("撤销物品成功"):HttpResult.error("撤销物品失败");
+    }
+
+
+
+    @Autowired
+    private ApplyFormService applyFormService;
+
+    @PostMapping("/toApplyFailed/{id}")
+    @ResponseBody
+    public HttpResult toApplyFailed(@PathVariable("id")String id){
+        boolean flag=true;
+        try {
+            final Goods byId = goodsService.getById(id);
+            byId.setStatus(GoodsStatusEnum.REVIEW_PASSED.getType());
+            flag = goodsService.saveOrUpdate(byId);
+            // 一个表单只能同时被一个人申请
+            ApplyForm one = applyFormService.getOne(new LambdaQueryWrapper<ApplyForm>().eq(ApplyForm::getGoodsId, id).eq(ApplyForm::getStatus, FormStatusEnum.IN_APPLY.getType()));
+            one.setStatus(FormStatusEnum.APPLY_FAILED.getType());
+            applyFormService.saveOrUpdate(one);
+        }catch (Exception e){
+            log.error("撤销物品失败 报错原因 {} 报错位置 {}",e.getMessage(),Arrays.toString(e.getStackTrace()));
+            flag=false;
+        }
+        return flag?HttpResult.ok("成功"):HttpResult.error("失败");
+    }
+    @PostMapping("/toApplySuccess/{id}")
+    @ResponseBody
+    public HttpResult toApplySuccess(@PathVariable("id")String id){
+        boolean flag=true;
+        try {
+            final Goods byId = goodsService.getById(id);
+            byId.setStatus(GoodsStatusEnum.END.getType());
+            flag = goodsService.saveOrUpdate(byId);
+            // 一个表单只能同时被一个人申请
+            ApplyForm one = applyFormService.getOne(new LambdaQueryWrapper<ApplyForm>().eq(ApplyForm::getGoodsId, id).eq(ApplyForm::getStatus, FormStatusEnum.IN_APPLY.getType()));
+            one.setStatus(FormStatusEnum.APPLY_SUCCESS.getType());
+            applyFormService.saveOrUpdate(one);
+        }catch (Exception e){
+            log.error("撤销物品失败 报错原因 {} 报错位置 {}",e.getMessage(),Arrays.toString(e.getStackTrace()));
+            flag=false;
+        }
+        return flag?HttpResult.ok("成功"):HttpResult.error("失败");
     }
 
     @Autowired
@@ -227,120 +270,5 @@ public class GoodsController {
 
     }
 
-
-    @GetMapping("adminGoods")
-    public ModelAndView adminGoods(GoodsSearchReq goodsSearchReq,Authentication authentication){
-
-
-        ModelAndView modelAndView = new ModelAndView("adminGoods");
-        User user = (User) authentication.getPrincipal();
-
-
-        Integer categoryType = goodsSearchReq.getCategoryType();
-        Integer operation = goodsSearchReq.getOperation();
-        String positionId = goodsSearchReq.getPositionId();
-        String searchKey = goodsSearchReq.getSearchKey();
-        Integer status = goodsSearchReq.getGoodStatus();
-
-        OperationEnum operationByType = OperationEnum.getOperationByType(operation);
-
-        Category defaultCategory = categoryType == -1 ? Category.DEFAULT : categoryService.getOne(new LambdaQueryWrapper<Category>()
-                .eq(Category::getType, categoryType), false);
-
-        Location defaultLocation = positionId.equals("-1") ? Location.DEFAULT : locationService.getOne(new LambdaQueryWrapper<Location>()
-                .eq(Location::getId, positionId), false);
-
-
-
-        IPage<Goods> page = goodsService.page(new QueryPage<Goods>().getPage(goodsSearchReq),
-                new LambdaQueryWrapper<Goods>()
-                        .eq(!positionId.equals("-1"), Goods::getLocationId, positionId)
-                        .eq(operation != -1, Goods::getType, operation)
-                        .eq(categoryType != -1, Goods::getCategoryType, categoryType)
-                        .eq(status!=-2,Goods::getStatus,status )
-                        .like(ObjectUtil.isNotEmpty(searchKey), Goods::getTitle, searchKey));
-
-//        PageInfo<Goods> goodsPageInfo = new PageInfo<>(page);
-        PageInfo goodsPageInfo = new PageInfo<>(page);
-
-//        final List<GoodsRes> collect = goodsService.list().stream().map(i -> {
-        List<GoodsRes> collect = page.getRecords().stream().map(i -> {
-
-            GoodsRes goodsRes = new GoodsRes();
-
-//            goodsRes.setOperation(OperationEnum.getOperationByType(i.getType()));
-            OperationEnum iOperationByType = OperationEnum.getOperationByType(i.getType());
-            goodsRes.setOperation(iOperationByType);
-            goodsRes.setOperationName(iOperationByType.getName());
-            goodsRes.setOperationType(iOperationByType.getType());
-
-            GoodsStatusEnum statusByType = GoodsStatusEnum.getStatusByType(i.getStatus());
-            goodsRes.setStatus(statusByType);
-            goodsRes.setStatusName(statusByType.getMsg());
-            goodsRes.setStatusType(statusByType.getType());
-
-            goodsRes.setUser(userService.getById(i.getUid()));
-            String[] split = i.getImgSrc().split(",");
-//            if (split.length==1&&ObjectUtil.isEmpty(split[0])){
-//                i.setImgSrc(ImgConstant.DEFAULT_IMG_PATH);
-//                split[0]=ImgConstant.DEFAULT_IMG_PATH;
-//            }
-            i.setImgSrc(split[0]);
-            i.setImgSrcList(Arrays.asList(split));
-
-            goodsRes.setDescription(i.getDescription());
-            goodsRes.setLocation(i.getLocationId().equals("-1") ? Location.DEFAULT : locationService.getById(i.getLocationId()));
-            goodsRes.setTitle(i.getTitle());
-            goodsRes.setCategory(categoryService.getOne(new LambdaQueryWrapper<Category>().eq(Category::getType, i.getCategoryType())));
-            goodsRes.setId(i.getId());
-            goodsRes.setCreateDate(DateUtil.formatDateTime(i.getCreateDate()));
-            return goodsRes;
-        }).collect(Collectors.toList());
-
-        goodsPageInfo.setList(collect);
-
-        List<String> names=new ArrayList<>();
-        names.add("标题");
-        names.add("拾取地址");
-        names.add("详细描述");
-        names.add("物品图片地址");
-        names.add("发布用户");
-        names.add("发布日期");
-        names.add("物品状态");
-        names.add("类型");
-        names.add("种类");
-        names.add("操作");
-
-        modelAndView.addObject("resultPageList",goodsPageInfo);
-        modelAndView.addObject("names",names);
-        List<CategoryRes> goodsInfo = categoryService.getGoodsInfo(GoodsStatusEnum.REVIEW_PASSED.getType(),user.getId());
-        List<Location> locationList = locationService.list();
-
-
-        // 位置列表
-        modelAndView.addObject("locationList", locationList);
-        // 物品统计信息
-        modelAndView.addObject("goodsInfos", goodsInfo);
-
-        // 位置列表
-        modelAndView.addObject("locationList", locationList);
-        // 物品统计信息
-//        modelAndView.addObject("goodsInfos", goodsInfo);
-
-        // 选择的Category
-        modelAndView.addObject("selectedCategory", defaultCategory);
-        // 选择的Position
-        modelAndView.addObject("selectedPosition", defaultLocation);
-        // 选择的Operation
-        modelAndView.addObject("selectedOperation", operationByType.getType());
-        modelAndView.addObject("selectGoodStatus", status);
-        // 搜索的keyword
-        modelAndView.addObject("searchKey", searchKey);
-
-        modelAndView.addObject("loginUser",user);
-
-
-        return modelAndView;
-    }
 
 }
