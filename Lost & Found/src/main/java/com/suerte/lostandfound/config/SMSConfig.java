@@ -24,7 +24,8 @@ public class SMSConfig {
     @SneakyThrows
     @Bean
     public Client client(){
-        return createClient("LTAI5tNXpHLTKWVrJYDCqA5Z", "FiTwJl7xscwThVh9KKgy5k8Ji4dg3X");
+//        return createClient("LTAI5tNXpHLTKWVrJYDCqA5Z", "FiTwJl7xscwThVh9KKgy5k8Ji4dg3X");
+        return createClient("", "");
     }
 
     public Client createClient(String accessKeyId, String accessKeySecret) throws Exception {
