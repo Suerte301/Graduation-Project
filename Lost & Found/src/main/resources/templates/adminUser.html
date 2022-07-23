@@ -199,7 +199,7 @@
 
                             <div class="col-md-12 text-center">
 <!--                                style="align-items: center;justify-content: center;display: flex; height: 500px;"-->
-                                <h2 th:if="${resultPageList.getTotalCount()==0}">未找到对应物品</h2>
+                                <h2 th:if="${resultPageList.getTotalCount()==0}">未找到对应用户</h2>
                                 <table th:if="${resultPageList.getTotalCount()>0}" class="table table-bordered table-condensed table-striped table-hover table-responsive text-center">
                                     <tr>
                                         <th class="text-center" th:each="name: ${names}" th:text="${name}"></th>
@@ -216,14 +216,226 @@
                                         <td th:text="${user.getQq()}"></td>
                                         <td th:text="${user.getTel()}"></td>
                                         <td>
-                                            <input type="button" class="btn btn-success" value="修改">
-                                            <input type="button" class="btn btn-success" value="重置密码">
-                                            <input type="button" class="btn btn-danger" value="删除">
+                                            <input type="button" class="btn btn-primary" th:onclick="showChangeUser([[${user.getId()}]],[[${user.getSid()}]],[[${user.getAccount()}]],[[${user.getAvatar()}]],[[${user.getName()}]],[[${user.getEmail()}]],[[${user.getQq()}]],[[${user.getTel()}]])" value="修改">
+                                            <input type="button" class="btn btn-success" th:onclick="resetPass([[${user.getId()}]])" value="重置密码">
+                                            <input type="button" class="btn btn-danger" th:onclick="delUser([[${user.getId()}]])" value="删除">
                                         </td>
                                     </tr>
                                 </table>
                             </div>
+                            <form action="/admin/updateUser" method="post" id="changeUserForm" class="form-horizontal" role="form">
+                                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                    &times;
+                                                </button>
+                                                <h4 class="modal-title" id="myModalLabel">
+                                                    修改用户信息
+                                                </h4>
+                                                <input id="changeId" name="changeId" hidden="hidden"/>
+                                            </div>
+                                            <!--                                            {# 模态框body #}-->
+                                            <div class="modal-body" style="height: 100%;">
+                                                <div class="form-group">
+                                                    <label for="changeSid" class="col-sm-3 control-label">学号</label>
+                                                    <div class="col-sm-7">
+                                                        <input type="text" disabled class="form-control"  name="changeSid" id="changeSid"
+                                                               placeholder="学号"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="changeAccount" class="col-sm-3 control-label">账户</label>
+                                                    <div class="col-sm-7">
+                                                        <input type="text" disabled class="form-control"  name="changeAccount" id="changeAccount"
+                                                               placeholder="账户"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="changeAvatar" class="col-sm-3 control-label">头像</label>
+                                                    <div class="col-sm-7">
+                                                        <img src=""  id="changeAvatar"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="changeName" class="col-sm-3 control-label">名字</label>
+                                                    <div class="col-sm-7">
+                                                        <input type="text" disabled class="form-control"  name="changeName" id="changeName"
+                                                               placeholder="名字"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="changeEmail" class="col-sm-3 control-label">邮箱</label>
+                                                    <div class="col-sm-7">
+                                                        <input type="text"  class="form-control"  name="changeEmail" id="changeEmail"
+                                                               placeholder="邮箱"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="changeQq" class="col-sm-3 control-label">QQ</label>
+                                                    <div class="col-sm-7">
+                                                        <input type="text"  class="form-control"  name="changeQq" id="changeQq"
+                                                               placeholder="QQ"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="changeTel" class="col-sm-3 control-label">电话</label>
+                                                    <div class="col-sm-7">
+                                                        <input type="text"  class="form-control"  name="changeTel" id="changeTel"
+                                                               placeholder="电话"/>
+                                                    </div>
+                                                </div>
+
+
+
+                                            </div>
+                                            <!--                                            {#            模态框底部#}-->
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                                <input type="button" onclick="changeUser()" class="btn btn-primary" value="提交"/>
+                                            </div>
+                                        </div><!-- /.modal-content -->
+                                    </div><!-- /.modal -->
+                                </div>
+                                <!--                                {##}-->
+                            </form>
+
+
+
                             <script>
+
+                                function delUser(id) {
+                                    if (confirm("此用户的所有信息将会被清除，确定要删除用户?")){
+                                        $.ajax({
+                                            type: 'delete',
+                                            url: '/admin/delUser/'+id,
+
+                                            success: function (data,status) {
+                                                // alert(data)
+                                                console.log(data)
+                                                alert(data.msg)
+                                                if (500 !== data.code){
+                                                    window.location.reload();
+                                                }
+
+                                                // console.log(status)
+                                            },
+                                            error:function (data,status) {
+                                                alert('error')
+                                                console.log(data)
+                                                console.log(status)
+                                            }
+                                        });
+                                    }
+
+                                }
+                                function resetPass(id) {
+                                    if (confirm("确定要重置密码?")){
+                                        let formData = new FormData();
+                                        formData.append("id",id);
+                                        console.log(formData.get("id"))
+                                        $.ajax({
+                                            type: 'post',
+                                            url: '/admin/resetUserPass',
+                                            data:formData,
+                                            contentType: false,
+                                            /**
+                                             * 必须false才会避开jQuery对 formdata 的默认处理
+                                             * XMLHttpRequest会对 formdata 进行正确的处理
+                                             */
+                                            processData: false,
+                                            success: function (data,status) {
+                                                // alert(data)
+                                                console.log(data)
+                                                alert(data.msg)
+                                                if (500 !== data.code){
+                                                    window.location.reload();
+                                                }
+
+
+                                                // console.log(status)
+                                            },
+                                            error:function (data,status) {
+                                                alert('error')
+                                                console.log(data)
+                                                console.log(status)
+                                            }
+                                        });
+                                    }
+                                }
+
+                                function changeUser() {
+                                    $("#changeEmail").val();
+
+                                    if (!checkQQ($("#changeQq").val())){
+                                        alert("qq 不符合格式 , 请重新输入")
+                                        $("#changeQq").val("");
+                                        return;
+                                    }
+                                    if (!checkMobile($("#changeTel").val())){
+                                        alert("Tel不符合格式 , 请重新输入")
+                                        $("#changeTel").val("");
+                                        return;
+                                    }
+                                    if (!checkEmail($("#changeEmail").val())){
+                                        alert("qq 不符合格式 , 请重新输入")
+                                        $("#changeEmail").val("");
+                                        return;
+                                    }
+                                    $("#changeUserForm").submit();
+                                }
+
+                                function showChangeUser(id,sid,account,avatar,name,email,qq,tel) {
+                                    $("#changeId").val(id)
+                                    $("#changeSid").val(sid)
+                                    $("#changeAccount").val(account)
+                                    $("#changeAvatar").attr("src",avatar)
+                                    $("#changeName").val(name)
+                                    $("#changeEmail").val(email)
+                                    $("#changeQq").val(qq)
+                                    $("#changeTel").val(tel)
+
+                                    $("#myModal").modal("show");
+                                }
+                                function checkMobile(number) {
+                                    if (number.startsWith("+86")) {
+                                        number = number.substring(3);
+                                    }
+
+                                    if (number.startsWith("+") || number.startsWith("0")) {
+                                        number = number.substring(1);
+                                    }
+                                    number = number.replace(" ", "").replace("-", "");
+                                    return /^((13[0-9])|(14[5-9])|(15[0-3])|(15[5-9])|(166)|(17[0-8])|(18[0-9])|(19[8-9]))\d{8}$/.test(number);
+                                    // return number.test("");
+                                }
+
+
+                                function checkEmail(str) {
+                                    let reg = /^\w+((-\w+)|(\.\w+))*@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/;
+                                    if (reg.test(str)) {
+                                        console.log('Email格式输入正确');
+                                        return true;
+                                    } else {
+                                        console.log('请输入正确格式的Email');
+                                        return false;
+                                    }
+                                }
+
+                                function checkQQ(str) {
+                                    // 1 首位不能是0 ^[1-9]
+                                    // 2 必须是 [5, 11] 位的数字 \d{4, 9}
+                                    let reg = /^[1-9][0-9]{4,9}$/gim;
+                                    if (reg.test(str)) {
+                                        console.log('QQ号码格式输入正确');
+                                        return true;
+                                    } else {
+                                        console.log('请输入正确格式的QQ号码');
+                                        return false;
+                                    }
+                                }
                                 function searchGoods(obj) {
                                     $("#currPage").val($(obj).text());
                                     $("#searchForm").submit()

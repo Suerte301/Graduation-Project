@@ -4,16 +4,10 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.suerte.lostandfound.entity.ApplyForm;
-import com.suerte.lostandfound.entity.Goods;
-import com.suerte.lostandfound.entity.Location;
-import com.suerte.lostandfound.entity.User;
+import com.suerte.lostandfound.entity.*;
 import com.suerte.lostandfound.eum.FormStatusEnum;
 import com.suerte.lostandfound.eum.OperationEnum;
-import com.suerte.lostandfound.service.ApplyFormService;
-import com.suerte.lostandfound.service.GoodsService;
-import com.suerte.lostandfound.service.LocationService;
-import com.suerte.lostandfound.service.UserService;
+import com.suerte.lostandfound.service.*;
 import com.suerte.lostandfound.util.PageInfo;
 import com.suerte.lostandfound.util.QueryPage;
 import com.suerte.lostandfound.vo.HttpResult;
@@ -128,13 +122,12 @@ public class ApplyFormController {
     }
 
 
-
     @DeleteMapping("/del/{id}")
     @ResponseBody
     public HttpResult del(@PathVariable("id")String id){
         boolean flag=true;
         try {
-            flag = applyFormService.removeById(id);
+            applyFormService.removeApplyForm(id);
         }catch (Exception e){
             log.error("撤销申请失败 报错原因 {} 报错位置 {}",e.getMessage(), Arrays.toString(e.getStackTrace()));
             flag=false;

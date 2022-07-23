@@ -18,6 +18,7 @@ import com.suerte.lostandfound.util.PageInfo;
 import com.suerte.lostandfound.util.QueryPage;
 import com.suerte.lostandfound.vo.HttpResult;
 import com.suerte.lostandfound.vo.req.AddGoodsReq;
+import com.suerte.lostandfound.vo.req.GoodUpdateReq;
 import com.suerte.lostandfound.vo.req.GoodsSearchReq;
 import com.suerte.lostandfound.vo.req.GoodsStatusReq;
 import com.suerte.lostandfound.vo.res.ApplyFormRes;
@@ -149,13 +150,15 @@ public class GoodsController {
         return HttpResult.ok(collect);
     }
 
+    @Autowired
+    private AdminService adminService;
 
     @DeleteMapping("/del/{id}")
     @ResponseBody
     public HttpResult del(@PathVariable("id")String id){
         boolean flag=true;
         try {
-             flag = goodsService.removeById(id);
+            adminService.delGoods(id);
         }catch (Exception e){
             log.error("撤销物品失败 报错原因 {} 报错位置 {}",e.getMessage(),Arrays.toString(e.getStackTrace()));
             flag=false;
@@ -263,11 +266,25 @@ public class GoodsController {
 
     }
     @PostMapping("update")
-    @ResponseBody
-    public HttpResult update(){
-        // TODO: 2022/4/16 更新物品状态
-        return HttpResult.ok();
+    public String update(GoodUpdateReq goodUpdateReq){
+        System.out.println(goodUpdateReq);
+        final Goods byId = goodsService.getById(goodUpdateReq.getChangeId());
+        byId.setStatus(goodUpdateReq.getChangeStatus());
+        byId.setType(goodUpdateReq.getChangeOperation());
+        byId.setUid(goodUpdateReq.getChangeUser());
+        final Category category = categoryService.getById(goodUpdateReq.getChangeCategory());
+        byId.setCategoryType(category.getType());
+        byId.setDescription(goodUpdateReq.getChangeDes());
+        byId.setLocationId(goodUpdateReq.getChangeLocation());
+        byId.setTitle(goodUpdateReq.getChangeTitle());
 
+        try {
+            goodsService.saveOrUpdate(byId);
+        }catch (Exception e){
+            log.error("更新报错 报错信息{} 报错位置{}",e.getMessage(),Arrays.toString(e.getStackTrace()));
+        }
+        // TODO: 2022/4/16 更新物品状态
+        return "redirect:/admin/adminGoods";
     }
 
 

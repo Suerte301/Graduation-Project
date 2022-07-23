@@ -233,7 +233,7 @@
 <!--                                                        类型: <span th:text="${goods.getOperationName()}"></span>-->
 <!--                                                        发布日期: <span th:text="${goods.getCreateDate()}"></span>-->
 <!--                                                        申请人: <span th:text="${goods.getApplyUser().getName()}"></span>-->
-                                                        <a href="#" data-toggle="tooltip" data-placement="top" th:onclick="complaint(${loginUser.getId()},${goods.getId()})" title="申诉" class="btn btn-danger btn-default btn-sm">
+                                                        <a href="#" data-toggle="tooltip" data-placement="top" th:onclick="complaint([[${loginUser.getId()}]],[[${goods.getId()}]])" title="申诉" class="btn btn-danger btn-default btn-sm">
                                                             <i class="fa fa-edit"></i>
                                                             申诉
                                                         </a>
@@ -247,7 +247,15 @@
                                                                     $.ajax({
                                                                         type: 'post',
                                                                         url: '/complaint/add',
-                                                                        contentType:"application/json;charset=utf-8",
+                                                                        /**
+                                                                         *必须false才会自动加上正确的Content-Type
+                                                                         */
+                                                                        contentType: false,
+                                                                        /**
+                                                                         * 必须false才会避开jQuery对 formdata 的默认处理
+                                                                         * XMLHttpRequest会对 formdata 进行正确的处理
+                                                                         */
+                                                                        processData: false,
                                                                         data:formData,
                                                                         success: function (data,status) {
                                                                             // alert(data)

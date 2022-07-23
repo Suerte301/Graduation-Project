@@ -76,7 +76,7 @@
                                         </div>
                                         <div class="panel-heading" style="border-bottom: #e3e3e3 solid">
                                             <h4 class="panel-title">
-                                                <a class="btn btn-sm" href="/admin/adminGoods" >物品信息管理</a>
+                                                <a class="btn btn-sm" href="/admin/adminGoods">物品信息管理</a>
                                                 <!--                                                <a class="btn btn-sm" onclick="showGoodsTable()">发布物品</a>-->
                                             </h4>
                                         </div>
@@ -99,12 +99,12 @@
                                                 <!--                                                <a class="btn btn-sm" onclick="showGoodsTable()">发布物品</a>-->
                                             </h4>
                                         </div>
-<!--                                        <div class="panel-heading" style="border-bottom: #e3e3e3 solid">-->
-<!--                                            <h4 class="panel-title">-->
-<!--                                                <a class="btn btn-sm" onclick="">发布物品审核</a>-->
-<!--                                                &lt;!&ndash;                                                <a class="btn btn-sm" onclick="showGoodsTable()">发布物品</a>&ndash;&gt;-->
-<!--                                            </h4>-->
-<!--                                        </div>-->
+                                        <!--                                        <div class="panel-heading" style="border-bottom: #e3e3e3 solid">-->
+                                        <!--                                            <h4 class="panel-title">-->
+                                        <!--                                                <a class="btn btn-sm" onclick="">发布物品审核</a>-->
+                                        <!--                                                &lt;!&ndash;                                                <a class="btn btn-sm" onclick="showGoodsTable()">发布物品</a>&ndash;&gt;-->
+                                        <!--                                            </h4>-->
+                                        <!--                                        </div>-->
 
                                         <script>
                                             function showGoodsTable() {
@@ -120,26 +120,27 @@
 
                                             function deleteGoods(id) {
                                                 $.ajax({
-                                                    url: "/goods/del/"+id,
+                                                    url: "/goods/del/" + id,
                                                     method: "delete",
-                                                    success: function (response,status) {
+                                                    success: function (response, status) {
                                                         console.log(response)
                                                         alert(response.msg)
-                                                        if (response.code!==500){
+                                                        if (response.code !== 500) {
                                                             window.location.reload();
                                                         }
                                                     }
                                                 })
 
                                             }
+
                                             function deleteForm(id) {
                                                 $.ajax({
-                                                    url: "/applyform/del/"+id,
+                                                    url: "/applyform/del/" + id,
                                                     method: "delete",
-                                                    success: function (response,status) {
+                                                    success: function (response, status) {
                                                         console.log(response)
                                                         alert(response.msg)
-                                                        if (response.code!==500){
+                                                        if (response.code !== 500) {
                                                             window.location.reload();
                                                         }
                                                     }
@@ -158,14 +159,13 @@
                 <div class="col-md-6 col-sm-6" style="margin-left: 5%;margin-right: 5%">
 
 
-
-                    <div class="row"  style="margin-bottom: 10px;padding-left: 2%;padding-right: 2%" id="searchDiv">
+                    <div class="row" id="searchDiv" style="margin-bottom: 10px;padding-left: 2%;padding-right: 2%">
                         <div class="row center-block text-center" style="margin-left: 7%">
                             <script th:inline="javascript">
                                 $(function () {
 
-                                    let searchKey= [[${searchKey}]];
-                                    let selectType= [[${selectType}]];
+                                    let searchKey = [[${searchKey}]];
+                                    let selectType = [[${selectType}]];
 
                                     // console.log(selectedOperation)
 
@@ -174,18 +174,22 @@
                                 })
                             </script>
                             <form action="/admin/applyForm" id="searchForm">
-                                <input name="currPage" hidden="hidden" id="currPage" th:value="${resultPageList.getCurrPage()}">
+                                <input hidden="hidden" id="currPage" name="currPage"
+                                       th:value="${resultPageList.getCurrPage()}">
                                 <div class="col-md-2 col-sm-2  cat-search-input" style="width: 20%">
-                                    <input type="text" id="searchKey" name="title" class="form-control" placeholder="I want to find...">
+                                    <input class="form-control" id="searchKey" name="title" placeholder="I want to find..."
+                                           type="text">
                                 </div>
                                 <div class="col-md-2 col-sm-2  cat-search-input" style="width: 15%">
                                     <select class="form-control" id="status" name="status">
                                         <option selected value="-2">状态</option>
-                                        <option th:each="formStatus : ${T(com.suerte.lostandfound.eum.FormStatusEnum).values()}" th:object="${formStatus}" th:value="*{type}" th:text="*{msg}"></option>
+                                        <option th:each="formStatus : ${T(com.suerte.lostandfound.eum.FormStatusEnum).values()}"
+                                                th:object="${formStatus}" th:text="*{msg}" th:value="*{type}"></option>
                                     </select>
                                 </div>
                                 <div class="col-md-2 col-sm-2  cat-search-input" style="width: 10%">
-                                    <button class="btn btn-custom btn-block" type="submit"><i class="fa fa-search"></i></button>
+                                    <button class="btn btn-custom btn-block" type="submit"><i class="fa fa-search"></i>
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -198,51 +202,222 @@
                         <div class="row" style="margin: 0">
 
                             <div class="col-md-12 text-center">
-<!--                                style="align-items: center;justify-content: center;display: flex; height: 500px;"-->
+                                <!--                                style="align-items: center;justify-content: center;display: flex; height: 500px;"-->
                                 <h2 th:if="${resultPageList.getTotalCount()==0}">未找到对应物品</h2>
-                                <table th:if="${resultPageList.getTotalCount()>0}" class="table table-bordered table-condensed table-striped table-hover table-responsive text-center">
+                                <table class="table table-bordered table-condensed table-striped table-hover table-responsive text-center"
+                                       th:if="${resultPageList.getTotalCount()>0}">
                                     <tr>
                                         <th class="text-center" th:each="name: ${names}" th:text="${name}"></th>
                                     </tr>
-                                    <tr th:each="applyForm:${resultPageList.getList()}" >
-                                        <td th:text="${applyForm.getId()}" hidden></td>
+                                    <tr th:each="applyForm:${resultPageList.getList()}">
+                                        <td hidden th:text="${applyForm.getId()}"></td>
                                         <td th:text="${applyForm.getGoodsRes().getTitle()}"></td>
                                         <td th:text="${applyForm.getGoodsRes().getLocation().getPosition()}"></td>
-<!--                                        <td th:text="${applyForm.getGoodsRes().getDescription()}"></td>-->
-                                        <td><img style="height: 50px" th:src="${applyForm.getGoodsRes().getImgSrc()}"></td>
+                                        <!--                                        <td th:text="${applyForm.getGoodsRes().getDescription()}"></td>-->
+                                        <td><img style="height: 50px" th:src="${applyForm.getGoodsRes().getImgSrc()}">
+                                        </td>
 
 
                                         <td th:text="${applyForm.getGoodsRes().getUser().getName()}"></td>
-<!--                                        <td th:text="${user.getPassword()}"></td>-->
+                                        <!--                                        <td th:text="${user.getPassword()}"></td>-->
                                         <td th:text="${applyForm.getGoodsRes().getCreateDate()}"></td>
-<!--                                        <td th:text="${user.getCreateDate()}"></td>-->
+                                        <!--                                        <td th:text="${user.getCreateDate()}"></td>-->
                                         <td th:text="${applyForm.getGoodsRes().getOperationName()}"></td>
                                         <td th:text="${applyForm.getGoodsRes().getCategory().getName()}"></td>
                                         <td th:text="${applyForm.getStatus().getMsg()}"></td>
                                         <td th:text="${applyForm.getApplyUser().getName()}"></td>
                                         <td>
-<!--                                            <p class="popover-options"><input type="button" data-container="body" data-toggle="popover" th:data-content="${applyForm.getPopUpDetail()}" title="Show Details" class="btn btn-success btn-default btn-sm"><i class="fa fa-eye"></i>查看详情</input></p>-->
-                                            <input type="button" class="btn btn-success" value="修改">
-<!--                                            <input type="button" class="btn btn-success" value="重置密码">-->
-                                            <input type="button" class="btn btn-danger" value="删除">
+                                            <!--                                            <p class="popover-options"><input type="button" data-container="body" data-toggle="popover" th:data-content="${applyForm.getPopUpDetail()}" title="Show Details" class="btn btn-success btn-default btn-sm"><i class="fa fa-eye"></i>查看详情</input></p>-->
+                                            <input class="btn btn-success" th:onclick="showChangeForm([[${applyForm.getId()}]],[[${applyForm.getGoodsRes().getTitle()}]],[[${applyForm.getGoodsRes().getLocation().getId()}]],[[${applyForm.getGoodsRes().getImgSrc()}]],[[${applyForm.getGoodsRes().getUser().getName()}]],[[${applyForm.getGoodsRes().getOperationType()}]],[[${applyForm.getGoodsRes().getCategory().getType()}]],[[${applyForm.getStatus().getType()}]],[[${applyForm.getApplyUser().getId()}]])"
+                                                   type="button"
+                                                   value="修改">
+                                            <!--                                            <input type="button" class="btn btn-success" value="重置密码">-->
+                                            <input class="btn btn-danger" th:onclick="delForm([[${applyForm.getId()}]])" type="button" value="删除">
                                         </td>
                                     </tr>
+
+
                                     <script>
+                                        function delForm(id) {
+                                            if (confirm("确定要删除申请表?")){
+                                                $.ajax({
+                                                    type: 'delete',
+                                                    url: '/admin/delForm/'+id,
+
+                                                    success: function (data,status) {
+                                                        // alert(data)
+                                                        console.log(data)
+                                                        alert(data.msg)
+                                                        if (500 !== data.code){
+                                                            window.location.reload();
+                                                        }
+
+                                                        // console.log(status)
+                                                    },
+                                                    error:function (data,status) {
+                                                        alert('error')
+                                                        console.log(data)
+                                                        console.log(status)
+                                                    }
+                                                });
+                                            }
+
+                                        }
+                                        function showChangeForm(applyId, goodsTitle, locationId, imgSrc, pubUserName, operationType, categoryId, status, applyUid) {
+                                            $("#changeId").val(applyId);
+                                            $("#changeTitle").val(goodsTitle);
+                                            $("#changeLocation").val(locationId);
+                                            $("#changeImg").attr("src", imgSrc);
+                                            $("#changePubUser").val(pubUserName)
+                                            $("#changeOperation").val(operationType)
+                                            // alert(categoryId)
+                                            $("#changeCategory").val(categoryId)
+                                            $("#changeStatus").val(status)
+                                            $("#changeApplyUser").val(applyUid)
+                                            // alert("123")
+                                            $("#myModal").modal("show");
+
+                                        }
+
                                         $(function () {
-                                            $(".popover-options a").popover({html:true,trigger: 'focus'});
+                                            $(".popover-options a").popover({html: true, trigger: 'focus'});
                                         })
                                     </script>
                                 </table>
 
                             </div>
+                            <form action="/admin/updateForm" class="form-horizontal" id="changeApplyForm" method="post"
+                                  role="form">
+                                <div aria-hidden="true" aria-labelledby="myModalLabel" class="modal fade" id="myModal"
+                                     role="dialog" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button aria-hidden="true" class="close" data-dismiss="modal"
+                                                        type="button">
+                                                    &times;
+                                                </button>
+                                                <h4 class="modal-title" id="myModalLabel">
+                                                    修改申请信息
+                                                </h4>
+                                                <input hidden="hidden" id="changeId" name="changeId"/>
+                                            </div>
+                                            <!--                                            {# 模态框body #}-->
+                                            <div class="modal-body" style="height: 100%;">
+
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label" for="changeTitle">标题</label>
+                                                    <div class="col-sm-7">
+                                                        <input class="form-control" disabled id="changeTitle"
+                                                               name="changeTitle" placeholder="标题"
+                                                               type="text"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label"
+                                                           for="changeLocation">地址</label>
+                                                    <div class="col-sm-7">
+                                                        <select class="form-control" data-placeholder="大致区域"
+                                                                id="changeLocation" name="changeLocation">
+                                                            <option selected value="-1">大致区域</option>
+                                                            <option th:each="location : ${locationList}"
+                                                                    th:object="${location}" th:text="*{position}"
+                                                                    th:value="*{id}"></option>
+                                                        </select>
+                                                    </div>
+
+                                                </div>
+
+
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label" for="changeImg">物品图片</label>
+                                                    <div class="col-sm-7">
+                                                        <img id="changeImg" style="width: 50%" src=""/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label"
+                                                           for="changePubUser">发布人</label>
+                                                    <div class="col-sm-7">
+                                                        <input class="form-control" disabled id="changePubUser"
+                                                               name="changePubUser" placeholder="发布人"
+                                                               type="text"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label"
+                                                           for="changeOperation">类型</label>
+                                                    <div class="col-sm-7">
+                                                        <select class="form-control" data-placeholder="类型"
+                                                                id="changeOperation" name="changeOperation">
+                                                            <option selected value="-1">类型</option>
+                                                            <option th:each="operation : ${T(com.suerte.lostandfound.eum.OperationEnum).getDefaultOps()}"
+                                                                    th:text="${operation.name}"
+                                                                    th:value="${operation.type}"></option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label"
+                                                           for="changeCategory">物品种类</label>
+                                                    <div class="col-sm-7">
+                                                        <select class="form-control" data-placeholder="物品种类"
+                                                                id="changeCategory" name="changeCategory">
+                                                            <option selected value="-1">分类</option>
+                                                            <option th:each="category : ${categories}"
+                                                                    th:object="${category}" th:text="*{name}"
+                                                                    th:value="*{type}"></option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label" for="changeStatus">申请状态</label>
+                                                    <div class="col-sm-7">
+                                                        <select class="form-control" data-placeholder="申请状态"
+                                                                id="changeStatus" name="changeStatus">
+                                                            <option selected value="-2">状态</option>
+                                                            <option th:each="formStatus : ${T(com.suerte.lostandfound.eum.FormStatusEnum).values()}"
+                                                                    th:object="${formStatus}" th:text="*{msg}"
+                                                                    th:value="*{type}"></option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label" for="changeApplyUser">申请用户</label>
+                                                    <div class="col-sm-7">
+                                                        <select data-placeholder="申请用户" class="form-control" name="changeApplyUser" id="changeApplyUser">
+                                                            <option th:each="user:${userList}" th:object="${user}" th:value="*{id}" th:text="*{sid}"></option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                            <!--                                            {#            模态框底部#}-->
+                                            <div class="modal-footer">
+                                                <button class="btn btn-default" data-dismiss="modal" type="button">关闭
+                                                </button>
+                                                <input class="btn btn-primary"  type="submit"
+                                                       value="提交"/>
+                                            </div>
+                                        </div><!-- /.modal-content -->
+                                    </div><!-- /.modal -->
+                                </div>
+                                <!--                                {##}-->
+                            </form>
+
                             <script>
                                 function searchGoods(obj) {
                                     $("#currPage").val($(obj).text());
                                     $("#searchForm").submit()
                                 }
                             </script>
-                            <div class="row" th:if="${resultPageList.getTotalPage()!=0}" th:with="middle=${T(com.suerte.lostandfound.util.NumberUtils).round(7.0,2.0)}">
-                                <div class="col-md-12 text-right" th:with="start=${resultPageList.getCurrPage()-middle>0?(resultPageList.getTotalPage()-resultPageList.getCurrPage()+1>middle?resultPageList.getCurrPage()-middle+1:resultPageList.getTotalPage()-7+1):1}">
+                            <div class="row" th:if="${resultPageList.getTotalPage()!=0}"
+                                 th:with="middle=${T(com.suerte.lostandfound.util.NumberUtils).round(7.0,2.0)}">
+                                <div class="col-md-12 text-right"
+                                     th:with="start=${resultPageList.getCurrPage()-middle>0?(resultPageList.getTotalPage()-resultPageList.getCurrPage()+1>middle?resultPageList.getCurrPage()-middle+1:resultPageList.getTotalPage()-7+1):1}">
 
                                     <!--                                    <span th:value="${resultPageList.getTotalPage()-resultPageList.getCurrPage()+1<5?resultPageList.getTotalPage()-4:resultPageList.getCurrPage()}"></span>-->
                                     <!--                                    <span th:value="${resultPageList.getTotalPage()-resultPageList.getCurrPage()+1<5?resultPageList.getTotalPage():resultPageList.getCurrPage()+4}"></span>-->
@@ -250,11 +425,12 @@
                                     <!--                                    <button href="#" th:text="${resultPageList.getCurrPage()-middle>0?(resultPageList.getTotalPage()-resultPageList.getCurrPage()+1>middle?resultPageList.getCurrPage()-middle+1:resultPageList.getTotalPage()-7+1):1}"></button>-->
 
 
-
-                                    <ul class="pagination" th:each="pageItem:${#numbers.sequence(start,resultPageList.getTotalPage()>start+7.0-1?start+7.0-1:resultPageList.getTotalPage())}">
+                                    <ul class="pagination"
+                                        th:each="pageItem:${#numbers.sequence(start,resultPageList.getTotalPage()>start+7.0-1?start+7.0-1:resultPageList.getTotalPage())}">
                                         <!--                                    <ul class="pagination" th:each="pageItem:${resultPageList.getTotalPage()-resultPageList.getCurrPage()+1<5?#numbers.sequence(resultPageList.getTotalPage()-6,resultPageList.getTotalPage()-2):#numbers.sequence(resultPageList.getCurrPage(),resultPageList.getCurrPage()+4)}">-->
                                         <!--                                    <ul class="pagination">-->
-                                        <li><a href="#" onclick="searchGoods(this)" th:text="${pageItemStat.current}"></a></li>
+                                        <li><a href="#" onclick="searchGoods(this)"
+                                               th:text="${pageItemStat.current}"></a></li>
                                         <!--                                        <li><a href="#" th:text="${T(com.suerte.lostandfound.util.NumberUtils).round(5.0,2.0)}"></a></li>-->
                                         <!--                                        <li><a href="#">2</a></li>-->
                                         <!--                                        <li class="active"><a href="#">3</a></li>-->
@@ -279,9 +455,6 @@
                                     <!--                                    </ul>-->
 
 
-
-
-
                                 </div>
                             </div>
 
@@ -299,7 +472,7 @@
 
 
                 </div>
-                <div class="col-md-3 col-sm-3" align="center">
+                <div align="center" class="col-md-3 col-sm-3">
                     <canvas height="200px" id="canvasClock" width="200px"></canvas>
                     <script>
                         (function (win) {
@@ -439,7 +612,7 @@
 
                         new DrawClock({el: document.getElementById("canvasClock")});
                     </script>
-                    <div id="clock" class="light"  style="margin: 0;padding: 0">
+                    <div class="light" id="clock" style="margin: 0;padding: 0">
                         <div class="display">
                             <div class="weekdays"></div>
                             <div class="ampm"></div>

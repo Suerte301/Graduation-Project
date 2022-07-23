@@ -13,6 +13,7 @@ import java.io.Serializable;
 public class CategoryRes implements Serializable {
     private static final long serialVersionUID = -5355438943365526756L;
 
+    private String id;
     private String name;
     private Integer type;
     private String clzName;

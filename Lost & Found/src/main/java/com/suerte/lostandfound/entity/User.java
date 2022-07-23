@@ -36,6 +36,9 @@ public class User implements UserDetails {
     private String name;
     private String password;
     private String uncrypted;
+
+    @TableField("defaultpass")
+    private String defaultpass;
     // 用于找回密码
     private String email;
     private String qq;

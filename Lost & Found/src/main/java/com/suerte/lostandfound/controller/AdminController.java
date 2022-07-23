@@ -16,10 +16,7 @@ import com.suerte.lostandfound.service.*;
 import com.suerte.lostandfound.util.PageInfo;
 import com.suerte.lostandfound.util.QueryPage;
 import com.suerte.lostandfound.vo.HttpResult;
-import com.suerte.lostandfound.vo.req.ApplyFormReq;
-import com.suerte.lostandfound.vo.req.ComplaintFormReq;
-import com.suerte.lostandfound.vo.req.GoodsSearchReq;
-import com.suerte.lostandfound.vo.req.UserSearchReq;
+import com.suerte.lostandfound.vo.req.*;
 import com.suerte.lostandfound.vo.res.ApplyFormRes;
 import com.suerte.lostandfound.vo.res.CategoryRes;
 import com.suerte.lostandfound.vo.res.ComplaintRes;
@@ -27,11 +24,10 @@ import com.suerte.lostandfound.vo.res.GoodsRes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
@@ -63,10 +59,23 @@ public class AdminController {
 
     @Autowired
     private MinioProperties minioProperties;
-
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private UserRoleMapper userRoleMapper;
+    @Autowired
+    private ApplyFormService applyFormService;
+    @Autowired
+    private GoodsService goodsService;
+    @Autowired
+    private ComplaintFormService complaintFormService;
+    @Autowired
+    private PasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private AdminService adminService;
 
     @GetMapping("management")
-    public ModelAndView management(Authentication authentication){
+    public ModelAndView management(Authentication authentication) {
         ModelAndView modelAndView = new ModelAndView("management");
         User user = (User) authentication.getPrincipal();
 
@@ -78,7 +87,7 @@ public class AdminController {
                 List<MinioItem> allObjectsByPrefix = minioTemplate.getAllObjectsByPrefix(minioProperties.getBucketName(), AvatarConstant.DEFAULT_AVATAR_PATH, true);
                 int randomAvatar = ThreadLocalRandom.current().nextInt(9) + 1;
                 MinioItem minioItem = allObjectsByPrefix.get(randomAvatar);
-                objectName =minioTemplate.objectUrl(minioProperties.getBucketName(), minioItem.getObjectName());
+                objectName = minioTemplate.objectUrl(minioProperties.getBucketName(), minioItem.getObjectName());
 
 //                ThreadLocalRandom.current().nextInt(10)
             }
@@ -88,7 +97,7 @@ public class AdminController {
             log.error("访问MinIo失败 报错原因 {} 报错位置 {}", e.getMessage(), Arrays.toString(e.getStackTrace()));
         }
 
-        modelAndView.addObject("loginUser",user);
+        modelAndView.addObject("loginUser", user);
 
 
         List<Category> categoryList = categoryService.list();
@@ -103,14 +112,8 @@ public class AdminController {
         return modelAndView;
     }
 
-@Autowired
-private UserService userService;
-
-    @Autowired
-    private UserRoleMapper userRoleMapper;
-
     @GetMapping("user")
-    public ModelAndView user(UserSearchReq userSearchReq, Authentication authentication){
+    public ModelAndView user(UserSearchReq userSearchReq, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
 
         final ModelAndView modelAndView = new ModelAndView("adminUser");
@@ -120,30 +123,30 @@ private UserService userService;
         final Set<Integer> adminUser = userRoleMapper.selectList(new LambdaQueryWrapper<UserRole>().eq(UserRole::getRid, RoleEnum.USER.getType())).stream().map(UserRole::getUid).collect(Collectors.toSet());
 
         final UserSearchEnum userSearchTypeByType = UserSearchEnum.getUserSearchTypeByType(type);
-        IPage<User> page =null;
-        if (userSearchTypeByType==null){
-            page=userService.page(new QueryPage<User>().getPage(userSearchReq));
-        }else {
-            switch (userSearchTypeByType){
+        IPage<User> page = null;
+        if (userSearchTypeByType == null) {
+            page = userService.page(new QueryPage<User>().getPage(userSearchReq));
+        } else {
+            switch (userSearchTypeByType) {
                 case ACCOUNT:
-                    page=userService.page(new QueryPage<User>().getPage(userSearchReq),new LambdaQueryWrapper<User>()
-                            .like(ObjectUtil.isNotEmpty(searchKey),User::getAccount,searchKey)
-                    .in(User::getId,adminUser));
+                    page = userService.page(new QueryPage<User>().getPage(userSearchReq), new LambdaQueryWrapper<User>()
+                            .like(ObjectUtil.isNotEmpty(searchKey), User::getAccount, searchKey)
+                            .in(User::getId, adminUser));
                     break;
                 case SID:
-                    page=userService.page(new QueryPage<User>().getPage(userSearchReq),new LambdaQueryWrapper<User>()
-                            .like(ObjectUtil.isNotEmpty(searchKey),User::getSid,searchKey)
-                            .notIn(User::getId,adminUser));
+                    page = userService.page(new QueryPage<User>().getPage(userSearchReq), new LambdaQueryWrapper<User>()
+                            .like(ObjectUtil.isNotEmpty(searchKey), User::getSid, searchKey)
+                            .notIn(User::getId, adminUser));
                     break;
                 case NAME:
-                    page=userService.page(new QueryPage<User>().getPage(userSearchReq),new LambdaQueryWrapper<User>()
-                            .like(ObjectUtil.isNotEmpty(searchKey),User::getName,searchKey)
-                            .in(User::getId,adminUser));
+                    page = userService.page(new QueryPage<User>().getPage(userSearchReq), new LambdaQueryWrapper<User>()
+                            .like(ObjectUtil.isNotEmpty(searchKey), User::getName, searchKey)
+                            .in(User::getId, adminUser));
                     break;
             }
         }
         PageInfo goodsPageInfo = new PageInfo<>(page);
-        List<String> names=new ArrayList<>();
+        List<String> names = new ArrayList<>();
         names.add("学号");
         names.add("账户");
         names.add("头像");
@@ -153,24 +156,18 @@ private UserService userService;
         names.add("电话");
         names.add("操作");
 
-        modelAndView.addObject("resultPageList",goodsPageInfo);
-        modelAndView.addObject("names",names);
-        modelAndView.addObject("searchKey",searchKey);
-        modelAndView.addObject("selectType",userSearchTypeByType==null?-1:userSearchTypeByType.getType());
+        modelAndView.addObject("resultPageList", goodsPageInfo);
+        modelAndView.addObject("names", names);
+        modelAndView.addObject("searchKey", searchKey);
+        modelAndView.addObject("selectType", userSearchTypeByType == null ? -1 : userSearchTypeByType.getType());
 //
-        modelAndView.addObject("loginUser",user);
+        modelAndView.addObject("loginUser", user);
         // TODO: 2022/4/16 显示所有物品申请信息
         return modelAndView;
     }
 
-    @Autowired
-    private ApplyFormService applyFormService;
-
-    @Autowired
-    private GoodsService goodsService;
-
     @GetMapping("applyForm")
-    public ModelAndView applyForm(ApplyFormReq applyFormReq, Authentication authentication){
+    public ModelAndView applyForm(ApplyFormReq applyFormReq, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
 
         final ModelAndView modelAndView = new ModelAndView("adminApplyForm");
@@ -180,9 +177,9 @@ private UserService userService;
         final FormStatusEnum userSearchTypeByType = FormStatusEnum.getStatusByType(type);
         final String searchKey = applyFormReq.getTitle();
         List<String> goodsList = goodsService.list(new LambdaQueryWrapper<Goods>().like(ObjectUtil.isNotEmpty(searchKey), Goods::getTitle, searchKey)).stream().map(Goods::getId).collect(Collectors.toList());
-        IPage<ApplyForm> page = goodsList.isEmpty()?new QueryPage<ApplyForm>().getPage(applyFormReq):applyFormService.page(new QueryPage<ApplyForm>().getPage(applyFormReq), new LambdaQueryWrapper<ApplyForm>()
-                .eq(userSearchTypeByType!=null,ApplyForm::getStatus, applyFormReq.getStatus())
-                .in(ApplyForm::getGoodsId,goodsList));
+        IPage<ApplyForm> page = goodsList.isEmpty() ? new QueryPage<ApplyForm>().getPage(applyFormReq) : applyFormService.page(new QueryPage<ApplyForm>().getPage(applyFormReq), new LambdaQueryWrapper<ApplyForm>()
+                .eq(userSearchTypeByType != null, ApplyForm::getStatus, applyFormReq.getStatus())
+                .in(ApplyForm::getGoodsId, goodsList));
 
 
         final List<ApplyFormRes> collect = page.getRecords().stream().map(i -> {
@@ -217,7 +214,7 @@ private UserService userService;
             goods.setImgSrc(split[0]);
             goods.setImgSrcList(Arrays.asList(split));
             goodsRes.setImgSrcList(goods.getImgSrcList());
-            goodsRes.setImgSrc(ObjectUtil.isEmpty(goods.getImgSrc())? ImgConstant.DEFAULT_ITEM_PATH :goods.getImgSrc());
+            goodsRes.setImgSrc(ObjectUtil.isEmpty(goods.getImgSrc()) ? ImgConstant.DEFAULT_ITEM_PATH : goods.getImgSrc());
             goodsRes.setDescription(goods.getDescription());
             goodsRes.setLocation(goods.getLocationId().equals("-1") ? Location.DEFAULT : locationService.getById(goods.getLocationId()));
             goodsRes.setTitle(goods.getTitle());
@@ -245,7 +242,7 @@ private UserService userService;
 
         goodsPageInfo.setList(collect);
 
-        List<String> names=new ArrayList<>();
+        List<String> names = new ArrayList<>();
         names.add("标题");
         names.add("拾取地址");
         names.add("物品图片地址");
@@ -257,20 +254,24 @@ private UserService userService;
         names.add("申请人");
         names.add("操作");
 
-        modelAndView.addObject("resultPageList",goodsPageInfo);
-        modelAndView.addObject("names",names);
-        modelAndView.addObject("selectType",userSearchTypeByType==null?-1:userSearchTypeByType.getType());
-        modelAndView.addObject("searchKey",searchKey);
+        modelAndView.addObject("resultPageList", goodsPageInfo);
+        modelAndView.addObject("names", names);
+        modelAndView.addObject("selectType", userSearchTypeByType == null ? -1 : userSearchTypeByType.getType());
+        modelAndView.addObject("searchKey", searchKey);
 //
-        modelAndView.addObject("loginUser",user);
+        final List<Location> list = locationService.list();
+        final List<Category> categories = categoryService.list();
+        final List<User> userList = userService.list();
+        modelAndView.addObject("locationList", list);
+        modelAndView.addObject("userList", userList);
+        modelAndView.addObject("categories", categories);
+        modelAndView.addObject("loginUser", user);
         // TODO: 2022/4/16 显示所有物品申请信息
         return modelAndView;
     }
 
-
-
     @GetMapping("adminGoods")
-    public ModelAndView adminGoods(GoodsSearchReq goodsSearchReq, Authentication authentication){
+    public ModelAndView adminGoods(GoodsSearchReq goodsSearchReq, Authentication authentication) {
 
 
         ModelAndView modelAndView = new ModelAndView("adminGoods");
@@ -292,13 +293,12 @@ private UserService userService;
                 .eq(Location::getId, positionId), false);
 
 
-
         IPage<Goods> page = goodsService.page(new QueryPage<Goods>().getPage(goodsSearchReq),
                 new LambdaQueryWrapper<Goods>()
                         .eq(!positionId.equals("-1"), Goods::getLocationId, positionId)
                         .eq(operation != -1, Goods::getType, operation)
                         .eq(categoryType != -1, Goods::getCategoryType, categoryType)
-                        .eq(status!=-2,Goods::getStatus,status )
+                        .eq(status != -2, Goods::getStatus, status)
                         .like(ObjectUtil.isNotEmpty(searchKey), Goods::getTitle, searchKey));
 
 //        PageInfo<Goods> goodsPageInfo = new PageInfo<>(page);
@@ -340,7 +340,7 @@ private UserService userService;
 
         goodsPageInfo.setList(collect);
 
-        List<String> names=new ArrayList<>();
+        List<String> names = new ArrayList<>();
         names.add("标题");
         names.add("拾取地址");
         names.add("详细描述");
@@ -352,9 +352,9 @@ private UserService userService;
         names.add("种类");
         names.add("操作");
 
-        modelAndView.addObject("resultPageList",goodsPageInfo);
-        modelAndView.addObject("names",names);
-        List<CategoryRes> goodsInfo = categoryService.getGoodsInfo(GoodsStatusEnum.REVIEW_PASSED.getType(),user.getId());
+        modelAndView.addObject("resultPageList", goodsPageInfo);
+        modelAndView.addObject("names", names);
+        List<CategoryRes> goodsInfo = categoryService.getGoodsInfo(GoodsStatusEnum.REVIEW_PASSED.getType(), user.getId());
         List<Location> locationList = locationService.list();
 
 
@@ -378,18 +378,138 @@ private UserService userService;
         // 搜索的keyword
         modelAndView.addObject("searchKey", searchKey);
 
-        modelAndView.addObject("loginUser",user);
+        final List<User> userList = userService.list();
+
+        modelAndView.addObject("userList", userList);
+
+        modelAndView.addObject("loginUser", user);
 
 
         return modelAndView;
     }
 
+    @PostMapping("resetUserPass")
+    @ResponseBody
+    public HttpResult resetUserPass(@RequestParam("id") Integer id) {
+        final User byId = userService.getById(id);
+        final String encode = bCryptPasswordEncoder.encode(byId.getDefaultpass());
 
-    @Autowired
-    private ComplaintFormService complaintFormService;
+        byId.setPassword(encode);
+        byId.setUncrypted(byId.getDefaultpass());
+        boolean b = true;
+        try {
+            b = userService.saveOrUpdate(byId);
+        } catch (Exception e) {
+            log.error("重置密码报错 报错信息{} 报错位置{}", e.getMessage(), Arrays.toString(e.getStackTrace()));
+
+            b = false;
+        }
+        return b ? HttpResult.ok("重置成功") : HttpResult.error("重置失败");
+    }
+
+    @DeleteMapping("delUser/{id}")
+    @ResponseBody
+    public HttpResult delUser(@PathVariable("id") Integer id) {
+        boolean b = true;
+        try {
+            adminService.delUser(id);
+        } catch (Exception e) {
+            log.error("删除用户报错 报错信息{} 报错位置{}", e.getMessage(), Arrays.toString(e.getStackTrace()));
+            b = false;
+        }
+        return b ? HttpResult.ok("删除成功") : HttpResult.error("删除失败");
+    }
+
+
+    @DeleteMapping("delGoods/{id}")
+    @ResponseBody
+    public HttpResult delGoods(@PathVariable("id") String id) {
+        boolean b = true;
+        try {
+            adminService.delGoods(id);
+        } catch (Exception e) {
+            log.error("删除物品报错 报错信息{} 报错位置{}", e.getMessage(), Arrays.toString(e.getStackTrace()));
+            b = false;
+        }
+        return b ? HttpResult.ok("删除成功") : HttpResult.error("删除失败");
+    }
+
+
+    @DeleteMapping("delComplaint/{id}")
+    @ResponseBody
+    public HttpResult delComplaint(@PathVariable("id") String id) {
+        boolean b = true;
+        try {
+            adminService.delComplaint(id);
+        } catch (Exception e) {
+            log.error("删除物品报错 报错信息{} 报错位置{}", e.getMessage(), Arrays.toString(e.getStackTrace()));
+            b = false;
+        }
+        return b ? HttpResult.ok("删除成功") : HttpResult.error("删除失败");
+    }
+
+
+    @DeleteMapping("delForm/{id}")
+    @ResponseBody
+    public HttpResult delForm(@PathVariable("id") String id) {
+        boolean b = true;
+        try {
+            b=applyFormService.removeById(id);
+        } catch (Exception e) {
+            log.error("删除用户报错 报错信息{} 报错位置{}", e.getMessage(), Arrays.toString(e.getStackTrace()));
+            b = false;
+        }
+        return b ? HttpResult.ok("删除成功") : HttpResult.error("删除失败");
+    }
+
+    @PostMapping("updateForm")
+    public String updateForm(ApplyFormUpdateReq applyFormUpdateReq) {
+
+        System.out.println(applyFormUpdateReq);
+
+        try {
+            adminService.updateForm(applyFormUpdateReq);
+
+        } catch (Exception e) {
+            log.error("更新报错 报错信息{} 报错位置{}", e.getMessage(), Arrays.toString(e.getStackTrace()));
+        }
+        return "redirect:/admin/applyForm";
+    }
+
+    @PostMapping("updateComplaintForm")
+    public String updateComplaintForm(ComplaintUpdateReq complaintUpdateReq) {
+
+        System.out.println(complaintUpdateReq);
+
+        try {
+            adminService.updateComplaintForm(complaintUpdateReq);
+        } catch (Exception e) {
+            log.error("更新报错 报错信息{} 报错位置{}", e.getMessage(), Arrays.toString(e.getStackTrace()));
+        }
+        return "redirect:/admin/complaintForm";
+    }
+
+
+    @PostMapping("updateUser")
+    public String updateUser(UserUpdateReq userUpdateReq) {
+        System.out.println(userUpdateReq);
+        final User byId = userService.getById(userUpdateReq.getChangeId());
+        byId.setEmail(userUpdateReq.getChangeEmail());
+        byId.setQq(userUpdateReq.getChangeQq());
+        byId.setTel(userUpdateReq.getChangeTel());
+
+        try {
+            userService.saveOrUpdate(byId);
+        } catch (Exception e) {
+            log.error("更新报错 报错信息{} 报错位置{}", e.getMessage(), Arrays.toString(e.getStackTrace()));
+        }
+
+        return "redirect:/admin/user";
+
+    }
 
     @GetMapping("complaintForm")
-    public ModelAndView complaintForm(ComplaintFormReq complaintFormReq, Authentication authentication){
+    public ModelAndView complaintForm(ComplaintFormReq complaintFormReq, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
 
         final ModelAndView modelAndView = new ModelAndView("adminComplaintForm");
@@ -402,17 +522,15 @@ private UserService userService;
         List<Integer> userList = userService.list(new LambdaQueryWrapper<User>().like(ObjectUtil.isNotEmpty(searchKey), User::getName, searchKey)).stream().map(User::getId).collect(Collectors.toList());
 
 
-
-
-        IPage<ComplaintForm> page =userList.isEmpty()?new QueryPage<ComplaintForm>().getPage(complaintFormReq):
+        IPage<ComplaintForm> page = userList.isEmpty() ? new QueryPage<ComplaintForm>().getPage(complaintFormReq) :
                 complaintFormService.page(new QueryPage<ComplaintForm>().getPage(complaintFormReq), new LambdaQueryWrapper<ComplaintForm>()
-                .eq(userSearchTypeByType!=null,ComplaintForm::getStatus, complaintFormReq.getStatus())
-                .in(ComplaintForm::getUid,userList));
+                        .eq(userSearchTypeByType != null, ComplaintForm::getStatus, complaintFormReq.getStatus())
+                        .in(ComplaintForm::getUid, userList));
 //                .eq(ComplaintForm::getUid, principal.getId()));
 //        PageInfo<ApplyForm> applyPageInfo = new PageInfo<>(page);
         PageInfo applyPageInfo = new PageInfo<>(page);
 
-        List<ComplaintRes> list = page.getRecords().stream().map(i->{
+        List<ComplaintRes> list = page.getRecords().stream().map(i -> {
             ComplaintRes complaintRes = new ComplaintRes();
 
             complaintRes.setUser(userService.getById(i.getUid()));
@@ -451,14 +569,14 @@ private UserService userService;
             applyFormRes.setStatus(FormStatusEnum.getStatusByType(byId.getStatus()));
 
             applyFormRes.setGoodsRes(goodsRes);
-            String imgSrcStr=ObjectUtil.isNotEmpty(goodsRes.getImgSrc())?goodsRes.getImgSrc():"/icons/emptyImg.png";
-            applyFormRes.setPopUpDetail("标题: <span>" + goodsRes.getTitle() + "</span>" +"<br>"+
-                    "拾取地址: <span>" + goodsRes.getLocation().getPosition() + "</span>" +"<br>"+
-                    "描述: <span>" + goodsRes.getDescription() + "</span>" +"<br>"+
-                    "图片: <img src='" + imgSrcStr + "'/>" +"<br>"+
-                    "发布用户: <span>" + goodsRes.getUser().getName() + "</span>" +"<br>"+
-                    "类型: <span>" + goodsRes.getOperationName() + "</span>" +"<br>"+
-                    "发布日期: <span>" + goodsRes.getCreateDate() + "</span>" +"<br>"+
+            String imgSrcStr = ObjectUtil.isNotEmpty(goodsRes.getImgSrc()) ? goodsRes.getImgSrc() : "/icons/emptyImg.png";
+            applyFormRes.setPopUpDetail("标题: <span>" + goodsRes.getTitle() + "</span>" + "<br>" +
+                    "拾取地址: <span>" + goodsRes.getLocation().getPosition() + "</span>" + "<br>" +
+                    "描述: <span>" + goodsRes.getDescription() + "</span>" + "<br>" +
+                    "图片: <img src='" + imgSrcStr + "'/>" + "<br>" +
+                    "发布用户: <span>" + goodsRes.getUser().getName() + "</span>" + "<br>" +
+                    "类型: <span>" + goodsRes.getOperationName() + "</span>" + "<br>" +
+                    "发布日期: <span>" + goodsRes.getCreateDate() + "</span>" + "<br>" +
                     "申请人: <span>" + applyFormRes.getApplyUser().getName() + "</span>");
 
 
@@ -472,7 +590,7 @@ private UserService userService;
 
         applyPageInfo.setList(list);
 
-        List<String> names=new ArrayList<>();
+        List<String> names = new ArrayList<>();
         names.add("标题");
         names.add("拾取地址");
         names.add("物品图片地址");
@@ -485,51 +603,64 @@ private UserService userService;
         names.add("申诉人");
         names.add("操作");
 
-        modelAndView.addObject("resultPageList",applyPageInfo);
-        modelAndView.addObject("names",names);
-        modelAndView.addObject("selectType",userSearchTypeByType==null?-1:userSearchTypeByType.getType());
-        modelAndView.addObject("searchKey",searchKey);
+        modelAndView.addObject("resultPageList", applyPageInfo);
+        modelAndView.addObject("names", names);
+        modelAndView.addObject("selectType", userSearchTypeByType == null ? -1 : userSearchTypeByType.getType());
+        modelAndView.addObject("searchKey", searchKey);
+
+        List<Category> categoryList = categoryService.list();
+        List<Location> locationList = locationService.list();
+
+        // 位置列表
+        modelAndView.addObject("locationList", locationList);
+        // 物品统计信息
+        modelAndView.addObject("categories", categoryList);
+
+        final List<User> userAllList = userService.list();
+
+        modelAndView.addObject("userList", userAllList);
+
+
 //
-        modelAndView.addObject("loginUser",user);
+        modelAndView.addObject("loginUser", user);
         // TODO: 2022/4/16 显示所有物品申请信息
         return modelAndView;
     }
 
 
-
     @GetMapping("goodList")
-    public HttpResult goodList(){
+    public HttpResult goodList() {
         // TODO: 2022/4/16 显示所有物品申请信息
         return HttpResult.ok();
     }
 
     @GetMapping("goodApplication")
-    public HttpResult goodApplication(){
+    public HttpResult goodApplication() {
         // TODO: 2022/4/16 物品申请信息审核
         return HttpResult.ok();
     }
 
 
     @GetMapping("list")
-    public HttpResult list(){
+    public HttpResult list() {
         // TODO: 2022/4/16 显示所有申诉信息
         return HttpResult.ok();
     }
 
     @DeleteMapping("del")
-    public HttpResult del(){
+    public HttpResult del() {
         // TODO: 2022/4/16 删除申诉信息
         return HttpResult.ok();
     }
 
     @PostMapping("add")
-    public HttpResult add(){
+    public HttpResult add() {
         // TODO: 2022/4/16 添加申诉信息
         return HttpResult.ok();
     }
 
     @PostMapping("update")
-    public HttpResult update(){
+    public HttpResult update() {
         // TODO: 2022/4/16 更新申诉信息
         return HttpResult.ok();
 

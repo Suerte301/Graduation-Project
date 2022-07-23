@@ -11,7 +11,7 @@
 
     <select id="getGoodsInfo" resultType="com.suerte.lostandfound.vo.res.CategoryRes">
 --         select c.name as name ,c.type as type, c.clzName as clzName ,count(g.id) as num from tb_goods as g right join tb_category as c on g.type=c.type group by(c.type)
-        select c.name as name ,c.type as type, c.clz_name as clzName ,count(g.id) as num from tb_category as c  
+        select c.id as id, c.name as name ,c.type as type, c.clz_name as clzName ,count(g.id) as num from tb_category as c
         left join 
         (select * from tb_goods where status=#{status} and id not in
          (select goods_id from tb_applyform where uid=#{uid})

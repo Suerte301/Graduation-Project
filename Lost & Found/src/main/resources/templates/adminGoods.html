@@ -226,6 +226,98 @@
                             <div class="col-md-12 text-center">
 <!--                                     style="align-items: center;justify-content: center;display: flex; height: 500px;"-->
                                 <h2 th:if="${resultPageList.getTotalCount()==0}">未找到对应物品</h2>
+
+                                <form action="/goods/update" method="post" class="form-horizontal" role="form">
+                                    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                        &times;
+                                                    </button>
+                                                    <h4 class="modal-title" id="myModalLabel">
+                                                        修改物品信息
+                                                    </h4>
+                                                    <input id="changeId" name="changeId" hidden="hidden"/>
+                                                </div>
+                                                <!--                                            {# 模态框body #}-->
+                                                <div class="modal-body" style="height: 100%;">
+                                                    <div class="form-group">
+                                                        <label for="changeTitle" class="col-sm-3 control-label">标题</label>
+                                                        <div class="col-sm-7">
+                                                            <input type="text" class="form-control"  name="changeTitle" id="changeTitle"
+                                                                   placeholder="标题"/>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="changeLocation" class="col-sm-3 control-label">拾取地址</label>
+                                                        <div class="col-sm-7">
+                                                            <select data-placeholder="大致区域" class="form-control" name="changeLocation" id="changeLocation">
+                                                                <option selected value="-1">大致区域</option>
+                                                                <option th:each="location : ${locationList}"  th:object="${location}" th:value="*{id}" th:text="*{position}"></option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="changeDes" class="col-sm-3 control-label">详细描述</label>
+                                                        <div class="col-sm-7">
+                                                            <input type="text" class="form-control"  name="changeDes" id="changeDes"
+                                                                   placeholder="详细描述"/>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="changeUser" class="col-sm-3 control-label">发布用户</label>
+                                                        <div class="col-sm-7">
+                                                            <select data-placeholder="发布用户" class="form-control" name="changeUser" id="changeUser">
+                                                                <option th:each="user:${userList}" th:object="${user}" th:value="*{id}" th:text="*{sid}"></option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="changeOperation" class="col-sm-3 control-label">类型</label>
+                                                        <div class="col-sm-7">
+                                                            <select data-placeholder="类型" class="form-control" name="changeOperation" id="changeOperation">
+                                                                <option selected value="-1">类型</option>
+                                                                <option th:each="operation : ${T(com.suerte.lostandfound.eum.OperationEnum).getDefaultOps()}" th:value="${operation.type}" th:text="${operation.name}"></option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="changeCategory" class="col-sm-3 control-label">物品种类</label>
+                                                        <div class="col-sm-7">
+                                                            <select data-placeholder="物品种类" class="form-control" name="changeCategory" id="changeCategory">
+                                                                <option selected value="-1">分类</option>
+                                                                <option th:each="category : ${goodsInfos}" th:object="${category}" th:value="*{id}" th:text="*{name}"></option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="changeStatus" class="col-sm-3 control-label">物品状态</label>
+                                                        <div class="col-sm-7">
+                                                            <select data-placeholder="物品状态" class="form-control" name="changeStatus" id="changeStatus">
+                                                                <option selected value="-2">状态</option>
+                                                                <option th:each="goodStatus : ${T(com.suerte.lostandfound.eum.GoodsStatusEnum).getAdminDefaultOps()}" th:object="${goodStatus}" th:value="*{type}" th:text="*{msg}"></option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <!--                                            {#            模态框底部#}-->
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                                    <input type="submit" class="btn btn-primary" value="提交"/>
+                                                </div>
+                                            </div><!-- /.modal-content -->
+                                        </div><!-- /.modal -->
+                                    </div>
+                                    <!--                                {##}-->
+                                </form>
+
                                 <table th:if="${resultPageList.getTotalCount()>0}" class="table table-bordered table-condensed table-striped table-hover table-responsive text-center">
                                     <tr>
                                         <th class="text-center" th:each="name: ${names}" th:text="${name}"></th>
@@ -242,13 +334,54 @@
                                         <td th:text="${goods.getOperationName()}"></td>
                                         <td th:text="${goods.getCategory().getName()}"></td>
                                         <td>
-                                            <input type="button" class="btn btn-success" value="修改">
-                                            <input type="button" class="btn btn-danger" value="删除">
+<!--                                            <button type="button" class="btn btn-success" id="modal" data-toggle="modal" data-target="#myModal" >修改</button>-->
+                                            <input type="button" class="btn btn-success" th:onclick="showChangeGoods([[${goods.getId()}]],[[${goods.getTitle()}]],[[${goods.getLocation().getId()}]],[[${goods.getDescription()}]],[[${goods.getUser().getId()}]],[[${goods.getOperationType()}]],[[${goods.getCategory().getId()}]],[[${goods.getStatusType()}]])" value="修改" />
+                                            <input type="button" class="btn btn-danger" th:onclick="delGoods([[${goods.getId()}]])" value="删除">
                                         </td>
                                     </tr>
                                 </table>
                             </div>
                             <script>
+
+                                function delGoods(id) {
+                                    if (confirm("此物品的所有信息将会被清除，确定要删除物品?")){
+                                        $.ajax({
+                                            type: 'delete',
+                                            url: '/admin/delGoods/'+id,
+
+                                            success: function (data,status) {
+                                                // alert(data)
+                                                console.log(data)
+                                                alert(data.msg)
+                                                if (500 !== data.code){
+                                                    window.location.reload();
+                                                }
+
+                                                // console.log(status)
+                                            },
+                                            error:function (data,status) {
+                                                alert('error')
+                                                console.log(data)
+                                                console.log(status)
+                                            }
+                                        });
+                                    }
+
+                                }
+
+                                function showChangeGoods(goodsId,title,locationId,desc,userId,operationId,categoryId,statusId) {
+                                    $("#changeId").val(goodsId)
+                                    $("#changeTitle").val(title)
+                                    $("#changeLocation").val(locationId)
+                                    $("#changeDes").val(desc)
+                                    $("#changeUser").val(userId)
+                                    $("#changeOperation").val(operationId)
+                                    // alert(categoryId)
+                                    $("#changeCategory").val(categoryId)
+                                    $("#changeStatus").val(statusId)
+                                    // alert("123")
+                                    $("#myModal").modal("show");
+                                }
                                 function searchGoods(obj) {
                                     $("#currPage").val($(obj).text());
                                     $("#searchForm").submit()

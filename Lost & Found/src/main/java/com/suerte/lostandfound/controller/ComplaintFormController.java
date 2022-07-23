@@ -150,7 +150,7 @@ public class ComplaintFormController {
         final ComplaintForm complaintForm = new ComplaintForm();
 
         Integer uid=null;
-        if (ObjectUtil.isEmpty(uidString)||uid.equals("null")){
+        if (ObjectUtil.isEmpty(uidString)||uidString.equals("null")){
             uid=((User)authentication.getPrincipal()).getId();
         }else {
             uid=Integer.valueOf(uidString);

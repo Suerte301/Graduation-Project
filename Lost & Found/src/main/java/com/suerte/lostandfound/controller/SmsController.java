@@ -40,7 +40,7 @@ public class SmsController {
             String randomCode = NumberUtils.randomCode();
             log.info("电话 {} 验证码 {}",phone,randomCode);
             SendSmsResponse sendSmsResponse = sendSmsService.sendSms(phone,randomCode);
-            if (sendSmsResponse.getBody().getCode().equals(SmsCodeEnum.OK.getCode())){
+             if (sendSmsResponse.getBody().getCode().equals(SmsCodeEnum.OK.getCode())){
                 log.info("message {}",sendSmsResponse.getBody().getMessage());
                 log.info("code {}",sendSmsResponse.getBody().getCode());
                 log.info("bizId {}",sendSmsResponse.getBody().getBizId());

@@ -366,7 +366,7 @@
                                 <div class="widget-body text-center">
                                     <img alt="avatar" th:src="${goods.getUser().getAvatar()}" class="seller-avatar img-responsive">
                                     <h2 class="seller-name" th:text="${goods.getUser().getName()}">John Doe</h2>
-                                    phone: <strong th:text="${goods.getUser().getTel()}">John Doe</strong><br>
+                                    <span th:if="${isApply}">phone: <strong th:text="${goods.getUser().getTel()}">John Doe</strong><br></span>
 <!--                                    <p class="seller-detail" th:text="${goods.getLocation().getPosition()}">Location: <strong>Orlando</strong><br/>-->
 <!--                                        QQ : <strong th:text="${goods.getUser().getQq()}">21 June 2010</strong></p>-->
 <!--                                        电话 : <strong th:text="${goods.getUser().getTel()}">21 June 2010</strong></p>-->
@@ -374,16 +374,16 @@
 <!--                                        学号/工号 : <strong th:text="${goods.getUser().getSid()}">21 June 2010</strong></p>-->
                                         Joined : <strong th:text="${T(com.suerte.lostandfound.util.TimeUtils).formatDate(goods.getUser().getCreateDate())}">21 June 2010</strong></p>
                                 </div>
-                                <div class="widget-footer">
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <button class="btn btn-info btn-block"><i class="fa fa-whatsapp"></i> 0823 4223 4234</button>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <button class="btn btn-warning btn-block" data-target="#sendMessageModal" data-toggle="modal"><i class="fa fa-envelope"></i> Send Message</button>
-                                        </div>
-                                    </div>
-                                </div>
+<!--                                <div class="widget-footer">-->
+<!--                                    <div class="row">-->
+<!--                                        <div class="col-sm-6">-->
+<!--                                            <button class="btn btn-info btn-block"><i class="fa fa-whatsapp"></i> 0823 4223 4234</button>-->
+<!--                                        </div>-->
+<!--                                        <div class="col-sm-6">-->
+<!--                                            <button class="btn btn-warning btn-block" data-target="#sendMessageModal" data-toggle="modal"><i class="fa fa-envelope"></i> Send Message</button>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
                             </div>
                             <div class="widget">
                                 <div class="widget-header">
@@ -537,6 +537,9 @@
                                     alert(data.msg)
                                     applyForm.val("已申请");
                                     applyForm.attr("disabled");
+                                    if (data.code!==500){
+                                        window.location.reload()
+                                    }
 
                                     // console.log(status)
                                 },

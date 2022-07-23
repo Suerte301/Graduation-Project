@@ -15,4 +15,7 @@ import java.util.List;
  */
 public interface ApplyFormService extends IService<ApplyForm> {
      List<UserApplyRes> getApplyFormByUid(Integer uid);
+
+     void removeApplyForm(String id);
+
 }
